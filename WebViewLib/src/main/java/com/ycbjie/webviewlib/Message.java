@@ -1,4 +1,4 @@
-package com.ycbjie.webviewlib.JsBridge;
+package com.ycbjie.webviewlib;
 
 import android.text.TextUtils;
 import org.json.JSONArray;
@@ -9,14 +9,37 @@ import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONTokener;
 
-
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2019/9/10
+ *     desc  : 自定义消息Message实体类
+ *     revise:
+ * </pre>
+ */
 public class Message {
 
-	private String callbackId; //callbackId
-	private String responseId; //responseId
-	private String responseData; //responseData
-	private String data; //data of message
-	private String handlerName; //name of handler
+    /**
+     * callbackId
+     */
+	private String callbackId;
+    /**
+     * responseId
+     */
+	private String responseId;
+    /**
+     * responseData
+     */
+	private String responseData;
+    /**
+     * data of message
+     */
+	private String data;
+    /**
+     * name of handler
+     */
+	private String handlerName;
 
     private final static String CALLBACK_ID_STR = "callbackId";
     private final static String RESPONSE_ID_STR = "responseId";

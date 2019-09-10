@@ -1,6 +1,5 @@
 package com.ycbjie.webviewlib;
 
-import android.app.Activity;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,24 +12,28 @@ import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * <pre>
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : 自定义x5的WebViewClient
- *     revise:
+ *     revise: 如果要自定义WebViewClient必须要集成此类
  * </pre>
  */
 public class X5WebViewClient extends WebViewClient {
 
     private InterWebListener webListener;
-    private Activity activity;
-    private WebView webView;
+    private BridgeWebView webView;
 
-    public X5WebViewClient(InterWebListener listener , Activity activity , WebView webView) {
+    public void setWebListener(InterWebListener listener){
         this.webListener = listener;
-        this.activity = activity;
+    }
+
+    public X5WebViewClient(BridgeWebView webView) {
         this.webView = webView;
     }
 
@@ -39,24 +42,83 @@ public class X5WebViewClient extends WebViewClient {
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        /*
-         * 防止加载网页时调起系统浏览器
-         */
-        view.loadUrl(url);
-        return true;
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 如果是返回数据
+        if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
+            webView.handlerReturnData(url);
+            return true;
+        } else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
+            webView.flushMessageQueue();
+            return true;
+        } else {
+            if (this.onCustomShouldOverrideUrlLoading(url)){
+                return true;
+            } else {
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+        }
+    }
+
+    protected boolean onCustomShouldOverrideUrlLoading(String url) {
+        return false;
+    }
+
+
+    /**
+     * 增加shouldOverrideUrlLoading在api>=24时
+     * @param view                                  view
+     * @param request                               request
+     * @return
+     */
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String url = request.getUrl().toString();
+            try {
+                url = URLDecoder.decode(url, "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                ex.printStackTrace();
+            }
+            //如果是返回数据
+            if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
+                webView.handlerReturnData(url);
+                return true;
+            } else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
+                webView.flushMessageQueue();
+                return true;
+            } else {
+                if (this.onCustomShouldOverrideUrlLoading(url)){
+                    return true;
+                } else {
+                    return super.shouldOverrideUrlLoading(view, request);
+                }
+            }
+        }else {
+            return super.shouldOverrideUrlLoading(view, request);
+        }
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        if (!X5WebUtils.isConnected(activity) && webListener!=null) {
+        if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
             //隐藏进度条方法
             webListener.hindProgressBar();
-            // html加载完成之后，添加js函数
-            webListener.addJsListener();
         }
         super.onPageFinished(view, url);
         //在html标签加载完成之后在加载图片内容
         webView.getSettings().setBlockNetworkImage(false);
+        //这个时候添加js注入方法
+        BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
+        if (webView.getStartupMessage() != null) {
+            for (Message m : webView.getStartupMessage()) {
+                webView.dispatchMessage(m);
+            }
+            webView.setStartupMessage(null);
+        }
     }
 
     @Override
@@ -133,5 +195,10 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         super.onReceivedSslError(view, handler, error);
+        //https忽略证书问题
+        if (handler!=null){
+            handler.proceed();
+        }
+
     }
 }

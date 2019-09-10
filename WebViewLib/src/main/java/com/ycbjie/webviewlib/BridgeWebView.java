@@ -1,4 +1,4 @@
-package com.ycbjie.webviewlib.JsBridge;
+package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,17 +17,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2019/9/10
+ *     desc  : 自定义WebView类
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
+ * </pre>
+ */
 @SuppressLint("SetJavaScriptEnabled")
 public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 
-
 	public static final String TO_LOAD_JS = "WebViewJavascriptBridge.js";
+	private long uniqueId = 0;
 	Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
 	Map<String, BridgeHandler> messageHandlers = new HashMap<>();
 	BridgeHandler defaultHandler = new DefaultHandler();
-
-	private List<Message> startupMessage = new ArrayList<Message>();
-
+	private List<Message> startupMessage = new ArrayList<>();
 	public List<Message> getStartupMessage() {
 		return startupMessage;
 	}
@@ -35,8 +42,6 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	public void setStartupMessage(List<Message> startupMessage) {
 		this.startupMessage = startupMessage;
 	}
-
-	private long uniqueId = 0;
 
 	public BridgeWebView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -54,10 +59,9 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	}
 
 	/**
-	 *
-	 * @param handler
-	 *            default handler,handle messages send by js without assigned handler name,
-     *            if js message has handler name, it will be handled by named handlers registered by native
+	 * 默认处理程序，处理js发送的没有指定处理程序名称的消息，
+	 * 如果js消息有处理程序名，它将由本机注册的命名处理程序处理
+	 * @param handler							handler
 	 */
 	public void setDefaultHandler(BridgeHandler handler) {
        this.defaultHandler = handler;
@@ -73,22 +77,23 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 		this.setWebViewClient(generateBridgeWebViewClient());
 	}
 
-    protected BridgeWebViewClient generateBridgeWebViewClient() {
-        return new BridgeWebViewClient(this);
+    protected X5WebViewClient generateBridgeWebViewClient() {
+        return new X5WebViewClient(this);
     }
 
     /**
      * 获取到CallBackFunction data执行调用并且从数据集移除
      * @param url
      */
-	void handlerReturnData(String url) {
+	public void handlerReturnData(String url) {
 		String functionName = BridgeUtil.getFunctionFromReturnUrl(url);
-		CallBackFunction f = responseCallbacks.get(functionName);
-		String data = BridgeUtil.getDataFromReturnUrl(url);
-		if (f != null) {
-			f.onCallBack(data);
-			responseCallbacks.remove(functionName);
-			return;
+		if (functionName!=null){
+			CallBackFunction f = responseCallbacks.get(functionName);
+			String data = BridgeUtil.getDataFromReturnUrl(url);
+			if (f != null) {
+				f.onCallBack(data);
+				responseCallbacks.remove(functionName);
+			}
 		}
 	}
 
@@ -114,7 +119,9 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 			m.setData(data);
 		}
 		if (responseCallback != null) {
-			String callbackStr = String.format(BridgeUtil.CALLBACK_ID_FORMAT, ++uniqueId + (BridgeUtil.UNDERLINE_STR + SystemClock.currentThreadTimeMillis()));
+			String callbackStr = String.format(BridgeUtil.CALLBACK_ID_FORMAT,
+					++uniqueId + (BridgeUtil.UNDERLINE_STR +
+							SystemClock.currentThreadTimeMillis()));
 			responseCallbacks.put(callbackStr, responseCallback);
 			m.setCallbackId(callbackStr);
 		}
@@ -140,29 +147,32 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
      * 分发message 必须在主线程才分发成功
      * @param m Message
      */
-	void dispatchMessage(Message m) {
+	public void dispatchMessage(Message m) {
         String messageJson = m.toJson();
-        //escape special characters for json string  为json字符串转义特殊字符
-        messageJson = messageJson.replaceAll("(\\\\)([^utrn])", "\\\\\\\\$1$2");
-        messageJson = messageJson.replaceAll("(?<=[^\\\\])(\")", "\\\\\"");
-		messageJson = messageJson.replaceAll("(?<=[^\\\\])(\')", "\\\\\'");
-		messageJson = messageJson.replaceAll("%7B", URLEncoder.encode("%7B"));
-		messageJson = messageJson.replaceAll("%7D", URLEncoder.encode("%7D"));
-		messageJson = messageJson.replaceAll("%22", URLEncoder.encode("%22"));
-        String javascriptCommand = String.format(BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
-        // 必须要找主线程才会将数据传递出去 --- 划重点
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            this.loadUrl(javascriptCommand);
-        }
+        //增加非空判断的逻辑
+        if (messageJson!=null){
+			//escape special characters for json string  为json字符串转义特殊字符
+			messageJson = messageJson.replaceAll("(\\\\)([^utrn])", "\\\\\\\\$1$2");
+			messageJson = messageJson.replaceAll("(?<=[^\\\\])(\")", "\\\\\"");
+			messageJson = messageJson.replaceAll("(?<=[^\\\\])(\')", "\\\\\'");
+			messageJson = messageJson.replaceAll("%7B", URLEncoder.encode("%7B"));
+			messageJson = messageJson.replaceAll("%7D", URLEncoder.encode("%7D"));
+			messageJson = messageJson.replaceAll("%22", URLEncoder.encode("%22"));
+			String javascriptCommand = String.format(
+					BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
+			// 必须要找主线程才会将数据传递出去 --- 划重点
+			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+				this.loadUrl(javascriptCommand);
+			}
+		}
     }
 
     /**
      * 刷新消息队列
      */
-	void flushMessageQueue() {
+	public void flushMessageQueue() {
 		if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 			loadUrl(BridgeUtil.JS_FETCH_QUEUE_FROM_JAVA, new CallBackFunction() {
-
 				@Override
 				public void onCallBack(String data) {
 					// deserializeMessage 反序列化消息

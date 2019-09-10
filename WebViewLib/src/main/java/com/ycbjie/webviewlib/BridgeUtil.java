@@ -1,4 +1,4 @@
-package com.ycbjie.webviewlib.JsBridge;
+package com.ycbjie.webviewlib;
 
 import android.content.Context;
 
@@ -9,26 +9,50 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class BridgeUtil {
-	final static String YY_OVERRIDE_SCHEMA = "yy://";
-	final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";//格式为   yy://return/{function}/returncontent
-	final static String YY_FETCH_QUEUE = YY_RETURN_DATA + "_fetchQueue/";
-	final static String EMPTY_STR = "";
-	final static String UNDERLINE_STR = "_";
-	final static String SPLIT_MARK = "/";
-	
-	final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
-	final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');";
-	final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:WebViewJavascriptBridge._fetchQueue();";
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2019/9/10
+ *     desc  : 工具类
+ *     revise: final修饰，不可修改，避免反射攻击
+ * </pre>
+ */
+public final class BridgeUtil {
+
+	public final static String YY_OVERRIDE_SCHEMA = "yy://";
+	/**
+	 * 格式为   yy://return/{function}/returncontent
+	 */
+	public final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";
+	public final static String YY_FETCH_QUEUE = YY_RETURN_DATA + "_fetchQueue/";
+	public final static String EMPTY_STR = "";
+	public final static String UNDERLINE_STR = "_";
+	public final static String SPLIT_MARK = "/";
+	public final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
+	public final static String JS_HANDLE_MESSAGE_FROM_JAVA =
+			"javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');";
+	public final static String JS_FETCH_QUEUE_FROM_JAVA =
+			"javascript:WebViewJavascriptBridge._fetchQueue();";
 	public final static String JAVASCRIPT_STR = "javascript:";
 
-	// 例子 javascript:WebViewJavascriptBridge._fetchQueue(); --> _fetchQueue
+	/**
+	 * 例子 javascript:WebViewJavascriptBridge._fetchQueue(); --> _fetchQueue
+	 * @param jsUrl				url
+	 * @return					返回字符串，注意获取的时候判断空
+	 */
 	public static String parseFunctionName(String jsUrl){
-		return jsUrl.replace("javascript:WebViewJavascriptBridge.", "").replaceAll("\\(.*\\);", "");
+		return jsUrl.replace("javascript:WebViewJavascriptBridge.", "")
+				.replaceAll("\\(.*\\);", "");
 	}
 
-	// 获取到传递信息的body值
-	// url = yy://return/_fetchQueue/[{"responseId":"JAVA_CB_2_3957","responseData":"Javascript Says Right back aka!"}]
+	/**
+	 * 获取到传递信息的body值
+	 * url = yy://return/_fetchQueue/[{"responseId":"JAVA_CB_2_3957",
+	 * "responseData":"Javascript Says Right back aka!"}]
+	 * @param url				url
+	 * @return					返回字符串，注意获取的时候判断空
+	 */
 	public static String getDataFromReturnUrl(String url) {
 		if(url.startsWith(YY_FETCH_QUEUE)) {
 			// return = [{"responseId":"JAVA_CB_2_3957","responseData":"Javascript Says Right back aka!"}]
@@ -63,8 +87,6 @@ public class BridgeUtil {
 		return null;
 	}
 
-	
-	
 	/**
 	 * js 文件将注入为第一个script引用
 	 * @param view WebView
@@ -119,6 +141,7 @@ public class BridgeUtil {
 				try {
 					in.close();
 				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

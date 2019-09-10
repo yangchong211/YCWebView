@@ -14,9 +14,9 @@ import com.tencent.smtt.sdk.QbSdk;
  * <pre>
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
- *     time  : 2018/5/6
+ *     time  : 2019/9/10
  *     desc  : WebView工具类
- *     revise: 潇湘剑雨，持续更新，欢迎各位同行提出问题和建议
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public final class X5WebUtils {

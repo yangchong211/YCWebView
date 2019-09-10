@@ -15,7 +15,7 @@ import static android.app.Activity.RESULT_OK;
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : 自定义x5的WebChromeClient
- *     revise:
+ *     revise: 如果自定义WebChromeClient，建议继承该类，后期添加视频播放的处理方法
  * </pre>
  */
 public class X5WebChromeClient extends WebChromeClient {
@@ -31,19 +31,24 @@ public class X5WebChromeClient extends WebChromeClient {
     private boolean isShowContent = false;
     private Activity activity;
 
-    public X5WebChromeClient(InterWebListener webListener , Activity activity) {
-        this.webListener = webListener;
+    public void setWebListener(InterWebListener listener){
+        this.webListener = listener;
+    }
+
+    public X5WebChromeClient(Activity activity) {
         this.activity = activity;
     }
 
     @Override
     public void onProgressChanged(WebView view, int newProgress) {
         super.onProgressChanged(view, newProgress);
-        webListener.startProgress(newProgress);
-        int max = 85;
-        if (newProgress> max && isShowContent){
-            webListener.hindProgressBar();
-            isShowContent = true;
+        if (webListener!=null){
+            webListener.startProgress(newProgress);
+            int max = 85;
+            if (newProgress> max && isShowContent){
+                webListener.hindProgressBar();
+                isShowContent = true;
+            }
         }
     }
 

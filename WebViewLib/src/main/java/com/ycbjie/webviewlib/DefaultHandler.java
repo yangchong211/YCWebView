@@ -1,4 +1,4 @@
-package com.ycbjie.webviewlib.JsBridge;
+package com.ycbjie.webviewlib;
 
 public class DefaultHandler implements BridgeHandler{
 

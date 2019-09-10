@@ -14,12 +14,14 @@ import com.tencent.smtt.sdk.WebViewClient;
  * <pre>
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
- *     time  : 2019/9/9
+ *     time  : 2019/9/10
  *     desc  : 自定义x5的webView
- *     revise:
+ *     revise: 可以使用这个类，方便统一初始化WebSettings的一些属性
+ *             如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
+ *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
-public class X5WebView extends WebView {
+public class X5WebView extends BridgeWebView {
 
     public X5WebView(Context arg0) {
         this(arg0,null);
