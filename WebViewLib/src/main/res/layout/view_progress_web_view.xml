@@ -19,6 +19,6 @@
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/layer_progress_bar"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </RelativeLayout>

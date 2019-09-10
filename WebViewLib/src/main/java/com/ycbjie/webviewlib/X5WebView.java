@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -37,6 +38,8 @@ import com.tencent.smtt.sdk.WebViewClient;
  * </pre>
  */
 public class X5WebView extends BridgeWebView {
+
+    private X5WebChromeClient x5WebChromeClient;
 
     public X5WebView(Context arg0) {
         this(arg0,null);
@@ -89,6 +92,26 @@ public class X5WebView extends BridgeWebView {
         ws.setTextZoom(100);
         // 不缩放
         this.setInitialScale(100);
+
+        //设置WebChromeClient
+        x5WebChromeClient = new X5WebChromeClient((Activity) getContext());
+        this.setWebChromeClient(x5WebChromeClient);
+    }
+
+    /**
+     * 获取设置的X5WebChromeClient对象
+     * @return                          X5WebChromeClient对象
+     */
+    public X5WebChromeClient getX5WebChromeClient(){
+        return x5WebChromeClient;
+    }
+
+    /**
+     * 获取设置的X5WebViewClient对象
+     * @return                          X5WebViewClient对象
+     */
+    public X5WebViewClient getX5WebViewClient(){
+        return this.generateBridgeWebViewClient();
     }
 
 }

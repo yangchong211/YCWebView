@@ -146,6 +146,15 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
+     * 销毁的时候需要移除一下视频view
+     */
+    public void removeVideoView(){
+        if (videoFullView!=null){
+            videoFullView.removeAllViews();
+        }
+    }
+
+    /**
      * 视频播放退出全屏会被调用的
      */
     @Override
@@ -206,6 +215,12 @@ public class X5WebChromeClient extends WebChromeClient {
         openFileChooserImpl(uploadMsg);
     }
 
+    /**
+     * 打开文件夹
+     * @param uploadMsg                         msg
+     * @param acceptType                        type
+     * @param capture                           capture
+     */
     @Override
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
         openFileChooserImpl(uploadMsg);
@@ -225,6 +240,10 @@ public class X5WebChromeClient extends WebChromeClient {
         return true;
     }
 
+    /**
+     * 打开文件夹
+     * @param uploadMsg                         msg
+     */
     private void openFileChooserImpl(ValueCallback<Uri> uploadMsg) {
         if (activity!=null){
             mUploadMessage = uploadMsg;
@@ -236,6 +255,10 @@ public class X5WebChromeClient extends WebChromeClient {
         }
     }
 
+    /**
+     * 打开文件夹，Android5.0以上
+     * @param uploadMsg                         msg
+     */
     private void openFileChooserImplForAndroid5(ValueCallback<Uri[]> uploadMsg) {
         if (activity!=null){
             mUploadMessageForAndroid5 = uploadMsg;

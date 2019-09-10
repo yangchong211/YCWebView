@@ -10,19 +10,50 @@
 
 
     <TextView
+        android:id="@+id/tv_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorAccent"
         android:text="1.浏览普通的网页"/>
 
     <TextView
+        android:id="@+id/tv_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorAccent"
         android:text="2.带加载进度条的网页"/>
+
+    <TextView
+        android:id="@+id/tv_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="3.电话，短信，邮件注入js"/>
+
+
+    <TextView
+        android:id="@+id/tv_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="5.播放网页中的视频，包括全频播放"/>
+
+    <TextView
+        android:id="@+id/tv_6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="6.在h5中打开相册上传图片"/>
+
 
 </LinearLayout>

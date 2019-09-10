@@ -36,12 +36,16 @@ import android.widget.ProgressBar;
  */
 public class ProgressWebView extends FrameLayout {
 
+    private X5WebView webView;
+
     public ProgressWebView(@NonNull Context context) {
-        this(context,null);
+        super(context);
+        init();
     }
 
     public ProgressWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        super(context, attrs);
+        init();
     }
 
     public ProgressWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -54,11 +58,10 @@ public class ProgressWebView extends FrameLayout {
         if (context!=null){
             View view = LayoutInflater.from(context).inflate(
                     R.layout.view_progress_web_view, this, false);
-            X5WebView webView = view.findViewById(R.id.web_view);
+            webView = view.findViewById(R.id.web_view);
             final ProgressBar pbProgress = view.findViewById(R.id.pb_progress);
-            X5WebChromeClient x5WebChromeClient = new X5WebChromeClient((Activity) context);
-            webView.setWebChromeClient(x5WebChromeClient);
-            x5WebChromeClient.setWebListener(new InterWebListener() {
+            pbProgress.setVisibility(VISIBLE);
+            webView.getX5WebChromeClient().setWebListener(new InterWebListener() {
                 @Override
                 public void hindProgressBar() {
                     pbProgress.setVisibility(GONE);
@@ -77,5 +80,8 @@ public class ProgressWebView extends FrameLayout {
         }
     }
 
+    public X5WebView getWebView(){
+        return webView;
+    }
 
 }
