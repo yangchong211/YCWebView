@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
+import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,8 +49,10 @@ public class X5WebViewClient extends WebViewClient {
         this.webListener = listener;
     }
 
-    public X5WebViewClient(BridgeWebView webView) {
+    public X5WebViewClient(BridgeWebView webView, Context context) {
         this.webView = webView;
+        //将js对象与java对象进行映射
+        webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
 
     @Override
@@ -134,6 +137,9 @@ public class X5WebViewClient extends WebViewClient {
             }
             webView.setStartupMessage(null);
         }
+        //html加载完成之后，添加监听图片的点击js函数
+        //addImageClickListener();
+        addImageClickListener(webView);
     }
 
     @Override
@@ -214,6 +220,52 @@ public class X5WebViewClient extends WebViewClient {
         if (handler!=null){
             handler.proceed();
         }
+    }
 
+    /**
+     * android与js交互：
+     * 首先我们拿到html中加载图片的标签img.
+     * 然后取出其对应的src属性
+     * 循环遍历设置图片的点击事件
+     * 将src作为参数传给java代码
+     * 在java回调方法中对界面进行跳转处理，用PhotoView加载大图实现，便于手势的操作
+     * 这个循环将所图片放入数组，当js调用本地方法时传入。
+     * 当然如果采用方式一获取图片的话，本地方法可以不需要传入这个数组
+     * //通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
+     * @param webView                       webview
+     */
+    private void addImageArrayClickListener(WebView webView) {
+        webView.loadUrl("javascript:(function(){" +
+                "var objs = document.getElementsByTagName(\"img\"); " +
+                "var array=new Array(); " +
+                "for(var j=0;j<objs.length;j++){" +
+                "    array[j]=objs[j].src; " +
+                "}"+
+                "for(var i=0;i<objs.length;i++)  " +
+                "{"
+                + "    objs[i].onclick=function()  " +
+                "    {  "
+                + "        window.imagelistener.openImage(this.src,array);  " +
+                "    }  " +
+                "}" +
+                "})()");
+    }
+
+    /**
+     * 通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
+     * @param webView                       webview
+     */
+    private void addImageClickListener(WebView webView) {
+        webView.loadUrl("javascript:(function(){" +
+                "var objs = document.getElementsByTagName(\"img\"); " +
+                "for(var i=0;i<objs.length;i++)  " +
+                "{"
+                + "    objs[i].onclick=function()  " +
+                "    {  "
+                + "        window.imagelistener.openImage(this.src);  " +
+                "    }  " +
+                "}" +
+                "})()");
     }
 }
+

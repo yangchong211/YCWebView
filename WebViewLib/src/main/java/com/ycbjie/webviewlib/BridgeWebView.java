@@ -93,7 +93,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	}
 
     protected X5WebViewClient generateBridgeWebViewClient() {
-        return new X5WebViewClient(this);
+        return new X5WebViewClient(this,getContext());
     }
 
     /**

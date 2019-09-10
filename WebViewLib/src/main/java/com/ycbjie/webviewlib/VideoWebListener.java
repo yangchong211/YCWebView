@@ -16,33 +16,35 @@ limitations under the License.
 
 package com.ycbjie.webviewlib;
 
-import android.support.annotation.IntRange;
-
 /**
  * <pre>
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
- *     desc  : web的接口回调，包括常见状态页面切换，进度条变化等
+ *     desc  : web的接口回调，主要是视频相关回调
  *     revise:
  * </pre>
  */
-public interface InterWebListener {
+public interface VideoWebListener {
 
     /**
-     * 隐藏进度条
+     * 显示全屏view
      */
-    void hindProgressBar();
+    void showVideoFullView();
 
     /**
-     * 展示异常页面
+     * 隐藏全屏view
      */
-    void showErrorView();
+    void hindVideoFullView();
 
     /**
-     * 进度条变化时调用，这里添加注解限定符，必须是在0到100之间
-     * @param newProgress 进度0-100
+     * 显示webview
      */
-    void startProgress(@IntRange(from = 0,to = 100) int newProgress);
+    void showWebView();
+
+    /**
+     * 隐藏webview
+     */
+    void hindWebView();
 
 }

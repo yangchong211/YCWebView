@@ -65,16 +65,6 @@ public class ProgressWebView extends FrameLayout {
                 }
 
                 @Override
-                public void showWebView() {
-
-                }
-
-                @Override
-                public void hindWebView() {
-
-                }
-
-                @Override
                 public void showErrorView() {
 
                 }

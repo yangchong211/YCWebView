@@ -15,7 +15,7 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:background="@color/colorPrimary"
-        android:text="1.腾讯x5加载页面"/>
+        android:text="1.浏览普通的网页"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -23,6 +23,6 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:background="@color/colorPrimary"
-        android:text="2.x5加载页面带进度条"/>
+        android:text="2.带加载进度条的网页"/>
 
 </LinearLayout>

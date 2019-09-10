@@ -16,33 +16,32 @@ limitations under the License.
 
 package com.ycbjie.webviewlib;
 
-import android.support.annotation.IntRange;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.view.MotionEvent;
+import android.widget.FrameLayout;
+
 
 /**
  * <pre>
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
- *     desc  : web的接口回调，包括常见状态页面切换，进度条变化等
+ *     desc  : 自定义全频播放视频的时候，视频的负空间
  *     revise:
  * </pre>
  */
-public interface InterWebListener {
+class FullscreenHolder extends FrameLayout {
 
-    /**
-     * 隐藏进度条
-     */
-    void hindProgressBar();
+    public FullscreenHolder(Context ctx) {
+        super(ctx);
+        setBackgroundColor(ctx.getResources().getColor(android.R.color.black));
+    }
 
-    /**
-     * 展示异常页面
-     */
-    void showErrorView();
-
-    /**
-     * 进度条变化时调用，这里添加注解限定符，必须是在0到100之间
-     * @param newProgress 进度0-100
-     */
-    void startProgress(@IntRange(from = 0,to = 100) int newProgress);
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return true;
+    }
 
 }
