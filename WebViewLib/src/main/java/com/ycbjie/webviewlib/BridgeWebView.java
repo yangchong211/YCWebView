@@ -1,3 +1,18 @@
+/*
+Copyright 2017 yangchong211（github.com/yangchong211）
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
@@ -83,7 +98,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 
     /**
      * 获取到CallBackFunction data执行调用并且从数据集移除
-     * @param url
+     * @param url						url链接
      */
 	public void handlerReturnData(String url) {
 		String functionName = BridgeUtil.getFunctionFromReturnUrl(url);
@@ -244,8 +259,8 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	/**
 	 * register handler,so that javascript can call it
 	 * 注册处理程序,以便javascript调用它
-	 * @param handlerName handlerName
-	 * @param handler BridgeHandler
+	 * @param handlerName 					handlerName
+	 * @param handler 						BridgeHandler
 	 */
 	public void registerHandler(String handlerName, BridgeHandler handler) {
 		if (handler != null) {
@@ -255,9 +270,8 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	}
 
 	/**
-	 * unregister handler
-	 *
-	 * @param handlerName
+	 * 解绑注册js操作，一般可以在onDestory中处理
+	 * @param handlerName					方法name
 	 */
 	public void unregisterHandler(String handlerName) {
 		if (handlerName != null) {
