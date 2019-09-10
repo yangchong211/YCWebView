@@ -1,13 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "28.0.0"
-
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -26,7 +25,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:appcompat-v7:27.1.1'
     compile files('libs/tbs_sdk_thirdapp_v4.3.0.1148_43697_sharewithdownloadwithfile_withoutGame_obfs_20190805_175505.jar')
 }
 
@@ -46,8 +45,7 @@ group = "cn.yc"
 //发布到JCenter上的项目名字，必须填写
 def libName = "WebViewLib"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.0.0"
-/**  上面配置后上传至jcenter后的编译路径是这样的： compile 'cn.yc:WebViewLib:1.0.0'  **/
+version = "1.1.0"
 
 //生成源文件
 task sourcesJar(type: Jar) {

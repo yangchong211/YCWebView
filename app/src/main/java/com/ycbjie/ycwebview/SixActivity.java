@@ -1,5 +1,6 @@
 package com.ycbjie.ycwebview;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.ycbjie.webviewlib.ProgressWebView;
+import com.ycbjie.webviewlib.X5WebChromeClient;
 import com.ycbjie.webviewlib.X5WebView;
 
 public class SixActivity extends AppCompatActivity {
@@ -58,4 +60,18 @@ public class SixActivity extends AppCompatActivity {
         String url = "file:///android_asset/upload_photo.html";
         webView.loadUrl(url);
     }
+
+
+    /**
+     * 上传图片之后的回调
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == X5WebChromeClient.FILE_CHOOSER_RESULT_CODE) {
+            webView.getX5WebChromeClient().uploadMessage(intent, resultCode);
+        } else if (requestCode == X5WebChromeClient.FILE_CHOOSER_RESULT_CODE_5) {
+            webView.getX5WebChromeClient().uploadMessageForAndroid5(intent, resultCode);
+        }
+    }
+
 }

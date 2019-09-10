@@ -1,13 +1,21 @@
 #### 目录介绍
-- 01.相关类介绍说明
+- 01.前沿说明
+    - 1.1 案例展示效果
+    - 1.2 该库功能和优势
+    - 1.3 相关类介绍说明
 - 02.如何使用
+    - 2.1 如何引入
+    - 2.2 最简单使用
+    - 2.3 常用api
+    - 2.4 使用建议
 - 03.js调用
 - 04.问题反馈
 - 05.webView优化
 - 06.关于参考
 
 
-### 01.相关类介绍说明
+### 01.前沿说明
+#### 1.3 相关类介绍说明
 - BridgeHandler         接口，主要处理消息回调逻辑
 - BridgeUtil            工具类，静态常量，以及获取js消息的一些方法，final修饰
 - BridgeWebView         自定义WebView类，主要处理与js之间的消息
@@ -26,6 +34,10 @@
 
 
 ### 02.如何使用
+- 如何引用，该x5的库已经更新到最新版本
+```
+
+```
 - 项目初始化
     ```
     X5WebUtils.init(this);
@@ -55,10 +67,12 @@
         android:scrollbarSize="3dp" />
     ```
 
+
+
 ### 03.js调用
-- 代码如下所示
+- 代码如下所示，下面中的jsname代表的是js这边提供给客户端的方法名称
     ```
-    mWebView.registerHandler("name", new BridgeHandler() {
+    mWebView.registerHandler("jsname", new BridgeHandler() {
         @Override
         public void handler(String data, CallBackFunction function) {
             
