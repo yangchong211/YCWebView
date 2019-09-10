@@ -1,8 +1,11 @@
 package com.ycbjie.webviewlib;
 
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.tencent.smtt.sdk.QbSdk;
@@ -16,22 +19,20 @@ import com.tencent.smtt.sdk.QbSdk;
  *     revise: 潇湘剑雨，持续更新，欢迎各位同行提出问题和建议
  * </pre>
  */
-public class WebViewUtils {
-
+public final class X5WebUtils {
 
     /**
      * 不能直接new，否则抛个异常
      */
-    private WebViewUtils() {
+    private X5WebUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-
     /**
-     * 初始化WebView
-     * @param context                   注意，必须是全局上下文，否则报错
+     * 初始化腾讯x5浏览器webView，建议在application初始化
+     * @param context                       上下文
      */
-    public static void initWebView(Context context){
+    public static void init(Context context){
         if(context instanceof Application){
             //搜集本地tbs内核信息并上报服务器，服务器返回结果决定使用哪个内核。
             QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
@@ -53,6 +54,40 @@ public class WebViewUtils {
             throw new UnsupportedOperationException("context must be application...");
         }
     }
+
+
+    /**
+     * 判断网络是否连接
+     * <p>需添加权限
+     * {@code <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />}</p>
+     *
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isConnected(Context context) {
+        if (context==null){
+            return false;
+        }
+        NetworkInfo info = getActiveNetworkInfo(context);
+        return info != null && info.isConnected();
+    }
+
+    /**
+     * 获取活动网络信息
+     * <p>需添加权限
+     * {@code <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />}</p>
+     *
+     * @return NetworkInfo
+     */
+    @SuppressLint("MissingPermission")
+    private static NetworkInfo getActiveNetworkInfo(Context context) {
+        ConnectivityManager manager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (manager == null) {
+            return null;
+        }
+        return manager.getActiveNetworkInfo();
+    }
+
 
 
 }

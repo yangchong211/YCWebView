@@ -8,13 +8,6 @@
     android:padding="10dp"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:background="@color/colorPrimary"
-        android:text="1.原生webView加载页面"/>
-
 
     <TextView
         android:layout_width="match_parent"
@@ -22,7 +15,7 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:background="@color/colorPrimary"
-        android:text="2.腾讯x5加载页面"/>
+        android:text="1.腾讯x5加载页面"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -30,6 +23,6 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:background="@color/colorPrimary"
-        android:text="3.采用封装库WebView加载页面"/>
+        android:text="2.x5加载页面带进度条"/>
 
 </LinearLayout>
