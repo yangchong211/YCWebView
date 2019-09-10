@@ -4,6 +4,7 @@
 - 03.js调用
 - 04.问题反馈
 - 05.webView优化
+- 06.关于参考
 
 
 ### 01.相关类介绍说明
@@ -64,6 +65,12 @@
         }
     });
     ```
+
+
+### 06.关于参考
+- 感谢
+    - [x5开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
+    - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
 
 
 

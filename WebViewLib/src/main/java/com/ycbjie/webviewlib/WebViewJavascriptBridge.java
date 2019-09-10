@@ -16,6 +16,15 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2019/9/10
+ *     desc  : js接口
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
+ * </pre>
+ */
 public interface WebViewJavascriptBridge {
 	
 	void send(String data);

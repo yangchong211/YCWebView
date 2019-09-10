@@ -38,6 +38,11 @@ class FullscreenHolder extends FrameLayout {
         setBackgroundColor(ctx.getResources().getColor(android.R.color.black));
     }
 
+    /**
+     * 设置自己处理触摸时间
+     * @param event                             event
+     * @return
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {

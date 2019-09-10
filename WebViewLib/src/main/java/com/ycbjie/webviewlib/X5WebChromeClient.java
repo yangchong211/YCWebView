@@ -36,6 +36,7 @@ import static android.app.Activity.RESULT_OK;
  *     time  : 2019/9/10
  *     desc  : 自定义x5的WebChromeClient
  *     revise: 如果自定义WebChromeClient，建议继承该类，后期添加视频播放的处理方法
+ *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public class X5WebChromeClient extends WebChromeClient {
@@ -56,18 +57,35 @@ public class X5WebChromeClient extends WebChromeClient {
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
 
+    /**
+     * 设置监听时间，包括常见状态页面切换，进度条变化等
+     * @param listener                          listener
+     */
     public void setWebListener(InterWebListener listener){
         this.webListener = listener;
     }
 
+    /**
+     * 设置视频播放监听，主要是比如全频，取消全频，隐藏和现实webView
+     * @param videoWebListener                  listener
+     */
     public void setVideoWebListener(VideoWebListener videoWebListener){
         this.videoWebListener = videoWebListener;
     }
 
+    /**
+     * 构造方法
+     * @param activity                          上下文
+     */
     public X5WebChromeClient(Activity activity) {
         this.activity = activity;
     }
 
+    /**
+     * 这个方法是监听加载进度变化的，当加载到百分之八十五的时候，页面一般就出来呢
+     * @param view                              view
+     * @param newProgress                       进度值
+     */
     @Override
     public void onProgressChanged(WebView view, int newProgress) {
         super.onProgressChanged(view, newProgress);
@@ -81,6 +99,11 @@ public class X5WebChromeClient extends WebChromeClient {
         }
     }
 
+    /**
+     * 这个方法主要是监听标题变化操作的
+     * @param view                              view
+     * @param title                             标题
+     */
     @Override
     public void onReceivedTitle(WebView view, String title) {
         super.onReceivedTitle(view, title);

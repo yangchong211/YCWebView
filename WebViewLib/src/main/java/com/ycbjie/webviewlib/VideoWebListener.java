@@ -21,7 +21,7 @@ package com.ycbjie.webviewlib;
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
- *     desc  : web的接口回调，主要是视频相关回调
+ *     desc  : web的接口回调，主要是视频相关回调，比如全频，取消全频，隐藏和现实webView
  *     revise:
  * </pre>
  */

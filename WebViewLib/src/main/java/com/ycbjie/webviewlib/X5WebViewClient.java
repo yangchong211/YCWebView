@@ -38,6 +38,7 @@ import java.net.URLDecoder;
  *     time  : 2019/9/10
  *     desc  : 自定义x5的WebViewClient
  *     revise: 如果要自定义WebViewClient必须要集成此类
+ *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public class X5WebViewClient extends WebViewClient {
@@ -45,16 +46,31 @@ public class X5WebViewClient extends WebViewClient {
     private InterWebListener webListener;
     private BridgeWebView webView;
 
+    /**
+     * 设置监听时间，包括常见状态页面切换，进度条变化等
+     * @param listener                          listener
+     */
     public void setWebListener(InterWebListener listener){
         this.webListener = listener;
     }
 
+    /**
+     * 构造方法
+     * @param webView                           需要传进来webview
+     * @param context                           上下文
+     */
     public X5WebViewClient(BridgeWebView webView, Context context) {
         this.webView = webView;
         //将js对象与java对象进行映射
         webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
 
+    /**
+     * 这个方法中可以做拦截
+     * @param view                              view
+     * @param url                               链接
+     * @return                                  是否自己处理，true表示自己处理
+     */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         if (TextUtils.isEmpty(url)) {
@@ -88,8 +104,8 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 增加shouldOverrideUrlLoading在api>=24时
-     * @param view                                  view
-     * @param request                               request
+     * @param view                              view
+     * @param request                           request
      * @return
      */
     @Override
@@ -120,6 +136,11 @@ public class X5WebViewClient extends WebViewClient {
         }
     }
 
+    /**
+     * 当页面加载完成会调用该方法
+     * @param view                              view
+     * @param url                               url链接
+     */
     @Override
     public void onPageFinished(WebView view, String url) {
         if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
@@ -142,6 +163,13 @@ public class X5WebViewClient extends WebViewClient {
         addImageClickListener(webView);
     }
 
+    /**
+     * 请求网络出现error
+     * @param view                              view
+     * @param errorCode                         错误🐎
+     * @param description                       description
+     * @param failingUrl                        失败链接
+     */
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String
             failingUrl) {
@@ -153,6 +181,12 @@ public class X5WebViewClient extends WebViewClient {
         }
     }
 
+    /**
+     * 当缩放改变的时候会调用该方法
+     * @param view                              view
+     * @param oldScale                          之前的缩放比例
+     * @param newScale                          现在缩放比例
+     */
     @Override
     public void onScaleChanged(WebView view, float oldScale, float newScale) {
         super.onScaleChanged(view, oldScale, newScale);

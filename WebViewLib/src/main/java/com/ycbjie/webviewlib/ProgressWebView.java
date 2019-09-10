@@ -80,6 +80,10 @@ public class ProgressWebView extends FrameLayout {
         }
     }
 
+    /**
+     * 获取X5WebView对象
+     * @return                                  获取X5WebView对象
+     */
     public X5WebView getWebView(){
         return webView;
     }
