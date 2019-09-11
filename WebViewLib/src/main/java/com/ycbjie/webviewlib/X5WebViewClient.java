@@ -205,7 +205,7 @@ public class X5WebViewClient extends WebViewClient {
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.e("服务器异常",error.getDescription().toString());
+            X5WebUtils.log("服务器异常"+error.getDescription().toString());
         }
         //ToastUtils.showToast("服务器异常6.0之后");
         //当加载错误时，就让它加载本地错误网页文件
@@ -250,6 +250,10 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         super.onReceivedSslError(view, handler, error);
+        if (error!=null){
+            String url = error.getUrl();
+            X5WebUtils.log("onReceivedSslError----异常url----"+url);
+        }
         //https忽略证书问题
         if (handler!=null){
             handler.proceed();

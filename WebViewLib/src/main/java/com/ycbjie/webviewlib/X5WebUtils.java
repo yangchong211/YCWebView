@@ -36,6 +36,8 @@ import com.tencent.smtt.sdk.QbSdk;
  */
 public final class X5WebUtils {
 
+    private static boolean isDebug = false;
+
     /**
      * 不能直接new，否则抛个异常
      */
@@ -103,6 +105,18 @@ public final class X5WebUtils {
         return manager.getActiveNetworkInfo();
     }
 
+    /**
+     * 设置是否打印日志，默认是不打印的
+     * @param debug                         是否打印日志
+     */
+    public static void setLog(boolean debug){
+        isDebug = debug;
+    }
 
+    protected static void log(String log){
+        if (isDebug){
+            Log.d("YCWebView----",log);
+        }
+    }
 
 }
