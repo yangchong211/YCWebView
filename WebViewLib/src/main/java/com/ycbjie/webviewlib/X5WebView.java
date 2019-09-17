@@ -22,8 +22,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 
 import com.tencent.smtt.sdk.WebSettings;
-import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewClient;
 
 
 /**

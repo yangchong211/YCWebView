@@ -18,7 +18,6 @@ package com.ycbjie.webviewlib;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
