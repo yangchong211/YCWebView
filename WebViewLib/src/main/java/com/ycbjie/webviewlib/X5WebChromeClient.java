@@ -92,7 +92,7 @@ public class X5WebChromeClient extends WebChromeClient {
         if (webListener!=null){
             webListener.startProgress(newProgress);
             int max = 85;
-            if (newProgress> max && isShowContent){
+            if (newProgress> max && !isShowContent){
                 webListener.hindProgressBar();
                 isShowContent = true;
             }
