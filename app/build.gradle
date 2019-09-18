@@ -22,5 +22,6 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //官方库
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation project(':WebViewLib')
+    //implementation project(':WebViewLib')
+    implementation 'cn.yc:WebViewLib:1.1.1'
 }
