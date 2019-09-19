@@ -19,6 +19,9 @@
 
 
 #### 1.1 案例展示效果
+- WebView启动过程大概分为以下几个阶段，这里借鉴美团的一张图片
+    - ![image](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2017/9a2f8beb.png)
+
 
 
 
@@ -82,7 +85,41 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
-
+- 优化一下
+    - 关于设置js支持的属性
+    ```
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(true);
+        }
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(false);
+        }
+    }
+    ```
+    - 关于destroy销毁逻辑
+    ```
+    @Override
+    protected void onDestroy() {
+        try {
+            if (webView != null) {
+                webView.stopLoading();
+                webView.destroy();
+                webView = null;
+            }
+        } catch (Exception e) {
+            Log.e("X5WebViewActivity", e.getMessage());
+        }
+        super.onDestroy();
+    }
+    ```
 
 
 ### 03.js调用
@@ -102,9 +139,33 @@
 
 
 ### 04.问题反馈
-- 视频播放宽度比webView设置的宽度大，超过屏幕
-    - 这个时候可以设置ws.setLoadWithOverviewMode(false);
-- 
+- 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
+- 关于加载word，pdf，xls等文档文件注意事项：Tbs不支持加载网络的文件，需要先把文件下载到本地，然后再加载出来
+
+
+
+### 05.webView优化
+- 视频全屏播放按返回页面被放大（部分手机出现），至于原因暂时没有找到，解决方案如下所示
+    ```
+    /**
+     * 当缩放改变的时候会调用该方法
+     * @param view                              view
+     * @param oldScale                          之前的缩放比例
+     * @param newScale                          现在缩放比例
+     */
+    @Override
+    public void onScaleChanged(WebView view, float oldScale, float newScale) {
+        super.onScaleChanged(view, oldScale, newScale);
+        //视频全屏播放按返回页面被放大的问题
+        if (newScale - oldScale > 7) {
+            //异常放大，缩回去。
+            view.setInitialScale((int) (oldScale / newScale * 100));
+        }
+    }
+    ```
+
+
+
 
 
 
