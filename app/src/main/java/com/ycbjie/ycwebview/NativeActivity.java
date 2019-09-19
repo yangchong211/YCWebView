@@ -144,6 +144,13 @@ public class NativeActivity extends AppCompatActivity {
     };
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //这个是处理回调逻辑
+        mWebView.getX5WebChromeClient().uploadMessageForAndroid5(data,resultCode);
+    }
+
     @JavascriptInterface
     public void initWebViewBridge() {
         mWebView.setDefaultHandler(new DefaultHandler());
@@ -154,7 +161,6 @@ public class NativeActivity extends AppCompatActivity {
 
             }
         });
-
         mWebView.registerHandler("submitFromWeb", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
