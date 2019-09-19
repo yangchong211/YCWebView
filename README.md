@@ -12,6 +12,7 @@
 - 04.问题反馈
 - 05.webView优化
 - 06.关于参考
+- 07.其他说明介绍
 
 
 ### 01.前沿说明
@@ -167,14 +168,51 @@
 
 
 
-
-
 ### 06.关于参考
-- 感谢
+- 感谢开源库
     - [x5开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
     - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
+- 参考博客
+    - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
 
 
+
+### 07.其他说明介绍
+#### 关于其他内容介绍
+![image](https://upload-images.jianshu.io/upload_images/4432347-7100c8e5a455c3ee.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+#### 关于博客汇总链接
+- 1.[技术博客汇总](https://www.jianshu.com/p/614cb839182c)
+- 2.[开源项目汇总](https://blog.csdn.net/m0_37700275/article/details/80863574)
+- 3.[生活博客汇总](https://blog.csdn.net/m0_37700275/article/details/79832978)
+- 4.[喜马拉雅音频汇总](https://www.jianshu.com/p/f665de16d1eb)
+- 5.[其他汇总](https://www.jianshu.com/p/53017c3fc75d)
+
+
+#### 其他推荐
+- 博客笔记大汇总【15年10月到至今】，包括Java基础及深入知识点，Android技术博客，Python学习笔记等等，还包括平时开发中遇到的bug汇总，当然也在工作之余收集了大量的面试题，长期更新维护并且修正，持续完善……开源的文件是markdown格式的！同时也开源了生活博客，从12年起，积累共计47篇[近20万字]，转载请注明出处，谢谢！
+- 链接地址：https://github.com/yangchong211/YCBlogs
+- 如果觉得好，可以star一下，谢谢！当然也欢迎提出建议，万事起于忽微，量变引起质变！
+
+
+
+#### 关于LICENSE
+```
+Copyright 2017 yangchong211（github.com/yangchong211）
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
 
 
 
