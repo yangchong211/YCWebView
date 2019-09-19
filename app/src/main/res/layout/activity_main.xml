@@ -64,5 +64,14 @@
         android:background="@color/colorAccent"
         android:text="6.在h5中打开相册上传图片"/>
 
+    <TextView
+        android:id="@+id/tv_7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="6.原生native和h5交互"/>
+
 
 </LinearLayout>

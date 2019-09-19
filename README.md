@@ -15,9 +15,17 @@
 
 
 ### 01.前沿说明
-#### 1.2 该库功能和优势
-- 提高webView开发效率，大概要节约你百分之六十的时间成本。支持处理js的交互逻辑，方便快捷，并且无耦合；同时暴露进度条加载进度，结束，以及异常状态listener给开发者；支持视频播放，以及打开文件的操作；集成了腾讯x5的WebView，最新版本，功能强大。
+#### 1.1 案例展示效果
 
+
+
+#### 1.2 该库功能和优势
+- 提高webView开发效率，大概要节约你百分之六十的时间成本，一键初始化操作；
+- 支持处理js的交互逻辑，方便快捷，并且无耦合；
+- 暴露进度条加载进度，结束，以及异常状态listener给开发者；
+- 支持视频播放；
+- 集成了腾讯x5的WebView，最新版本，功能强大；
+- 支持打开文件的操作，并且回调
 
 
 #### 1.3 相关类介绍说明
@@ -32,10 +40,8 @@
 - WebViewJavascriptBridge       js桥接接口
 - X5WebChromeClient     自定义x5的WebChromeClient，处理进度监听，title变化，以及上传图片，后期添加视频处理逻辑
 - X5WebUtils            工具类，初始化腾讯x5浏览器webView，及调用该类init方法
-- X5WebView             可以使用这个类，方便统一初始化WebSettings的一些属性，
-                        如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
-- X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要集成此类
-                        一定要继承该类，因为注入js监听是在该类中操作的
+- X5WebView             可以使用这个类，方便统一初始化WebSettings的一些属性，如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
+- X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要集成此类，一定要继承该类，因为注入js监听是在该类中操作的
 
 
 ### 02.如何使用
@@ -84,6 +90,9 @@
         }
     });
     ```
+
+### 04.问题反馈
+
 
 
 ### 06.关于参考
