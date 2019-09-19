@@ -71,7 +71,27 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:background="@color/colorAccent"
-        android:text="6.原生native和h5交互，该案例是参考JsBridge"/>
+        android:text="7.原生native和h5交互，该案例是参考JsBridge"/>
+
+
+    <TextView
+        android:id="@+id/tv_8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="8.长按web页面处理，可以复制web页面文字，以及图片"/>
+
+    <TextView
+        android:id="@+id/tv_9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:background="@color/colorAccent"
+        android:text="9.加载word，ppt，pdf等文档文件"/>
+
 
 
 </LinearLayout>

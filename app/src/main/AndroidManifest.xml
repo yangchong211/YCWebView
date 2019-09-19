@@ -49,6 +49,9 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".NativeActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".EightActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".FileDisplayActivity"/>
     </application>
 
 </manifest>

@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.ycbjie.ycwebview"
         minSdkVersion 17
-        targetSdkVersion 27
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -21,7 +21,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //官方库
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    //implementation project(':WebViewLib')
-    implementation 'cn.yc:WebViewLib:1.1.1'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+//    implementation project(':WebViewLib')
+        implementation 'cn.yc:WebViewLib:1.1.2'
 }
