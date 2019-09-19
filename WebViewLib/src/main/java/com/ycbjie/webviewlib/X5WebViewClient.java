@@ -147,8 +147,12 @@ public class X5WebViewClient extends WebViewClient {
             webListener.hindProgressBar();
         }
         super.onPageFinished(view, url);
-        //在html标签加载完成之后在加载图片内容
-        webView.getSettings().setBlockNetworkImage(false);
+        //设置网页在加载的时候暂时不加载图片
+        //webView.getSettings().setBlockNetworkImage(false);
+        //页面finish后再发起图片加载
+        if(!webView.getSettings().getLoadsImagesAutomatically()) {
+            webView.getSettings().setLoadsImagesAutomatically(true);
+        }
         //这个时候添加js注入方法
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
         if (webView.getStartupMessage() != null) {
@@ -177,6 +181,10 @@ public class X5WebViewClient extends WebViewClient {
             //用javascript隐藏系统定义的404页面信息
             String data = "Page NO FOUND！";
             view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+        } else {
+            if (webListener!=null){
+                webListener.showErrorView();
+            }
         }
     }
 

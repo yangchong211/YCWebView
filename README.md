@@ -86,6 +86,51 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
+- 关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理
+    ```
+    mWebView.getX5WebChromeClient().setWebListener(interWebListener);
+    private InterWebListener interWebListener = new InterWebListener() {
+        @Override
+        public void hindProgressBar() {
+            pb.setVisibility(View.GONE);
+        }
+    
+        @Override
+        public void showErrorView() {
+            //设置自定义异常错误页面
+        }
+    
+        @Override
+        public void startProgress(int newProgress) {
+            pb.setProgress(newProgress);
+        }
+    };
+    ```
+- 关于视频播放的时候，web的接口回调，主要是视频相关回调，比如全频，取消全频，隐藏和现实webView
+    ```
+    x5WebChromeClient = x5WebView.getX5WebChromeClient();
+    x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
+        @Override
+        public void showVideoFullView() {
+            //视频全频播放时监听
+        }
+    
+        @Override
+        public void hindVideoFullView() {
+            //隐藏全频播放，也就是正常播放视频
+        }
+    
+        @Override
+        public void showWebView() {
+            //显示webView
+        }
+    
+        @Override
+        public void hindWebView() {
+            //隐藏webView
+        }
+    });
+    ```
 - 优化一下
     - 关于设置js支持的属性
     ```
@@ -164,8 +209,98 @@
         }
     }
     ```
-
-
+- 加载webView中的资源时，加快加载的速度优化，主要是针对图片
+    - html代码下载到WebView后，webkit开始解析网页各个节点，发现有外部样式文件或者外部脚本文件时，会异步发起网络请求下载文件，但如果在这之前也有解析到image节点，那势必也会发起网络请求下载相应的图片。在网络情况较差的情况下，过多的网络请求就会造成带宽紧张，影响到css或js文件加载完成的时间，造成页面空白loading过久。解决的方法就是告诉WebView先不要自动加载图片，等页面finish后再发起图片加载。
+    ```
+    //初始化的时候设置，具体代码在X5WebView类中
+    if(Build.VERSION.SDK_INT >= KITKAT) {
+        //设置网页在加载的时候暂时不加载图片
+        ws.setLoadsImagesAutomatically(true);
+    } else {
+        ws.setLoadsImagesAutomatically(false);
+    }
+    
+    /**
+     * 当页面加载完成会调用该方法
+     * @param view                              view
+     * @param url                               url链接
+     */
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        //页面finish后再发起图片加载
+        if(!webView.getSettings().getLoadsImagesAutomatically()) {
+            webView.getSettings().setLoadsImagesAutomatically(true);
+        }
+    }
+    ```
+- 自定义加载异常error的状态页面，比如下面这些方法中可能会出现error
+    - 当WebView加载页面出错时（一般为404 NOT FOUND），安卓WebView会默认显示一个出错界面。当WebView加载出错时，会在WebViewClient实例中的onReceivedError()，还有onReceivedTitle方法接收到错误
+    ```
+    /**
+     * 请求网络出现error
+     * @param view                              view
+     * @param errorCode                         错误🐎
+     * @param description                       description
+     * @param failingUrl                        失败链接
+     */
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String
+            failingUrl) {
+        super.onReceivedError(view, errorCode, description, failingUrl);
+        if (errorCode == 404) {
+            //用javascript隐藏系统定义的404页面信息
+            String data = "Page NO FOUND！";
+            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+        } else {
+            if (webListener!=null){
+                webListener.showErrorView();
+            }
+        }
+    }
+    
+    // 向主机应用程序报告Web资源加载错误。这些错误通常表明无法连接到服务器。
+    // 值得注意的是，不同的是过时的版本的回调，新的版本将被称为任何资源（iframe，图像等）
+    // 不仅为主页。因此，建议在回调过程中执行最低要求的工作。
+    // 6.0 之后
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        super.onReceivedError(view, request, error);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            X5WebUtils.log("服务器异常"+error.getDescription().toString());
+        }
+        //ToastUtils.showToast("服务器异常6.0之后");
+        //当加载错误时，就让它加载本地错误网页文件
+        //mWebView.loadUrl("file:///android_asset/errorpage/error.html");
+        if (webListener!=null){
+            webListener.showErrorView();
+        }
+    }
+    
+    /**
+     * 这个方法主要是监听标题变化操作的
+     * @param view                              view
+     * @param title                             标题
+     */
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
+        super.onReceivedTitle(view, title);
+        if (title.contains("404") || title.contains("网页无法打开")){
+            if (webListener!=null){
+                webListener.showErrorView();
+            }
+        } else {
+            // 设置title
+        }
+    }
+    ```
+- WebView硬件加速导致页面渲染闪烁
+    - 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。解决这个问题的方法是在过渡期前将WebView的硬件加速临时关闭，过渡期后再开启
+    ```
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
+    ```
 
 
 ### 06.关于参考

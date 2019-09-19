@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.ycbjie.webviewlib.VideoWebListener;
 import com.ycbjie.webviewlib.X5WebChromeClient;
 import com.ycbjie.webviewlib.X5WebView;
 import com.ycbjie.webviewlib.X5WebViewClient;
@@ -73,5 +74,26 @@ public class FiveActivity extends AppCompatActivity {
         webView.loadUrl(movieUrl);
         x5WebChromeClient = webView.getX5WebChromeClient();
         x5WebViewClient = webView.getX5WebViewClient();
+        x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
+            @Override
+            public void showVideoFullView() {
+                //视频全频播放时监听
+            }
+
+            @Override
+            public void hindVideoFullView() {
+                //隐藏全频播放，也就是正常播放视频
+            }
+
+            @Override
+            public void showWebView() {
+                //显示webView
+            }
+
+            @Override
+            public void hindWebView() {
+                //隐藏webView
+            }
+        });
     }
 }

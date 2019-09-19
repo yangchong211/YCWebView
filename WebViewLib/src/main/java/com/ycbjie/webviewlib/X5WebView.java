@@ -23,6 +23,8 @@ import android.util.AttributeSet;
 
 import com.tencent.smtt.sdk.WebSettings;
 
+import static android.os.Build.VERSION_CODES.KITKAT;
+
 
 /**
  * <pre>
@@ -90,7 +92,12 @@ public class X5WebView extends BridgeWebView {
         ws.setTextZoom(100);
         // 不缩放
         this.setInitialScale(100);
-
+        if(Build.VERSION.SDK_INT >= KITKAT) {
+            //设置网页在加载的时候暂时不加载图片
+            ws.setLoadsImagesAutomatically(true);
+        } else {
+            ws.setLoadsImagesAutomatically(false);
+        }
         //设置WebChromeClient
         x5WebChromeClient = new X5WebChromeClient((Activity) getContext());
         this.setWebChromeClient(x5WebChromeClient);
