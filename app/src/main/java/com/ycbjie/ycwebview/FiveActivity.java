@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 
 import com.ycbjie.webviewlib.VideoWebListener;
 import com.ycbjie.webviewlib.X5WebChromeClient;
@@ -53,7 +54,17 @@ public class FiveActivity extends AppCompatActivity {
             if (x5WebChromeClient!=null){
                 x5WebChromeClient.removeVideoView();
             }
+            //有音频播放的web页面的销毁逻辑
+            //在关闭了Activity时，如果Webview的音乐或视频，还在播放。就必须销毁Webview
+            //但是注意：webview调用destory时,webview仍绑定在Activity上
+            //这是由于自定义webview构建时传入了该Activity的context对象
+            //因此需要先从父容器中移除webview,然后再销毁webview:
             if (webView != null) {
+                ViewGroup parent = (ViewGroup) webView.getParent();
+                if (parent != null) {
+                    parent.removeView(webView);
+                }
+                webView.removeAllViews();
                 webView.destroy();
                 webView = null;
             }

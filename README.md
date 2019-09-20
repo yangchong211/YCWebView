@@ -329,7 +329,32 @@
         }
     }
     ```
-
+- **5.0.6 web音频播放销毁后还有声音**
+    - WebView页面中播放了音频,退出Activity后音频仍然在播放，需要在Activity的onDestory()中调用
+    ```
+    @Override
+    protected void onDestroy() {
+        try {
+            //有音频播放的web页面的销毁逻辑
+            //在关闭了Activity时，如果Webview的音乐或视频，还在播放。就必须销毁Webview
+            //但是注意：webview调用destory时,webview仍绑定在Activity上
+            //这是由于自定义webview构建时传入了该Activity的context对象
+            //因此需要先从父容器中移除webview,然后再销毁webview:
+            if (webView != null) {
+                ViewGroup parent = (ViewGroup) webView.getParent();
+                if (parent != null) {
+                    parent.removeView(webView);
+                }
+                webView.removeAllViews();
+                webView.destroy();
+                webView = null;
+            }
+        } catch (Exception e) {
+            Log.e("X5WebViewActivity", e.getMessage());
+        }
+        super.onDestroy();
+    }
+    ```
 
 
 

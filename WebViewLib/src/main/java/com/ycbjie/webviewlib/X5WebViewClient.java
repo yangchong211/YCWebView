@@ -174,6 +174,7 @@ public class X5WebViewClient extends WebViewClient {
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
         if (webView.getStartupMessage() != null) {
             for (Message m : webView.getStartupMessage()) {
+                //分发message 必须在主线程才分发成功
                 webView.dispatchMessage(m);
             }
             webView.setStartupMessage(null);
