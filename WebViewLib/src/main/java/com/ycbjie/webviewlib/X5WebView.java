@@ -64,20 +64,28 @@ public class X5WebView extends BridgeWebView {
         ws.setSaveFormData(true);
         // 是否应该支持使用其屏幕缩放控件和手势缩放
         ws.setSupportZoom(true);
+        // 设置内置的缩放控件。若为false，则该WebView不可缩放
         ws.setBuiltInZoomControls(true);
+        // 隐藏原生的缩放控件
         ws.setDisplayZoomControls(false);
         // 启动应用缓存
         ws.setAppCacheEnabled(true);
         // 设置缓存模式
+        // 缓存模式如下：
+        // LOAD_CACHE_ONLY: 不使用网络，只读取本地缓存数据
+        // LOAD_DEFAULT: （默认）根据cache-control决定是否从网络上取数据。
+        // LOAD_NO_CACHE: 不使用缓存，只从网络获取数据.
+        // LOAD_CACHE_ELSE_NETWORK，只要本地有，无论是否过期，或者no-cache，都使用缓存中的数据。
         ws.setCacheMode(WebSettings.LOAD_DEFAULT);
         ws.setAppCacheMaxSize(Long.MAX_VALUE);
         // setDefaultZoom  api19被弃用
         // 设置此属性，可任意比例缩放。
         ws.setUseWideViewPort(true);
         // 告诉WebView启用JavaScript执行。默认的是false。
+        // 注意：这个很重要   如果访问的页面中要与Javascript交互，则webview必须设置支持Javascript
         ws.setJavaScriptEnabled(true);
         //  页面加载好以后，再放开图片
-        ws.setBlockNetworkImage(false);
+        //ws.setBlockNetworkImage(false);
         // 使用localStorage则必须打开
         ws.setDomStorageEnabled(true);
         // 排版适应屏幕
@@ -117,6 +125,13 @@ public class X5WebView extends BridgeWebView {
      */
     public X5WebViewClient getX5WebViewClient(){
         return this.generateBridgeWebViewClient();
+    }
+
+    /**
+     * 刷新界面可以用这个方法
+     */
+    public void reLoad(){
+        this.reload();
     }
 
 }

@@ -55,15 +55,15 @@
 
 
 ### 02.如何使用
-- 如何引用，该x5的库已经更新到最新版本
+- **如何引用，该x5的库已经更新到最新版本**
     ```
     implementation 'cn.yc:WebViewLib:1.1.2'
     ```
-- 项目初始化
+- **项目初始化**
     ```
     X5WebUtils.init(this);
     ```
-- 最普通使用，需要自己做手动设置setting相关属性
+- **最普通使用，需要自己做手动设置setting相关属性**
     ```
     <BridgeWebView
         android:id="@+id/web_view"
@@ -71,7 +71,7 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
-- 也可以使用X5WebView，已经做了常见的setting属性设置
+- **也可以使用X5WebView，已经做了常见的setting属性设置**
     ```
     <X5WebView
         android:id="@+id/web_view"
@@ -79,7 +79,7 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
-- 如果想有带进度的，可以使用ProgressWebView
+- **如果想有带进度的，可以使用ProgressWebView**
     ```
     <可以使用ProgressWebView
         android:id="@+id/web_view"
@@ -87,7 +87,7 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
-- 关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理
+- **关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理**
     ```
     mWebView.getX5WebChromeClient().setWebListener(interWebListener);
     private InterWebListener interWebListener = new InterWebListener() {
@@ -107,7 +107,7 @@
         }
     };
     ```
-- 关于视频播放的时候，web的接口回调，主要是视频相关回调，比如全频，取消全频，隐藏和现实webView
+- **关于视频播放的时候，web的接口回调，主要是视频相关回调，比如全频，取消全频，隐藏和现实webView**
     ```
     x5WebChromeClient = x5WebView.getX5WebChromeClient();
     x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
@@ -132,7 +132,7 @@
         }
     });
     ```
-- 优化一下
+- **优化一下相关的操作**
     - 关于设置js支持的属性
     ```
     @Override
@@ -170,7 +170,7 @@
 
 
 ### 03.js调用
-- 代码如下所示，下面中的jsname代表的是js这边提供给客户端的方法名称
+- **代码如下所示，下面中的jsname代表的是js这边提供给客户端的方法名称**
     ```
     mWebView.registerHandler("jsname", new BridgeHandler() {
         @Override
@@ -179,7 +179,7 @@
         }
     });
     ```
-- 如何回调数据给web那边
+- **如何回调数据给web那边**
     ```
     function.onCallBack("回调数据");
     ```
@@ -192,7 +192,8 @@
 
 
 ### 05.webView优化
-- **5.0.1 视频全屏播放按返回页面被放大（部分手机出现），至于原因暂时没有找到，解决方案如下所示**
+- **5.0.1 视频全屏播放按返回页面被放大（部分手机出现)**
+    - 至于原因暂时没有找到，解决方案如下所示
     ```
     /**
      * 当缩放改变的时候会调用该方法
@@ -302,6 +303,34 @@
         webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
     ```
+- **5.0.5 WebView加载证书错误**
+    - webView加载一些别人的url时候，有时候会发生证书认证错误的情况，这时候我们希望能够正常的呈现页面给用户，我们需要忽略证书错误，需要调用WebViewClient类的onReceivedSslError方法，调用handler.proceed()来忽略该证书错误。
+    ```
+    /**
+     * 在加载资源时通知主机应用程序发生SSL错误
+     * 作用：处理https请求
+     * @param view                              view
+     * @param handler                           handler
+     * @param error                             error
+     */
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        super.onReceivedSslError(view, handler, error);
+        if (error!=null){
+            String url = error.getUrl();
+            X5WebUtils.log("onReceivedSslError----异常url----"+url);
+        }
+        //https忽略证书问题
+        if (handler!=null){
+            //表示等待证书响应
+            handler.proceed();
+            // handler.cancel();      //表示挂起连接，为默认方式
+            // handler.handleMessage(null);    //可做其他处理
+        }
+    }
+    ```
+
+
 
 
 ### 06.关于参考

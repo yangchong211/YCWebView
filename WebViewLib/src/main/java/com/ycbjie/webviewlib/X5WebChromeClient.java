@@ -83,6 +83,7 @@ public class X5WebChromeClient extends WebChromeClient {
 
     /**
      * 这个方法是监听加载进度变化的，当加载到百分之八十五的时候，页面一般就出来呢
+     * 作用：获得网页的加载进度并显示
      * @param view                              view
      * @param newProgress                       进度值
      */

@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -66,6 +67,8 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 这个方法中可以做拦截
+     * 主要的作用是处理各种通知和请求事件
+     * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
      * @param view                              view
      * @param url                               链接
      * @return                                  是否自己处理，true表示自己处理
@@ -103,6 +106,8 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 增加shouldOverrideUrlLoading在api>=24时
+     * 主要的作用是处理各种通知和请求事件
+     * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
      * @param view                              view
      * @param request                           request
      * @return
@@ -133,6 +138,18 @@ public class X5WebViewClient extends WebViewClient {
         }else {
             return super.shouldOverrideUrlLoading(view, request);
         }
+    }
+
+    /**
+     * 作用：开始载入页面调用的，我们可以设定一个loading的页面，告诉用户程序在等待网络响应。
+     * @param webView                           view
+     * @param s                                 s
+     * @param bitmap                            bitmap
+     */
+    @Override
+    public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
+        super.onPageStarted(webView, s, bitmap);
+        //设定加载开始的操作
     }
 
     /**
@@ -168,6 +185,9 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 请求网络出现error
+     * 作用：加载页面的服务器出现错误时（如404）调用。
+     * App里面使用webView控件的时候遇到了诸如404这类的错误的时候，若也显示浏览器里面的那种错误提示页面就显得很丑陋，
+     * 那么这个时候我们的app就需要加载一个本地的错误提示页面，即webView如何加载一个本地的页面
      * @param view                              view
      * @param errorCode                         错误🐎
      * @param description                       description
@@ -250,6 +270,10 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 在加载资源时通知主机应用程序发生SSL错误
+     * 作用：处理https请求
+     *      webView加载一些别人的url时候，有时候会发生证书认证错误的情况，这时候希望能够正常的呈现页面给用户，
+     *      我们需要忽略证书错误，需要调用WebViewClient类的onReceivedSslError方法，
+     *      调用handler.proceed()来忽略该证书错误。
      * @param view                              view
      * @param handler                           handler
      * @param error                             error
@@ -263,8 +287,21 @@ public class X5WebViewClient extends WebViewClient {
         }
         //https忽略证书问题
         if (handler!=null){
+            //表示等待证书响应
             handler.proceed();
+            // handler.cancel();      //表示挂起连接，为默认方式
+            // handler.handleMessage(null);    //可做其他处理
         }
+    }
+
+    /**
+     * 作用：在加载页面资源时会调用，每一个资源（比如图片）的加载都会调用一次。
+     * @param webView                           view
+     * @param s                                 s
+     */
+    @Override
+    public void onLoadResource(WebView webView, String s) {
+        super.onLoadResource(webView, s);
     }
 
     /**
