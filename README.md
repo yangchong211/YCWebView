@@ -10,7 +10,10 @@
     - 2.4 使用建议
 - 03.js调用
 - 04.问题反馈
+    - 4.0.2 x5加载office资源
+    - 4.0.3 WebView播放视频问题
     - 4.0.5 使用scheme协议打开链接风险
+    - 4.0.6 如何处理加载错误
 - 05.webView优化
     - 5.0.1 视频全屏播放按返回页面被放大
     - 5.0.2 加快加载webView中的图片资源
@@ -202,7 +205,20 @@
 
 ### 04.问题反馈
 - 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
+
+
+#### 4.0.2 x5加载office资源
 - 关于加载word，pdf，xls等文档文件注意事项：Tbs不支持加载网络的文件，需要先把文件下载到本地，然后再加载出来
+- 还有一点要注意，在onDestroy方法中调用此方法mTbsReaderView.onStop()，否则第二次打开无法浏览。更多可以看FileReaderView类代码！
+
+
+
+#### 4.0.3 WebView播放视频问题
+- 1、此次的方案用到WebView，而且其中会有视频嵌套，在默认的WebView中直接播放视频会有问题， 而且不同的SDK版本情况还不一样，网上搜索了下解决方案，在此记录下. webView.getSettings.setPluginState(PluginState.ON);webView.setWebChromeClient(new WebChromeClient());
+- 2、然后在webView的Activity配置里面加上： android:hardwareAccelerated="true"
+- 3、以上可以正常播放视频了，但是webview的页面都finish了居然还能听 到视频播放的声音， 于是又查了下发现webview的onResume方法可以继续播放，onPause可以暂停播放， 但是这两个方法都是在Added in API level 11添加的，所以需要用反射来完成。
+- 4、停止播放：在页面的onPause方法中使用：webView.getClass().getMethod("onPause").invoke(webView, (Object[])null);
+- 5、继续播放：在页面的onResume方法中使用：webView.getClass().getMethod("onResume").invoke(webView,(Object[])null);这样就可以控制视频的暂停和继续播放了。
 
 
 #### 4.0.5 使用scheme协议打开链接风险
@@ -213,6 +229,92 @@
     - APP中任何接收外部输入数据的地方都是潜在的攻击点，过滤检查来自网页的参数。
     - 不要通过网页传输敏感信息，有的网站为了引导已经登录的用户到APP上使用，会使用脚本动态的生成URL Scheme的参数，其中包括了用户名、密码或者登录态token等敏感信息，让用户打开APP直接就登录了。恶意应用也可以注册相同的URL Sechme来截取这些敏感信息。Android系统会让用户选择使用哪个应用打开链接，但是如果用户不注意，就会使用恶意应用打开，导致敏感信息泄露或者其他风险。
 
+
+#### 4.0.6 如何处理加载错误(Http、SSL、Resource)
+- 对于WebView加载一个网页过程中所产生的错误回调，大致有三种
+    ```
+    /**
+     * 只有在主页面加载出现错误时，才会回调这个方法。这正是展示加载错误页面最合适的方法。
+     * 然而，如果不管三七二十一直接展示错误页面的话，那很有可能会误判，给用户造成经常加载页面失败的错觉。
+     * 由于不同的WebView实现可能不一样，所以我们首先需要排除几种误判的例子：
+     *      1.加载失败的url跟WebView里的url不是同一个url，排除；
+     *      2.errorCode=-1，表明是ERROR_UNKNOWN的错误，为了保证不误判，排除
+     *      3failingUrl=null&errorCode=-12，由于错误的url是空而不是ERROR_BAD_URL，排除
+     * @param webView                                           webView
+     * @param errorCode                                         errorCode
+     * @param description                                       description
+     * @param failingUrl                                        failingUrl
+     */
+    @Override
+    public void onReceivedError(WebView webView, int errorCode,
+                                String description, String failingUrl) {
+        super.onReceivedError(webView, errorCode, description, failingUrl);
+        // -12 == EventHandle.ERROR_BAD_URL, a hide return code inside android.net.http package
+        if ((failingUrl != null && !failingUrl.equals(webView.getUrl())
+                && !failingUrl.equals(webView.getOriginalUrl())) /* not subresource error*/
+                || (failingUrl == null && errorCode != -12) /*not bad url*/
+                || errorCode == -1) { //当 errorCode = -1 且错误信息为 net::ERR_CACHE_MISS
+            return;
+        }
+        if (!TextUtils.isEmpty(failingUrl)) {
+            if (failingUrl.equals(webView.getUrl())) {
+                //做自己的错误操作，比如自定义错误页面
+            }
+        }
+    }
+
+    /**
+     * 只有在主页面加载出现错误时，才会回调这个方法。这正是展示加载错误页面最合适的方法。
+     * 然而，如果不管三七二十一直接展示错误页面的话，那很有可能会误判，给用户造成经常加载页面失败的错觉。
+     * 由于不同的WebView实现可能不一样，所以我们首先需要排除几种误判的例子：
+     *      1.加载失败的url跟WebView里的url不是同一个url，排除；
+     *      2.errorCode=-1，表明是ERROR_UNKNOWN的错误，为了保证不误判，排除
+     *      3failingUrl=null&errorCode=-12，由于错误的url是空而不是ERROR_BAD_URL，排除
+     * @param webView                                           webView
+     * @param webResourceRequest                                webResourceRequest
+     * @param webResourceError                                  webResourceError
+     */
+    @Override
+    public void onReceivedError(WebView webView, WebResourceRequest webResourceRequest,
+                                WebResourceError webResourceError) {
+        super.onReceivedError(webView, webResourceRequest, webResourceError);
+    }
+
+    /**
+     * 任何HTTP请求产生的错误都会回调这个方法，包括主页面的html文档请求，iframe、图片等资源请求。
+     * 在这个回调中，由于混杂了很多请求，不适合用来展示加载错误的页面，而适合做监控报警。
+     * 当某个URL，或者某个资源收到大量报警时，说明页面或资源可能存在问题，这时候可以让相关运营及时响应修改。
+     * @param webView                                           webView
+     * @param webResourceRequest                                webResourceRequest
+     * @param webResourceResponse                               webResourceResponse
+     */
+    @Override
+    public void onReceivedHttpError(WebView webView, WebResourceRequest webResourceRequest,
+                                    WebResourceResponse webResourceResponse) {
+        super.onReceivedHttpError(webView, webResourceRequest, webResourceResponse);
+    }
+
+    /**
+     * 任何HTTPS请求，遇到SSL错误时都会回调这个方法。
+     * 比较正确的做法是让用户选择是否信任这个网站，这时候可以弹出信任选择框供用户选择（大部分正规浏览器是这么做的）。
+     * 有时候，针对自己的网站，可以让一些特定的网站，不管其证书是否存在问题，都让用户信任它。
+     * 坑：有时候部分手机打开页面报错，绝招：让自己网站的所有二级域都是可信任的。
+     * @param webView                                           webView
+     * @param sslErrorHandler                                   sslErrorHandler
+     * @param sslError                                          sslError
+     */
+    @Override
+    public void onReceivedSslError(WebView webView, SslErrorHandler sslErrorHandler, SslError sslError) {
+        super.onReceivedSslError(webView, sslErrorHandler, sslError);
+        //判断网站是否是可信任的，与自己网站host作比较
+        if (WebViewUtils.isYCHost(webView.getUrl())) {
+            //如果是自己的网站，则继续使用SSL证书
+            sslErrorHandler.proceed();
+        } else {
+            super.onReceivedSslError(webView, sslErrorHandler, sslError);
+        }
+    }
+    ```
 
 
 ### 05.webView优化
