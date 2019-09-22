@@ -9,9 +9,13 @@
     - 2.3 常用api
     - 2.4 使用建议
 - 03.js调用
+    - 3.1 如何使用项目js调用
+    - 3.2 js的调用时机分析
 - 04.问题反馈
+    - 4.0.1 视频播放宽度超过屏幕
     - 4.0.2 x5加载office资源
     - 4.0.3 WebView播放视频问题
+    - 4.0.4 无法获取webView的正确高度
     - 4.0.5 使用scheme协议打开链接风险
     - 4.0.6 如何处理加载错误
 - 05.webView优化
@@ -21,7 +25,6 @@
     - 5.0.4 WebView硬件加速导致页面渲染闪烁
     - 5.0.5 WebView加载证书错误
     - 5.0.6 web音频播放销毁后还有声音
-    -
 - 06.关于参考
 - 07.其他说明介绍
 
@@ -188,6 +191,7 @@
 
 
 ### 03.js调用
+#### 3.1 如何使用项目js调用
 - **代码如下所示，下面中的jsname代表的是js这边提供给客户端的方法名称**
     ```
     mWebView.registerHandler("jsname", new BridgeHandler() {
@@ -203,7 +207,26 @@
     ```
 
 
+#### 3.2 js的调用时机分析
+- **onPageFinished()或者onPageStarted()方法中注入js代码**
+    - 做过WebView开发，并且需要和js交互，大部分都会认为js在WebViewClient.onPageFinished()方法中注入最合适，此时dom树已经构建完成，页面已经完全展现出来。但如果做过页面加载速度的测试，会发现WebViewClient.onPageFinished()方法通常需要等待很久才会回调（首次加载通常超过3s），这是因为WebView需要加载完一个网页里主文档和所有的资源才会回调这个方法。
+    - 能不能在WebViewClient.onPageStarted()中注入呢？答案是不确定。经过测试，有些机型可以，有些机型不行。在WebViewClient.onPageStarted()中注入还有一个致命的问题——这个方法可能会回调多次，会造成js代码的多次注入。
+    - 从7.0开始，WebView加载js方式发生了一些小改变，**官方建议把js注入的时机放在页面开始加载之后**。
+- **WebViewClient.onProgressChanged()方法中注入js代码**
+    - WebViewClient.onProgressChanged()这个方法在dom树渲染的过程中会回调多次，每次都会告诉我们当前加载的进度。
+        - 在这个方法中，可以给WebView自定义进度条，类似微信加载网页时的那种进度条
+        - 如果在此方法中注入js代码，则需要避免重复注入，需要增强逻辑。可以定义一个boolean值变量控制注入时机
+    - 那么有人会问，加载到多少才需要处理js注入逻辑呢？
+        - 正是因为这个原因，页面的进度加载到80%的时候，实际上dom树已经渲染得差不多了，表明WebView已经解析了<html>标签，这时候注入一定是成功的。在WebViewClient.onProgressChanged()实现js注入有几个需要注意的地方：
+        - 1 上文提到的多次注入控制，使用了boolean值变量控制
+        - 2 重新加载一个URL之前，需要重置boolean值变量，让重新加载后的页面再次注入js
+        - 3 如果做过本地js，css等缓存，则先判断本地是否存在，若存在则加载本地，否则加载网络js
+        - 4 注入的进度阈值可以自由定制，理论上10%-100%都是合理的，不过建议使用了75%到90%之间可以。
+
+
+
 ### 04.问题反馈
+#### 4.0.1 视频播放宽度超过屏幕
 - 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
 
 
@@ -219,6 +242,40 @@
 - 3、以上可以正常播放视频了，但是webview的页面都finish了居然还能听 到视频播放的声音， 于是又查了下发现webview的onResume方法可以继续播放，onPause可以暂停播放， 但是这两个方法都是在Added in API level 11添加的，所以需要用反射来完成。
 - 4、停止播放：在页面的onPause方法中使用：webView.getClass().getMethod("onPause").invoke(webView, (Object[])null);
 - 5、继续播放：在页面的onResume方法中使用：webView.getClass().getMethod("onResume").invoke(webView,(Object[])null);这样就可以控制视频的暂停和继续播放了。
+
+
+#### 4.0.4 无法获取webView的正确高度
+- 偶发情况，获取不到webView的内容高度
+    - 其中htmlString是一个HTML格式的字符串。
+    ```
+    WebView view = new WebView(context);
+    view.loadData(htmlString, "text/html", "utf-8");
+
+    view.setWebViewClient(new WebViewClient() {
+        public void onPageFinished(WebView view, String url) {
+         super.onPageFinished(view, url);
+         Log.d("2", view.getContentheight() + "");
+        }
+    });
+    ```
+    - 这是因为onPageFinished回调指的WebView已经完成从网络读取的字节数，这一点。在点onPageFinished被激发的页面可能还没有被解析。
+- 第一种解决办法：提供onPageFinished（）一些延迟
+    ```
+    webView.setWebViewClient(new WebViewClient() {
+     @Override
+     public void onPageFinished(WebView view, String url) {
+      super.onPageFinished(view, url);
+      new Handler().postDelayed(new Runnable() {
+       @Override
+       public void run() {
+        int contentHeight = webView.getContentHeight();
+        int viewHeight = webView.getHeight();
+       }
+      }, 500);
+     }
+    });
+    ```
+- 第二种解决办法：使用js获取内容高度，具体可以看这篇文章：https://www.jianshu.com/p/ad22b2649fba
 
 
 #### 4.0.5 使用scheme协议打开链接风险
