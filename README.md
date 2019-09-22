@@ -10,7 +10,15 @@
     - 2.4 使用建议
 - 03.js调用
 - 04.问题反馈
+    - 4.0.5 使用scheme协议打开链接风险
 - 05.webView优化
+    - 5.0.1 视频全屏播放按返回页面被放大
+    - 5.0.2 加快加载webView中的图片资源
+    - 5.0.3 自定义加载异常error的状态页面
+    - 5.0.4 WebView硬件加速导致页面渲染闪烁
+    - 5.0.5 WebView加载证书错误
+    - 5.0.6 web音频播放销毁后还有声音
+    -
 - 06.关于参考
 - 07.其他说明介绍
 
@@ -55,10 +63,13 @@
 
 
 ### 02.如何使用
+#### 2.1 如何引入
 - **如何引用，该x5的库已经更新到最新版本**
     ```
     implementation 'cn.yc:WebViewLib:1.1.2'
     ```
+
+#### 2.2 最简单使用
 - **项目初始化**
     ```
     X5WebUtils.init(this);
@@ -87,6 +98,8 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
+
+#### 2.3 常用api
 - **关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理**
     ```
     mWebView.getX5WebChromeClient().setWebListener(interWebListener);
@@ -132,6 +145,8 @@
         }
     });
     ```
+
+#### 2.4 使用建议
 - **优化一下相关的操作**
     - 关于设置js支持的属性
     ```
@@ -190,10 +205,19 @@
 - 关于加载word，pdf，xls等文档文件注意事项：Tbs不支持加载网络的文件，需要先把文件下载到本地，然后再加载出来
 
 
+#### 4.0.5 使用scheme协议打开链接风险
+- 常见的用法是在APP获取到来自网页的数据后，重新生成一个intent，然后发送给别的组件使用这些数据。比如使用Webview相关的Activity来加载一个来自网页的url，如果此url来自url scheme中的参数，如：yc://ycbjie:8888/from?load_url=http://www.taobao.com。
+    - 如果在APP中，没有检查获取到的load_url的值，攻击者可以构造钓鱼网站，诱导用户点击加载，就可以盗取用户信息。
+    - 这个时候，别人非法篡改参数，于是将scheme协议改成yc://ycbjie:8888/from?load_url=http://www.doubi.com。这个时候点击进去即可进入钓鱼链接地址。
+- 使用建议
+    - APP中任何接收外部输入数据的地方都是潜在的攻击点，过滤检查来自网页的参数。
+    - 不要通过网页传输敏感信息，有的网站为了引导已经登录的用户到APP上使用，会使用脚本动态的生成URL Scheme的参数，其中包括了用户名、密码或者登录态token等敏感信息，让用户打开APP直接就登录了。恶意应用也可以注册相同的URL Sechme来截取这些敏感信息。Android系统会让用户选择使用哪个应用打开链接，但是如果用户不注意，就会使用恶意应用打开，导致敏感信息泄露或者其他风险。
+
+
 
 ### 05.webView优化
-- **5.0.1 视频全屏播放按返回页面被放大（部分手机出现)**
-    - 至于原因暂时没有找到，解决方案如下所示
+#### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
+- 至于原因暂时没有找到，解决方案如下所示
     ```
     /**
      * 当缩放改变的时候会调用该方法
@@ -211,8 +235,10 @@
         }
     }
     ```
-- **5.0.2 加载webView中的资源时，加快加载的速度优化，主要是针对图片**
-    - html代码下载到WebView后，webkit开始解析网页各个节点，发现有外部样式文件或者外部脚本文件时，会异步发起网络请求下载文件，但如果在这之前也有解析到image节点，那势必也会发起网络请求下载相应的图片。在网络情况较差的情况下，过多的网络请求就会造成带宽紧张，影响到css或js文件加载完成的时间，造成页面空白loading过久。解决的方法就是告诉WebView先不要自动加载图片，等页面finish后再发起图片加载。
+
+
+#### 5.0.2 加载webView中的资源时，加快加载的速度优化，主要是针对图片
+- html代码下载到WebView后，webkit开始解析网页各个节点，发现有外部样式文件或者外部脚本文件时，会异步发起网络请求下载文件，但如果在这之前也有解析到image节点，那势必也会发起网络请求下载相应的图片。在网络情况较差的情况下，过多的网络请求就会造成带宽紧张，影响到css或js文件加载完成的时间，造成页面空白loading过久。解决的方法就是告诉WebView先不要自动加载图片，等页面finish后再发起图片加载。
     ```
     //初始化的时候设置，具体代码在X5WebView类中
     if(Build.VERSION.SDK_INT >= KITKAT) {
@@ -236,8 +262,10 @@
         }
     }
     ```
-- **5.0.3 自定义加载异常error的状态页面，比如下面这些方法中可能会出现error**
-    - 当WebView加载页面出错时（一般为404 NOT FOUND），安卓WebView会默认显示一个出错界面。当WebView加载出错时，会在WebViewClient实例中的onReceivedError()，还有onReceivedTitle方法接收到错误
+
+
+#### 5.0.3 自定义加载异常error的状态页面，比如下面这些方法中可能会出现error
+- 当WebView加载页面出错时（一般为404 NOT FOUND），安卓WebView会默认显示一个出错界面。当WebView加载出错时，会在WebViewClient实例中的onReceivedError()，还有onReceivedTitle方法接收到错误
     ```
     /**
      * 请求网络出现error
@@ -296,8 +324,10 @@
         }
     }
     ```
-- **5.0.4 WebView硬件加速导致页面渲染闪烁**
-    - 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。解决这个问题的方法是在过渡期前将WebView的硬件加速临时关闭，过渡期后再开启
+
+
+#### 5.0.4 WebView硬件加速导致页面渲染闪烁
+- 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。解决这个问题的方法是在过渡期前将WebView的硬件加速临时关闭，过渡期后再开启
     ```
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
         webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -329,8 +359,10 @@
         }
     }
     ```
-- **5.0.6 web音频播放销毁后还有声音**
-    - WebView页面中播放了音频,退出Activity后音频仍然在播放，需要在Activity的onDestory()中调用
+
+
+#### 5.0.6 web音频播放销毁后还有声音
+- WebView页面中播放了音频,退出Activity后音频仍然在播放，需要在Activity的onDestory()中调用
     ```
     @Override
     protected void onDestroy() {
