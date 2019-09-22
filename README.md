@@ -25,6 +25,8 @@
     - 5.0.4 WebView硬件加速导致页面渲染闪烁
     - 5.0.5 WebView加载证书错误
     - 5.0.6 web音频播放销毁后还有声音
+    - 5.0.7 DNS采用和客户端API相同的域名
+    - 5.0.8 如何设置白名单操作
 - 06.关于参考
 - 07.其他说明介绍
 
@@ -544,6 +546,39 @@
             Log.e("X5WebViewActivity", e.getMessage());
         }
         super.onDestroy();
+    }
+    ```
+
+
+#### 5.0.7 DNS采用和客户端API相同的域名
+- 建立连接/服务器处理；在页面请求的数据返回之前，主要有以下过程耗费时间。
+    ```
+    DNS
+    connection
+    服务器处理
+    ```
+- DNS采用和客户端API相同的域名
+    - DNS会在系统级别进行缓存，对于WebView的地址，如果使用的域名与native的API相同，则可以直接使用缓存的DNS而不用再发起请求图片。
+    - 举个简单例子，客户端请求域名主要位于api.yc.com，然而内嵌的WebView主要位于 i.yc.com。
+    - 当我们初次打开App时：客户端首次打开都会请求api.yc.com，其DNS将会被系统缓存。然而当打开WebView的时候，由于请求了不同的域名，需要重新获取i.yc.com的IP。静态资源同理，最好与客户端的资源域名保持一致。
+
+
+#### 5.0.8 如何设置白名单操作
+- 客户端内的WebView都是可以通过客户端的某个schema打开的，而要打开页面的URL很多都并不写在客户端内，而是可以由URL中的参数传递过去的。上面4.0.5 使用scheme协议打开链接风险已经说明了scheme使用的危险性，那么如何避免这个问题了，设置运行访问的白名单。或者当用户打开外部链接前给用户强烈而明显的提示。具体操作如下所示：
+    - 在onPageStarted开始加载资源的方法中，获取加载url的host值，然后和本地保存的合法host做比较，这里domainList是一个数组
+    ```
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        super.onPageStarted(view, url, favicon);
+        String host = Uri.parse(url).getHost();
+        LoggerUtils.i("host:" + host);
+        if (!BuildConfig.IS_DEBUG) {
+            if (Arrays.binarySearch(domainList, host) < 0) {
+                //不在白名单内，非法网址，这个时候给用户强烈而明显的提示
+            } else {
+                //合法网址
+            }
+        }
     }
     ```
 
