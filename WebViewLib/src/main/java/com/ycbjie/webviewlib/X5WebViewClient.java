@@ -62,7 +62,7 @@ public class X5WebViewClient extends WebViewClient {
     public X5WebViewClient(BridgeWebView webView, Context context) {
         this.webView = webView;
         //将js对象与java对象进行映射
-        webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
+        //webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
 
     /**
@@ -181,7 +181,7 @@ public class X5WebViewClient extends WebViewClient {
         }
         //html加载完成之后，添加监听图片的点击js函数
         //addImageClickListener();
-        addImageClickListener(webView);
+        //addImageClickListener(webView);
     }
 
     /**
