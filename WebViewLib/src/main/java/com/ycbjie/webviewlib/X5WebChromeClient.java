@@ -114,6 +114,9 @@ public class X5WebChromeClient extends WebChromeClient {
             }
         } else {
             // 设置title
+            if (webListener!=null){
+                webListener.showTitle(title);
+            }
         }
     }
 

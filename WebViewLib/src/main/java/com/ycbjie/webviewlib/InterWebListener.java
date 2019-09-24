@@ -41,8 +41,13 @@ public interface InterWebListener {
 
     /**
      * 进度条变化时调用，这里添加注解限定符，必须是在0到100之间
-     * @param newProgress 进度0-100
+     * @param newProgress                   进度0-100
      */
     void startProgress(@IntRange(from = 0,to = 100) int newProgress);
 
+    /**
+     * 获取加载网页的标题
+     * @param title                         title标题
+     */
+    void showTitle(String title);
 }
