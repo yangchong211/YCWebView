@@ -27,6 +27,7 @@
     - 5.0.6 web音频播放销毁后还有声音
     - 5.0.7 DNS采用和客户端API相同的域名
     - 5.0.8 如何设置白名单操作
+    - 5.0.9 后台无法释放js导致发热耗电
 - 06.关于参考
 - 07.其他说明介绍
 
@@ -576,6 +577,7 @@
     - 当我们初次打开App时：客户端首次打开都会请求api.yc.com，其DNS将会被系统缓存。然而当打开WebView的时候，由于请求了不同的域名，需要重新获取i.yc.com的IP。静态资源同理，最好与客户端的资源域名保持一致。
 
 
+
 #### 5.0.8 如何设置白名单操作
 - 客户端内的WebView都是可以通过客户端的某个schema打开的，而要打开页面的URL很多都并不写在客户端内，而是可以由URL中的参数传递过去的。上面4.0.5 使用scheme协议打开链接风险已经说明了scheme使用的危险性，那么如何避免这个问题了，设置运行访问的白名单。或者当用户打开外部链接前给用户强烈而明显的提示。具体操作如下所示：
     - 在onPageStarted开始加载资源的方法中，获取加载url的host值，然后和本地保存的合法host做比较，这里domainList是一个数组
@@ -591,6 +593,30 @@
             } else {
                 //合法网址
             }
+        }
+    }
+    ```
+
+
+#### 5.0.9 后台无法释放js导致发热耗电
+- 在有些手机你如果webview加载的html里，有一些js一直在执行比如动画之类的东西，如果此刻webview 挂在了后台这些资源是不会被释放用户也无法感知。
+- 导致一直占有cpu 耗电特别快，所以如果遇到这种情况，处理方式如下所示。大概意思就是在后台的时候，会调用onStop方法，即此时关闭js交互，回到前台调用onResume再开启js交互。
+    ```
+    //在onStop里面设置setJavaScriptEnabled(false);
+    //在onResume里面设置setJavaScriptEnabled(true)。
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(true);
+        }
+    
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(false);
         }
     }
     ```
