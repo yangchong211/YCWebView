@@ -1,5 +1,7 @@
 package com.ycbjie.ycwebview;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -7,12 +9,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.BridgeUtil;
+import com.ycbjie.webviewlib.BridgeWebView;
 import com.ycbjie.webviewlib.X5WebChromeClient;
 import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.X5WebViewClient;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 public class EightActivity extends AppCompatActivity {
 
@@ -68,6 +79,42 @@ public class EightActivity extends AppCompatActivity {
                 return handleLongImage();
             }
         });
+        MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView, this);
+        webView.setWebViewClient(webViewClient);
+        MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(this);
+        webView.setWebChromeClient(webChromeClient);
+    }
+
+
+    private class MyX5WebViewClient extends X5WebViewClient {
+        public MyX5WebViewClient(BridgeWebView webView, Context context) {
+            super(webView, context);
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Log.d("网络拦截--------1------",url);
+            return super.shouldOverrideUrlLoading(view, url);
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            Log.d("网络拦截--------2------",request.getUrl().toString());
+            return super.shouldOverrideUrlLoading(view, request);
+        }
+    }
+
+
+    private class MyX5WebChromeClient extends X5WebChromeClient{
+
+        /**
+         * 构造方法
+         *
+         * @param activity 上下文
+         */
+        public MyX5WebChromeClient(Activity activity) {
+            super(activity);
+        }
     }
 
     /**
