@@ -37,6 +37,8 @@ import static android.app.Activity.RESULT_OK;
  *     desc  : 自定义x5的WebChromeClient
  *     revise: 如果自定义WebChromeClient，建议继承该类，后期添加视频播放的处理方法
  *             demo地址：https://github.com/yangchong211/YCWebView
+ *
+ *             作用：WebViewClient主要辅助WebView执行处理各种响应请求事件的
  * </pre>
  */
 public class X5WebChromeClient extends WebChromeClient {
@@ -56,6 +58,7 @@ public class X5WebChromeClient extends WebChromeClient {
     private View customView;
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
+    private BridgeWebView webView;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -73,11 +76,22 @@ public class X5WebChromeClient extends WebChromeClient {
         this.videoWebListener = videoWebListener;
     }
 
+
     /**
      * 构造方法
      * @param activity                          上下文
      */
-    public X5WebChromeClient(Activity activity) {
+    public X5WebChromeClient(BridgeWebView webView ,Activity activity) {
+        this.webView = webView;
+        this.activity = activity;
+    }
+
+
+    /**
+     * 构造方法
+     * @param activity                          上下文
+     */
+    private X5WebChromeClient(Activity activity) {
         this.activity = activity;
     }
 
@@ -95,6 +109,14 @@ public class X5WebChromeClient extends WebChromeClient {
             int max = 85;
             if (newProgress> max && !isShowContent){
                 webListener.hindProgressBar();
+                //在这个时候添加js注入方法，具体可以看readme文档
+                /*BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
+                if (webView.getStartupMessage() != null) {
+                    for (Message m : webView.getStartupMessage()) {
+                        webView.dispatchMessage(m);
+                    }
+                    webView.setStartupMessage(null);
+                }*/
                 isShowContent = true;
             }
         }
@@ -118,6 +140,7 @@ public class X5WebChromeClient extends WebChromeClient {
                 webListener.showTitle(title);
             }
         }
+        X5LogUtils.i("-------onReceivedTitle-------"+title);
     }
 
     /**
@@ -137,6 +160,7 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     @Override
     public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
+        X5LogUtils.i("-------onShowCustomView-------");
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         videoWebListener.hindWebView();
         // 如果一个视图已经存在，那么立刻终止并新建一个
@@ -186,6 +210,7 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     @Override
     public void onHideCustomView() {
+        X5LogUtils.i("-------onHideCustomView-------");
         if (customView == null) {
             // 不是全屏播放状态
             return;
@@ -250,6 +275,7 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     @Override
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+        X5LogUtils.i("-------openFileChooser-------");
         openFileChooserImpl(uploadMsg);
     }
 
@@ -263,6 +289,7 @@ public class X5WebChromeClient extends WebChromeClient {
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> uploadMsg,
                                      FileChooserParams fileChooserParams) {
+        X5LogUtils.i("-------onShowFileChooser-------");
         openFileChooserImplForAndroid5(uploadMsg);
         return true;
     }

@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,47 +36,50 @@ import android.widget.ProgressBar;
 public class ProgressWebView extends FrameLayout {
 
     private X5WebView webView;
+    private String urlTitle;
 
     public ProgressWebView(@NonNull Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public ProgressWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public ProgressWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
-    private void init(){
-        Context context = getContext();
-        if (context!=null){
-            View view = LayoutInflater.from(context).inflate(
-                    R.layout.view_progress_web_view, this, false);
-            webView = view.findViewById(R.id.web_view);
-            final ProgressBar pbProgress = view.findViewById(R.id.pb_progress);
-            pbProgress.setVisibility(VISIBLE);
-            webView.getX5WebChromeClient().setWebListener(new InterWebListener() {
-                @Override
-                public void hindProgressBar() {
-                    pbProgress.setVisibility(GONE);
-                }
+    private void init(Context context){
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.view_progress_web_view, this, false);
+        webView = view.findViewById(R.id.web_view);
+        final ProgressBar pbProgress = view.findViewById(R.id.pb_progress);
+        pbProgress.setVisibility(VISIBLE);
+        webView.getX5WebChromeClient().setWebListener(new InterWebListener() {
+            @Override
+            public void hindProgressBar() {
+                pbProgress.setVisibility(GONE);
+            }
 
-                @Override
-                public void showErrorView() {
+            @Override
+            public void showErrorView() {
 
-                }
+            }
 
-                @Override
-                public void startProgress(int newProgress) {
-                    pbProgress.setProgress(newProgress);
-                }
-            });
-        }
+            @Override
+            public void startProgress(int newProgress) {
+                pbProgress.setProgress(newProgress);
+            }
+
+            @Override
+            public void showTitle(String title) {
+                urlTitle = title;
+            }
+        });
     }
 
     /**
@@ -86,6 +88,14 @@ public class ProgressWebView extends FrameLayout {
      */
     public X5WebView getWebView(){
         return webView;
+    }
+
+    /**
+     * 获取监听到url的标题
+     * @return
+     */
+    public String getTitle(){
+        return urlTitle;
     }
 
 }

@@ -39,6 +39,9 @@ import java.net.URLDecoder;
  *     desc  : 自定义x5的WebViewClient
  *     revise: 如果要自定义WebViewClient必须要集成此类
  *             demo地址：https://github.com/yangchong211/YCWebView
+ *
+ *             作用：主要辅助 WebView 处理J avaScript 的对话框、网站 Logo、网站 title、load 进度等处理
+ *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public class X5WebViewClient extends WebViewClient {
@@ -62,8 +65,9 @@ public class X5WebViewClient extends WebViewClient {
     public X5WebViewClient(BridgeWebView webView, Context context) {
         this.webView = webView;
         //将js对象与java对象进行映射
-        //webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
+        webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
+
 
     /**
      * 这个方法中可以做拦截
@@ -75,6 +79,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        X5LogUtils.i("-------shouldOverrideUrlLoading----1---"+url);
         if (TextUtils.isEmpty(url)) {
             return false;
         }
@@ -114,6 +119,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String url = request.getUrl().toString();
             try {
@@ -150,6 +156,7 @@ public class X5WebViewClient extends WebViewClient {
     public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
         super.onPageStarted(webView, s, bitmap);
         //设定加载开始的操作
+        X5LogUtils.i("-------onPageStarted-------"+s);
     }
 
     /**
@@ -159,6 +166,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public void onPageFinished(WebView view, String url) {
+        X5LogUtils.i("-------onPageFinished-------"+url);
         if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
             //隐藏进度条方法
             webListener.hindProgressBar();
@@ -181,7 +189,7 @@ public class X5WebViewClient extends WebViewClient {
         }
         //html加载完成之后，添加监听图片的点击js函数
         //addImageClickListener();
-        //addImageClickListener(webView);
+        addImageArrayClickListener(webView);
     }
 
     /**
@@ -198,6 +206,7 @@ public class X5WebViewClient extends WebViewClient {
     public void onReceivedError(WebView view, int errorCode, String description, String
             failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
+        X5LogUtils.i("-------onReceivedError-------"+failingUrl);
         if (errorCode == 404) {
             //用javascript隐藏系统定义的404页面信息
             String data = "Page NO FOUND！";
@@ -218,6 +227,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onScaleChanged(WebView view, float oldScale, float newScale) {
         super.onScaleChanged(view, oldScale, newScale);
+        X5LogUtils.i("-------onScaleChanged-------"+newScale);
         //视频全屏播放按返回页面被放大的问题
         if (newScale - oldScale > 7) {
             //异常放大，缩回去。
@@ -232,8 +242,9 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
+        X5LogUtils.i("-------onReceivedError-------"+error.getDescription().toString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            X5WebUtils.log("服务器异常"+error.getDescription().toString());
+            X5LogUtils.d("服务器异常"+error.getDescription().toString());
         }
         //ToastUtils.showToast("服务器异常6.0之后");
         //当加载错误时，就让它加载本地错误网页文件
@@ -254,6 +265,7 @@ public class X5WebViewClient extends WebViewClient {
     public void onReceivedHttpError(WebView view, WebResourceRequest request,
                                     WebResourceResponse errorResponse) {
         super.onReceivedHttpError(view, request, errorResponse);
+        X5LogUtils.i("-------onReceivedError-------"+ errorResponse.getReasonPhrase());
     }
 
 
@@ -267,6 +279,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
         super.onReceivedLoginRequest(view, realm, account, args);
+        X5LogUtils.i("-------onReceivedLoginRequest-------"+ args);
     }
 
     /**
@@ -282,9 +295,10 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         super.onReceivedSslError(view, handler, error);
+        X5LogUtils.i("-------onReceivedSslError-------"+ error.getUrl());
         if (error!=null){
             String url = error.getUrl();
-            X5WebUtils.log("onReceivedSslError----异常url----"+url);
+            X5LogUtils.i("onReceivedSslError----异常url----"+url);
         }
         //https忽略证书问题
         if (handler!=null){
@@ -303,6 +317,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onLoadResource(WebView webView, String s) {
         super.onLoadResource(webView, s);
+        X5LogUtils.i("-------onLoadResource-------"+ s);
     }
 
     /**

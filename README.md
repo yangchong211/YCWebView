@@ -19,6 +19,7 @@
     - 4.0.5 使用scheme协议打开链接风险
     - 4.0.6 如何处理加载错误
     - 4.0.7 webView防止内存泄漏
+    - 4.1.9 掘金问题反馈记录
 - 05.webView优化
     - 5.0.1 视频全屏播放按返回页面被放大
     - 5.0.2 加快加载webView中的图片资源
@@ -29,6 +30,7 @@
     - 5.0.7 DNS采用和客户端API相同的域名
     - 5.0.8 如何设置白名单操作
     - 5.0.9 后台无法释放js导致发热耗电
+    - 5.1.0 可以提前显示加载进度条
 - 06.关于参考
 - 07.其他说明介绍
 
@@ -121,6 +123,31 @@
         android:layout_height="match_parent"
         android:scrollbarSize="3dp" />
     ```
+- **如何使用自己的WebViewClient和WebChromeClient**
+    ```
+    //主要是在X5WebViewClient和X5WebChromeClient已经做了很多常见的逻辑处理，如果不满足你使用，可以如下这样写
+    MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView, this);
+    webView.setWebViewClient(webViewClient);
+    MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(this);
+    webView.setWebChromeClient(webChromeClient);
+    
+    private class MyX5WebViewClient extends X5WebViewClient {
+        public MyX5WebViewClient(BridgeWebView webView, Context context) {
+            super(webView, context);
+        }
+        
+        //重写你需要的方法即可
+    }
+    
+    private class MyX5WebChromeClient extends X5WebChromeClient{
+        public MyX5WebChromeClient(Activity activity) {
+            super(activity);
+        }
+        
+        //重写你需要的方法即可
+    }
+    ```
+
 
 #### 2.3 常用api
 - **关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理**
@@ -168,6 +195,10 @@
         }
     });
     ```
+- **其他api说明**
+```
+
+```
 
 #### 2.4 使用建议
 - **优化一下相关的操作**
@@ -389,6 +420,12 @@
         }
     }
     ```
+
+
+#### 4.1.9 掘金问题反馈记录
+- 使用JsBridge遇到的坑
+    - 由于JsBridge采用 json字符串，客户端传给前端数据中/进行了转义，导致前端收到数据后解析不出来。二，当前端给Native端发消息时，如果发送的消息频率过快，导致队列清空 shouldurl不回调，最终callback不回调，客户端也就收不到消息了。
+
 
 
 ### 05.webView优化
@@ -622,6 +659,9 @@
     }
     ```
 
+
+#### 5.1.0 可以提前显示加载进度条
+- 提前显示进度条不是提升性能 ， 但是对用户体验来说也是很重要的一点 ， WebView.loadUrl("url") 不会立马就回调 onPageStarted 或者 onProgressChanged 因为在这一时间段 ， WebView 有可能在初始化内核 ， 也有可能在与服务器建立连接 ， 这个时间段容易出现白屏
 
 
 ### 06.关于参考

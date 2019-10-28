@@ -81,7 +81,7 @@ public class EightActivity extends AppCompatActivity {
         });
         MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView, this);
         webView.setWebViewClient(webViewClient);
-        MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(this);
+        MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(webView,this);
         webView.setWebChromeClient(webChromeClient);
     }
 
@@ -112,8 +112,8 @@ public class EightActivity extends AppCompatActivity {
          *
          * @param activity 上下文
          */
-        public MyX5WebChromeClient(Activity activity) {
-            super(activity);
+        public MyX5WebChromeClient(BridgeWebView webView,Activity activity) {
+            super(webView,activity);
         }
     }
 

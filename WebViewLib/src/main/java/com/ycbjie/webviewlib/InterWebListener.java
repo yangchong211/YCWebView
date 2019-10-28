@@ -24,7 +24,7 @@ import android.support.annotation.IntRange;
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : web的接口回调，包括常见状态页面切换，进度条变化等
- *     revise:
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public interface InterWebListener {

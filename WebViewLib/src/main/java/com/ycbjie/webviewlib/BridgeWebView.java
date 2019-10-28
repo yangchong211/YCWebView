@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
@@ -46,14 +47,24 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 
 	public static final String TO_LOAD_JS = "WebViewJavascriptBridge.js";
 	private long uniqueId = 0;
-	Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
-	Map<String, BridgeHandler> messageHandlers = new HashMap<>();
+	private Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
+	private Map<String, BridgeHandler> messageHandlers = new HashMap<>();
 	BridgeHandler defaultHandler = new DefaultHandler();
 	private List<Message> startupMessage = new ArrayList<>();
+	private X5WebViewClient x5WebViewClient;
+	private X5WebChromeClient x5WebChromeClient;
+
+	/**
+	 * 获取消息list集合
+	 * @return							集合
+	 */
 	public List<Message> getStartupMessage() {
 		return startupMessage;
 	}
 
+	/**
+	 * 设置消息，注意目前在onProgressChanged方法中调用
+	 */
 	public void setStartupMessage(List<Message> startupMessage) {
 		this.startupMessage = startupMessage;
 	}
@@ -89,12 +100,19 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
-		this.setWebViewClient(generateBridgeWebViewClient());
+		x5WebViewClient = new X5WebViewClient(this,getContext());
+		this.setWebViewClient(x5WebViewClient);
+		x5WebChromeClient = new X5WebChromeClient(this, (Activity) getContext());
+		this.setWebChromeClient(x5WebChromeClient);
 	}
 
     protected X5WebViewClient generateBridgeWebViewClient() {
-        return new X5WebViewClient(this,getContext());
+        return x5WebViewClient;
     }
+
+	protected X5WebChromeClient generateBridgeWebChromeClient() {
+		return x5WebChromeClient;
+	}
 
     /**
      * 获取到CallBackFunction data执行调用并且从数据集移除

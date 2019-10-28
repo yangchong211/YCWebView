@@ -144,10 +144,8 @@ public final class BridgeUtil {
                     sb.append(line);
                 }
             } while (line != null);
-
             bufferedReader.close();
             in.close();
- 
             return sb.toString();
 		} catch (Exception e) {
 			e.printStackTrace();

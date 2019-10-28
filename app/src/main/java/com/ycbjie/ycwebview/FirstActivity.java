@@ -57,7 +57,7 @@ public class FirstActivity extends AppCompatActivity {
         setContentView(R.layout.activity_first);
         webView = findViewById(R.id.web_view);
 
-        String url = "http://www.baidu.com";
+        String url = "https://github.com/yangchong211";
         webView.loadUrl(url);
     }
 }

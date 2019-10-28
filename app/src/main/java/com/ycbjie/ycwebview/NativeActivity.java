@@ -141,6 +141,11 @@ public class NativeActivity extends AppCompatActivity {
         public void startProgress(int newProgress) {
             pb.setProgress(newProgress);
         }
+
+        @Override
+        public void showTitle(String title) {
+
+        }
     };
 
 

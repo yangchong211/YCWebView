@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.tencent.smtt.sdk.WebSettings;
 
@@ -38,8 +39,6 @@ import static android.os.Build.VERSION_CODES.KITKAT;
  * </pre>
  */
 public class X5WebView extends BridgeWebView {
-
-    private X5WebChromeClient x5WebChromeClient;
 
     public X5WebView(Context arg0) {
         this(arg0,null);
@@ -88,6 +87,8 @@ public class X5WebView extends BridgeWebView {
         //ws.setBlockNetworkImage(false);
         // 使用localStorage则必须打开
         ws.setDomStorageEnabled(true);
+        //防止中文乱码
+        ws.setDefaultTextEncodingName("UTF -8");
         // 排版适应屏幕
         ws.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
         // WebView是否新窗口打开(加了后可能打不开网页)
@@ -106,9 +107,8 @@ public class X5WebView extends BridgeWebView {
         } else {
             ws.setLoadsImagesAutomatically(false);
         }
-        //设置WebChromeClient
-        x5WebChromeClient = new X5WebChromeClient((Activity) getContext());
-        this.setWebChromeClient(x5WebChromeClient);
+        //默认关闭硬件加速
+        setOpenLayerType(false);
     }
 
     /**
@@ -116,7 +116,7 @@ public class X5WebView extends BridgeWebView {
      * @return                          X5WebChromeClient对象
      */
     public X5WebChromeClient getX5WebChromeClient(){
-        return x5WebChromeClient;
+        return this.generateBridgeWebChromeClient();
     }
 
     /**
@@ -130,8 +130,25 @@ public class X5WebView extends BridgeWebView {
     /**
      * 刷新界面可以用这个方法
      */
-    public void reLoad(){
+    public void reLoadView(){
         this.reload();
+    }
+
+    /**
+     * 是否开启软硬件加速
+     * @param layerType                布尔值
+     */
+    public void setOpenLayerType(boolean layerType){
+        if (layerType){
+            //开启软硬件加速，开启软硬件加速这个性能提升还是很明显的，但是会耗费更大的内存 。
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            } else {
+                this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            }
+        }
     }
 
 }

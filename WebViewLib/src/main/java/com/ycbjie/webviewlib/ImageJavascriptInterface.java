@@ -26,7 +26,7 @@ import android.util.Log;
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : WebView与android交互的接口设置实现类
- *     revise:
+ *     revise: js通信接口
  * </pre>
  */
 public class ImageJavascriptInterface {

@@ -30,7 +30,7 @@ import org.json.JSONTokener;
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : 自定义消息Message实体类
- *     revise:
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
 public class Message {

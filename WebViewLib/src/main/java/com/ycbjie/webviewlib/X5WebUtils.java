@@ -21,9 +21,14 @@ import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 
+import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
+
+import java.util.ArrayList;
 
 /**
  * <pre>
@@ -35,8 +40,6 @@ import com.tencent.smtt.sdk.QbSdk;
  * </pre>
  */
 public final class X5WebUtils {
-
-    private static boolean isDebug = false;
 
     /**
      * 不能直接new，否则抛个异常
@@ -106,16 +109,31 @@ public final class X5WebUtils {
     }
 
     /**
-     * 设置是否打印日志，默认是不打印的
-     * @param debug                         是否打印日志
+     * 同步cookie
+     * 建议调用webView.loadUrl(url)之前一句调用此方法就可以给WebView设置Cookie
+     * @param url               地址
+     * @param cookieList        需要添加的Cookie值,以键值对的方式:key=value
      */
-    public static void setLog(boolean debug){
-        isDebug = debug;
-    }
-
-    protected static void log(String log){
-        if (isDebug){
-            Log.d("YCWebView----",log);
+    public static void syncCookie(Context context , String url, ArrayList<String> cookieList) {
+        //初始化
+        CookieSyncManager.createInstance(context);
+        //获取对象
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        //移除
+        cookieManager.removeSessionCookie();
+        //添加cookie操作
+        if (cookieList != null && cookieList.size() > 0) {
+            for (String cookie : cookieList) {
+                cookieManager.setCookie(url, cookie);
+            }
+        }
+        String cookies = cookieManager.getCookie(url);
+        X5LogUtils.d("cookies-------"+cookies);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.flush();
+        } else {
+            CookieSyncManager.getInstance().sync();
         }
     }
 

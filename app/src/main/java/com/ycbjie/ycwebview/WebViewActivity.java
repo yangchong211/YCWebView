@@ -90,6 +90,7 @@ public class WebViewActivity extends AppCompatActivity {
     public void initView() {
         mWebView = findViewById(R.id.web_view);
         pb = findViewById(R.id.pb);
+        pb.setVisibility(View.VISIBLE);
         mWebView.loadUrl("https://github.com/yangchong211/LifeHelper");
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
@@ -110,6 +111,11 @@ public class WebViewActivity extends AppCompatActivity {
         @Override
         public void startProgress(int newProgress) {
             pb.setProgress(newProgress);
+        }
+
+        @Override
+        public void showTitle(String title) {
+
         }
     };
 }
