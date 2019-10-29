@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="1.浏览普通的网页"/>
 
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="2.1 带加载进度条的网页"/>
 
@@ -33,6 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="2.2 带加载进度条的网页"/>
 
@@ -42,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="3.电话，短信，邮件注入js"/>
 
@@ -52,6 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="5.播放网页中的视频，包括全频播放"/>
 
@@ -61,6 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="6.在h5中打开相册上传图片"/>
 
@@ -70,6 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="7.原生native和h5交互，该案例是参考JsBridge"/>
 
@@ -80,6 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="8.长按web页面处理，可以复制web页面文字，以及图片"/>
 
@@ -89,9 +97,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
+        android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="9.加载word，ppt，pdf等文档文件"/>
 
+    <TextView
+        android:id="@+id/tv_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:textSize="12sp"
+        android:background="@color/colorAccent"
+        android:text="10.和scrollView结合使用，比如商城商品详情页使用场景"/>
 
 
 </LinearLayout>

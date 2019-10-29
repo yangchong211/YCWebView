@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.ycbjie.ycwebview.ten.TenActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_7).setOnClickListener(this);
         findViewById(R.id.tv_8).setOnClickListener(this);
         findViewById(R.id.tv_9).setOnClickListener(this);
+        findViewById(R.id.tv_10).setOnClickListener(this);
     }
 
     @Override
@@ -52,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_9:
                 startActivity(new Intent(this,FileDisplayActivity.class));
+                break;
+            case R.id.tv_10:
+                startActivity(new Intent(this, TenActivity.class));
                 break;
             default:
                 break;
