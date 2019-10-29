@@ -326,10 +326,9 @@ public class X5WebViewClient extends WebViewClient {
      * 然后取出其对应的src属性
      * 循环遍历设置图片的点击事件
      * 将src作为参数传给java代码
-     * 在java回调方法中对界面进行跳转处理，用PhotoView加载大图实现，便于手势的操作
      * 这个循环将所图片放入数组，当js调用本地方法时传入。
      * 当然如果采用方式一获取图片的话，本地方法可以不需要传入这个数组
-     * //通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
+     * 通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
      * @param webView                       webview
      */
     private void addImageArrayClickListener(WebView webView) {

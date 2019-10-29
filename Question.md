@@ -222,6 +222,87 @@
 
 
 ### 15.WebView中图片点击放大
+- 首先载入js
+    ```
+    //将js对象与java对象进行映射
+    webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
+    ```
+- html加载完成之后，添加监听图片的点击js函数，这个可以在onPageFinished方法中操作
+    ```
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        X5LogUtils.i("-------onPageFinished-------"+url);
+        //html加载完成之后，添加监听图片的点击js函数
+        //addImageClickListener();
+        addImageArrayClickListener(webView);
+    }
+    ```
+- 具体看addImageArrayClickListener的实现方法。
+    ```
+    /**
+     * android与js交互：
+     * 首先我们拿到html中加载图片的标签img.
+     * 然后取出其对应的src属性
+     * 循环遍历设置图片的点击事件
+     * 将src作为参数传给java代码
+     * 这个循环将所图片放入数组，当js调用本地方法时传入。
+     * 当然如果采用方式一获取图片的话，本地方法可以不需要传入这个数组
+     * 通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
+     * @param webView                       webview
+     */
+    private void addImageArrayClickListener(WebView webView) {
+        webView.loadUrl("javascript:(function(){" +
+                "var objs = document.getElementsByTagName(\"img\"); " +
+                "var array=new Array(); " +
+                "for(var j=0;j<objs.length;j++){" +
+                "    array[j]=objs[j].src; " +
+                "}"+
+                "for(var i=0;i<objs.length;i++)  " +
+                "{"
+                + "    objs[i].onclick=function()  " +
+                "    {  "
+                + "        window.imagelistener.openImage(this.src,array);  " +
+                "    }  " +
+                "}" +
+                "})()");
+    }
+    ```
+- 最后看看js的通信接口做了什么
+    ```
+    public class ImageJavascriptInterface {
+    
+        private Context context;
+        private String[] imageUrls;
+    
+        public ImageJavascriptInterface(Context context,String[] imageUrls) {
+            this.context = context;
+            this.imageUrls = imageUrls;
+        }
+    
+        public ImageJavascriptInterface(Context context) {
+            this.context = context;
+        }
+    
+        /**
+         * 接口返回的方式
+         */
+        @android.webkit.JavascriptInterface
+        public void openImage(String img , String[] imageUrls) {
+            Intent intent = new Intent();
+            intent.putExtra("imageUrls", imageUrls);
+            intent.putExtra("curImageUrl", img);
+    //        intent.setClass(context, PhotoBrowserActivity.class);
+            context.startActivity(intent);
+            for (int i = 0; i < imageUrls.length; i++) {
+                Log.e("图片地址"+i,imageUrls[i].toString());
+            }
+        }
+    }
+    ```
+
+
+
+
 
 
 
