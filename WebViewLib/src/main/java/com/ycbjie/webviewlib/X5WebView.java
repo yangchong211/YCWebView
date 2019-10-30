@@ -16,7 +16,6 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;

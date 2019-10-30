@@ -24,6 +24,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
+import com.tencent.smtt.export.external.interfaces.JsPromptResult;
+import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
@@ -141,6 +143,34 @@ public class X5WebChromeClient extends WebChromeClient {
             }
         }
         X5LogUtils.i("-------onReceivedTitle-------"+title);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     * @param s1                                s1
+     * @param s2                                s2
+     * @param jsPromptResult                    jsPromptResult
+     * @return
+     */
+    @Override
+    public boolean onJsPrompt(WebView webView, String s, String s1,
+                              String s2, JsPromptResult jsPromptResult) {
+        return super.onJsPrompt(webView, s, s1, s2, jsPromptResult);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     * @param s1                                s1
+     * @param jsResult                          jsResult
+     * @return
+     */
+    @Override
+    public boolean onJsAlert(WebView webView, String s, String s1, JsResult jsResult) {
+        return super.onJsAlert(webView, s, s1, jsResult);
     }
 
     /**

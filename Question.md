@@ -1,20 +1,191 @@
 #### 问题汇总目录介绍
-- 01.关于js注入时机修改
-- 02.WebView进化史介绍
-- 03.提前初始化WebView必要性
-- 04.如何保证js安全性
-- 07.如何代码开启硬件加速
-- 08.WebView设置Cookie
-- 09.webView加载网页不显示图片
-- 11.提前显示加载进度条
-- 12.绕过证书校验漏洞
-- 13.allowFileAccess漏洞
-- 14.WebView嵌套ScrollView问题
-- 15.WebView中图片点击放大
+- 4.0.0 WebView进化史介绍
+- 4.0.1 提前初始化WebView必要性
+- 4.0.2 x5加载office资源
+- 4.0.3 WebView播放视频问题
+- 4.0.4 无法获取webView的正确高度
+- 4.0.5 使用scheme协议打开链接风险
+- 4.0.6 如何处理加载错误
+- 4.0.7 webView防止内存泄漏
+- 4.0.8 关于js注入时机修改
+- 4.0.9 视频播放宽度超过屏幕
+- 4.1.0 如何保证js安全性
+- 4.1.1 如何代码开启硬件加速
+- 4.1.2 WebView设置Cookie
+- 4.1.4 webView加载网页不显示图片
+- 4.1.5 绕过证书校验漏洞
+- 4.1.6 allowFileAccess漏洞
+- 4.1.7 WebView嵌套ScrollView问题
+- 4.1.8 WebView中图片点击放大
+- 4.1.9 页面滑动期间不渲染/执行
+- 4.2.0 被运营商劫持和注入问题
+- 4.2.1 解决资源加载缓慢问题
+- 4.2.2 判断是否已经滚动到页面底端
 
 
-### 参考博客
-- https://juejin.im/post/58a037df86b599006b3fade4
+
+### 4.0.0 WebView进化史介绍
+- 进化史如下所示
+    - 从Android4.4系统开始，Chromium内核取代了Webkit内核。
+    - 从Android5.0系统开始，WebView移植成了一个独立的apk，可以不依赖系统而独立存在和更新。
+    - 从Android7.0 系统开始，如果用户手机里安装了 Chrome ， 系统优先选择 Chrome 为应用提供 WebView 渲染。
+    - 从Android8.0系统开始，默认开启WebView多进程模式，即WebView运行在独立的沙盒进程中。
+
+
+### 4.0.1 提前初始化WebView必要性
+- 第一次打开Web面 ，使用WebView加载页面的时候特别慢，第二次打开就能明显的感觉到速度有提升，为什么？
+    - 是因为在你第一次加载页面的时候 WebView 内核并没有初始化 ，所以在第一次加载页面的时候需要耗时去初始化WebView内核 。
+    - 提前初始化WebView内核 ，例如如下把它放到了Application里面去初始化 , 在页面里可以直接使用该WebView，这种方法可以比较有效的减少WebView在App中的首次打开时间。当用户访问页面时，不需要初始化WebView的时间。
+    - 但是这样也有不好的地方，额外的内存消耗。页面间跳转需要清空上一个页面的痕迹，更容易内存泄露。
+
+
+### 4.0.2 x5加载office资源
+- 关于加载word，pdf，xls等文档文件注意事项：Tbs不支持加载网络的文件，需要先把文件下载到本地，然后再加载出来
+- 还有一点要注意，在onDestroy方法中调用此方法mTbsReaderView.onStop()，否则第二次打开无法浏览。更多可以看FileReaderView类代码！
+
+
+
+### 4.0.3 WebView播放视频问题
+- 1、此次的方案用到WebView，而且其中会有视频嵌套，在默认的WebView中直接播放视频会有问题， 而且不同的SDK版本情况还不一样，网上搜索了下解决方案，在此记录下. webView.getSettings.setPluginState(PluginState.ON);webView.setWebChromeClient(new WebChromeClient());
+- 2、然后在webView的Activity配置里面加上： android:hardwareAccelerated="true"
+- 3、以上可以正常播放视频了，但是webview的页面都finish了居然还能听 到视频播放的声音， 于是又查了下发现webview的onResume方法可以继续播放，onPause可以暂停播放， 但是这两个方法都是在Added in API level 11添加的，所以需要用反射来完成。
+- 4、停止播放：在页面的onPause方法中使用：webView.getClass().getMethod("onPause").invoke(webView, (Object[])null);
+- 5、继续播放：在页面的onResume方法中使用：webView.getClass().getMethod("onResume").invoke(webView,(Object[])null);这样就可以控制视频的暂停和继续播放了。
+
+
+### 4.0.4 无法获取webView的正确高度
+- 偶发情况，获取不到webView的内容高度
+    - 其中htmlString是一个HTML格式的字符串。
+    ```
+    webView.loadData(htmlString, "text/html", "utf-8");
+    webView.setWebViewClient(new WebViewClient() {
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            Log.d("yc", view.getContentheight() + "");
+        }
+    });
+    ```
+    - 这是因为onPageFinished回调指的WebView已经完成从网络读取的字节数，这一点。在点onPageFinished被激发的页面可能还没有被解析。
+- 第一种解决办法：提供onPageFinished（）一些延迟
+    ```
+    webView.setWebViewClient(new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            webView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    int contentHeight = webView.getContentHeight();
+                    int viewHeight = webView.getHeight();
+                }
+            }, 500);
+        }
+    });
+    ```
+- 第二种解决办法：使用js获取内容高度，具体可以看这篇文章：https://www.jianshu.com/p/ad22b2649fba
+
+
+
+### 4.0.5 使用scheme协议打开链接风险
+- 常见的用法是在APP获取到来自网页的数据后，重新生成一个intent，然后发送给别的组件使用这些数据。比如使用Webview相关的Activity来加载一个来自网页的url，如果此url来自url scheme中的参数，如：yc://ycbjie:8888/from?load_url=http://www.taobao.com。
+    - 如果在APP中，没有检查获取到的load_url的值，攻击者可以构造钓鱼网站，诱导用户点击加载，就可以盗取用户信息。
+    - 这个时候，别人非法篡改参数，于是将scheme协议改成yc://ycbjie:8888/from?load_url=http://www.doubi.com。这个时候点击进去即可进入钓鱼链接地址。
+- 使用建议
+    - APP中任何接收外部输入数据的地方都是潜在的攻击点，过滤检查来自网页的参数。
+    - 不要通过网页传输敏感信息，有的网站为了引导已经登录的用户到APP上使用，会使用脚本动态的生成URL Scheme的参数，其中包括了用户名、密码或者登录态token等敏感信息，让用户打开APP直接就登录了。恶意应用也可以注册相同的URL Sechme来截取这些敏感信息。Android系统会让用户选择使用哪个应用打开链接，但是如果用户不注意，就会使用恶意应用打开，导致敏感信息泄露或者其他风险。
+- 解决办法
+    - 在内嵌的WebView中应该限制允许打开的WebView的域名，并设置运行访问的白名单。或者当用户打开外部链接前给用户强烈而明显的提示。具体操作可以看5.0.8 如何设置白名单操作方式。
+
+
+### 4.0.6 如何处理加载错误(Http、SSL、Resource)
+- 对于WebView加载一个网页过程中所产生的错误回调，大致有三种
+    ```
+    /**
+     * 只有在主页面加载出现错误时，才会回调这个方法。这正是展示加载错误页面最合适的方法。
+     * 然而，如果不管三七二十一直接展示错误页面的话，那很有可能会误判，给用户造成经常加载页面失败的错觉。
+     * 由于不同的WebView实现可能不一样，所以我们首先需要排除几种误判的例子：
+     *      1.加载失败的url跟WebView里的url不是同一个url，排除；
+     *      2.errorCode=-1，表明是ERROR_UNKNOWN的错误，为了保证不误判，排除
+     *      3failingUrl=null&errorCode=-12，由于错误的url是空而不是ERROR_BAD_URL，排除
+     * @param webView                                           webView
+     * @param errorCode                                         errorCode
+     * @param description                                       description
+     * @param failingUrl                                        failingUrl
+     */
+    @Override
+    public void onReceivedError(WebView webView, int errorCode,
+                                String description, String failingUrl) {
+        super.onReceivedError(webView, errorCode, description, failingUrl);
+        // -12 == EventHandle.ERROR_BAD_URL, a hide return code inside android.net.http package
+        if ((failingUrl != null && !failingUrl.equals(webView.getUrl())
+                && !failingUrl.equals(webView.getOriginalUrl())) /* not subresource error*/
+                || (failingUrl == null && errorCode != -12) /*not bad url*/
+                || errorCode == -1) { //当 errorCode = -1 且错误信息为 net::ERR_CACHE_MISS
+            return;
+        }
+        if (!TextUtils.isEmpty(failingUrl)) {
+            if (failingUrl.equals(webView.getUrl())) {
+                //做自己的错误操作，比如自定义错误页面
+            }
+        }
+    }
+
+    /**
+     * 只有在主页面加载出现错误时，才会回调这个方法。这正是展示加载错误页面最合适的方法。
+     * 然而，如果不管三七二十一直接展示错误页面的话，那很有可能会误判，给用户造成经常加载页面失败的错觉。
+     * 由于不同的WebView实现可能不一样，所以我们首先需要排除几种误判的例子：
+     *      1.加载失败的url跟WebView里的url不是同一个url，排除；
+     *      2.errorCode=-1，表明是ERROR_UNKNOWN的错误，为了保证不误判，排除
+     *      3failingUrl=null&errorCode=-12，由于错误的url是空而不是ERROR_BAD_URL，排除
+     * @param webView                                           webView
+     * @param webResourceRequest                                webResourceRequest
+     * @param webResourceError                                  webResourceError
+     */
+    @Override
+    public void onReceivedError(WebView webView, WebResourceRequest webResourceRequest,
+                                WebResourceError webResourceError) {
+        super.onReceivedError(webView, webResourceRequest, webResourceError);
+    }
+
+    /**
+     * 任何HTTP请求产生的错误都会回调这个方法，包括主页面的html文档请求，iframe、图片等资源请求。
+     * 在这个回调中，由于混杂了很多请求，不适合用来展示加载错误的页面，而适合做监控报警。
+     * 当某个URL，或者某个资源收到大量报警时，说明页面或资源可能存在问题，这时候可以让相关运营及时响应修改。
+     * @param webView                                           webView
+     * @param webResourceRequest                                webResourceRequest
+     * @param webResourceResponse                               webResourceResponse
+     */
+    @Override
+    public void onReceivedHttpError(WebView webView, WebResourceRequest webResourceRequest,
+                                    WebResourceResponse webResourceResponse) {
+        super.onReceivedHttpError(webView, webResourceRequest, webResourceResponse);
+    }
+
+    /**
+     * 任何HTTPS请求，遇到SSL错误时都会回调这个方法。
+     * 比较正确的做法是让用户选择是否信任这个网站，这时候可以弹出信任选择框供用户选择（大部分正规浏览器是这么做的）。
+     * 有时候，针对自己的网站，可以让一些特定的网站，不管其证书是否存在问题，都让用户信任它。
+     * 坑：有时候部分手机打开页面报错，绝招：让自己网站的所有二级域都是可信任的。
+     * @param webView                                           webView
+     * @param sslErrorHandler                                   sslErrorHandler
+     * @param sslError                                          sslError
+     */
+    @Override
+    public void onReceivedSslError(WebView webView, SslErrorHandler sslErrorHandler, SslError sslError) {
+        super.onReceivedSslError(webView, sslErrorHandler, sslError);
+        //判断网站是否是可信任的，与自己网站host作比较
+        if (WebViewUtils.isYCHost(webView.getUrl())) {
+            //如果是自己的网站，则继续使用SSL证书
+            sslErrorHandler.proceed();
+        } else {
+            super.onReceivedSslError(webView, sslErrorHandler, sslError);
+        }
+    }
+    ```
+
+
+### 4.0.9 视频播放宽度超过屏幕
+- 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
 
 
 ### 01.关于js注入时机修改
@@ -84,17 +255,37 @@
     ```
 
 
-### 02.WebView进化史介绍
-- 进化史如下所示
-    - 从Android4.4系统开始，Chromium内核取代了Webkit内核。
-    - 从Android5.0系统开始，WebView移植成了一个独立的apk，可以不依赖系统而独立存在和更新。
-    - 从Android7.0 系统开始，如果用户手机里安装了 Chrome ， 系统优先选择 Chrome 为应用提供 WebView 渲染。
-    - 从Android8.0系统开始，默认开启WebView多进程模式，即WebView运行在独立的沙盒进程中。
+### 4.1.0 如何保证js安全性
+- Android和js如何通信
+    - 为了与Web页面实现动态交互，Android应用程序允许WebView通过WebView.addJavascriptInterface接口向Web页面注入Java对象，页面Javascript脚本可直接引用该对象并调用该对象的方法。
+    - 这类应用程序一般都会有类似如下的代码：
+        ```
+        webView.addJavascriptInterface(javaObj, "jsObj");
+        ```
+    - 此段代码将javaObj对象暴露给js脚本，可以通过jsObj对象对其进行引用，调用javaObj的方法。结合Java的反射机制可以通过js脚本执行任意Java代码，相关代码如下：
+        - 当受影响的应用程序执行到上述脚本的时候，就会执行someCmd指定的命令。
+        ```
+        <script>
+        　　function execute(cmdArgs) {
+            　　return jsobj.getClass().forName("java.lang.Runtime").getMethod("getRuntime",null).invoke(null,null).exec(cmdArgs);
+        　　}
+        
+        　　execute(someCmd);
+        </script>
+        ```
+- addJavascriptInterface任何命令执行漏洞
+    - 在webView中使用js与html进行交互是一个不错的方式，但是，在Android4.2(16，包含4.2)及以下版本中，如果使用addJavascriptInterface，则会存在被注入js接口的漏洞；在4.2之后，由于Google增加了@JavascriptInterface，该漏洞得以解决。
+- @JavascriptInterface注解做了什么操作
+    - 之前，任何Public的函数都可以在JS代码中访问，而Java对象继承关系会导致很多Public的函数都可以在JS中访问，其中一个重要的函数就是getClass()。然后JS可以通过反射来访问其他一些内容。通过引入 @JavascriptInterface注解，则在JS中只能访问 @JavascriptInterface注解的函数。这样就可以增强安全性。
 
 
 
-### 03.提前初始化WebView必要性
-- https://www.jianshu.com/p/fc7909e24178
+### 4.1.1 如何代码开启硬件加速
+- 开启软硬件加速这个性能提升还是很明显的，但是会耗费更大的内存 。直接调用代码api即可完成，webView.setOpenLayerType(true);
+
+
+### 4.1.2 WebView设置Cookie
+- h5页面为何要设置cookie，主要是避免网页重复登录，作用是记录用户登录信息，下次进去不需要重复登录。
 - 代码里怎么设置Cookie，如下所示
     ```
     /**
@@ -132,41 +323,25 @@
     webView.getSettings().setBuiltInZoomControls(true);  
     webView.getSettings().setJavaScriptEnabled(true);  
     ```
+- 还有跨域问题： 域A: test1.yc.com 域B: test2.yc.com
+    - 那么在域A生产一个可以使域A和域B都能访问的Cookie就需要将Cookie的domain设置为.yc.com；
+    - 如果要在域A生产一个令域A不能访问而域能访问的Cookie就要将Cookie设置为test2.yc.com。
+- Cookie的过期机制
+    - 可以设置Cookie的生效时间字段名为： expires 或 max-age。
+        - expires：过期的时间点
+        - max-age：生效的持续时间，单位为秒。
+    - 若将Cookie的 max-age 设置为负数，或者 expires 字段设置为过期时间点，数据库更新后这条Cookie将从数据库中被删除。如果将Cookie的 max-age 和 expires 字段设置为正常的过期日期，则到期后再数据库更新时会删除该条数据。
+- 下面列出几个有用的接口：
+    - 获取某个url下的所有Cookie：CookieManager.getInstance().getCookie(url)
+    - 判断WebView是否接受Cookie：CookieManager.getInstance().acceptCookie()
+    - 清除Session Cookie：CookieManager.getInstance().removeSessionCookies(ValueCallback<Boolean> callback)
+    - 清除所有Cookie：CookieManager.getInstance().removeAllCookies(ValueCallback<Boolean> callback)
+    - Cookie持久化：CookieManager.getInstance().flush()
+    - 针对某个主机设置Cookie：CookieManager.getInstance().setCookie(String url, String value)
 
 
-### 04.如何保证js安全性
-- Android和js如何通信
-    - 为了与Web页面实现动态交互，Android应用程序允许WebView通过WebView.addJavascriptInterface接口向Web页面注入Java对象，页面Javascript脚本可直接引用该对象并调用该对象的方法。
-    - 这类应用程序一般都会有类似如下的代码：
-        ```
-        webView.addJavascriptInterface(javaObj, "jsObj");
-        ```
-    - 此段代码将javaObj对象暴露给js脚本，可以通过jsObj对象对其进行引用，调用javaObj的方法。结合Java的反射机制可以通过js脚本执行任意Java代码，相关代码如下：
-        - 当受影响的应用程序执行到上述脚本的时候，就会执行someCmd指定的命令。
-        ```
-        <script>
-        　　function execute(cmdArgs) {
-            　　return jsobj.getClass().forName("java.lang.Runtime").getMethod("getRuntime",null).invoke(null,null).exec(cmdArgs);
-        　　}
-        
-        　　execute(someCmd);
-        </script>
-        ```
-- addJavascriptInterface任何命令执行漏洞
-    - 在webview中使用js与html进行交互是一个不错的方式，但是，在Android4.2(16，包含4.2)及以下版本中，如果使用addJavascriptInterface，则会存在被注入js接口的漏洞；在4.2之后，由于Google增加了@JavascriptInterface，该漏洞得以解决。
-- @JavascriptInterface注解做了什么操作
-    - 之前，任何Public的函数都可以在JS代码中访问，而Java对象继承关系会导致很多Public的函数都可以在JS中访问，其中一个重要的函数就是getClass()。然后JS可以通过反射来访问其他一些内容。通过引入 @JavascriptInterface注解，则在JS中只能访问 @JavascriptInterface注解的函数。这样就可以增强安全性。
 
-
-### 07.如何代码开启硬件加速
-- 开启软硬件加速这个性能提升还是很明显的，但是会耗费更大的内存 。直接调用代码api即可完成，webView.setOpenLayerType(true);
-
-
-### 08.WebView设置Cookie
-- https://www.jianshu.com/p/53897db4d734
-
-
-### 09.webView加载网页不显示图片
+### 4.1.4 webView加载网页不显示图片
 - webView从Lollipop(5.0)开始webView默认不允许混合模式, https当中不能加载http资源, 而开发的时候可能使用的是https的链接, 但是链接中的图片可能是http的, 所以需要设置开启。
     ```
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -176,24 +351,8 @@
     ```
 
 
-### 11.提前显示加载进度条
-- 提前显示进度条不是提升性能 ， 但是对用户体验来说也是很重要的一点 ， WebView.loadUrl("url") 不会立马就回调 onPageStarted 或者 onProgressChanged 因为在这一时间段，WebView 有可能在初始化内核，也有可能在与服务器建立连接，这个时间段容易出现白屏，白屏用户体验是很糟糕的 ，所以建议
-    ```
-    //正确
-    pb.setVisibility(View.VISIBLE);
-    mWebView.loadUrl("https://github.com/yangchong211/LifeHelper");
-    
-    //不太好
-    @Override
-    public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
-        super.onPageStarted(webView, s, bitmap);
-        //设定加载开始的操作
-        pb.setVisibility(View.VISIBLE);
-    }
-    ```
 
-
-### 12.绕过证书校验漏洞
+### 4.1.5 绕过证书校验漏洞
 - webviewClient中有onReceivedError方法，当出现证书校验错误时，我们可以在该方法中使用handler.proceed()来忽略证书校验继续加载网页，或者使用默认的handler.cancel()来终端加载。
     - 因为我们使用了handler.proceed()，由此产生了该“绕过证书校验漏洞”。如果确定所有页面都能满足证书校验，则不必要使用handler.proceed()
     ```
@@ -207,21 +366,21 @@
 
 
 
-### 13.allowFileAccess漏洞
+### 4.1.6 allowFileAccess漏洞
 - 如果webview.getSettings().setAllowFileAccess(boolean)设置为true，则会面临该问题；该漏洞是通过WebView对Javascript的延时执行和html文件替换产生的。
     - 解决方案是禁止WebView页面打开本地文件，即：webview.getSettings().setAllowFileAccess(false);
     - 或者更直接的禁止使用JavaScript：webview.getSettings().setJavaScriptEnabled(false);
 
 
 
-### 14.WebView嵌套ScrollView问题
+### 4.1.7 WebView嵌套ScrollView问题
 - 问题描述
     - 当 WebView 嵌套在 ScrollView 里面的时候，如果 WebView 先加载了一个高度很高的网页，然后加载了一个高度很低的网页，就会造成 WebView 的高度无法自适应，底部出现大量空白的情况出现。
 - 为何出现这种情况
 
 
 
-### 15.WebView中图片点击放大
+### 4.1.8 WebView中图片点击放大
 - 首先载入js
     ```
     //将js对象与java对象进行映射
@@ -299,6 +458,67 @@
         }
     }
     ```
+
+
+### 4.1.9 页面滑动期间不渲染/执行
+- 在有些需求中会有一些吸顶的元素，例如导航条，购买按钮等；当页面滚动超出元素高度后，元素吸附在屏幕顶部。在WebView中成了难题：在页面滚动期间，Scroll Event不触发。不仅如此，WebView在滚动期间还有各种限定：
+    - setTimeout和setInterval不触发。
+    - GIF动画不播放。
+    - 很多回调会延迟到页面停止滚动之后。
+    - background-position: fixed不支持。
+- 这些限制让WebView在滚动期间很难有较好的体验。这些限制大部分是不可突破的，但至少对于吸顶功能还是可以做一些支持，解决方法：
+    - 在Android上，监听touchMove事件可以在滑动期间做元素的position切换（惯性运动期间就无效了）。
+- 参考美团技术文章
+
+
+
+### 4.2.0 被运营商劫持和注入问题
+- 由于WebView加载的页面代码是从服务器动态获取的，这些代码将会很容易被中间环节所窃取或者修改，其中最主要的问题出自地方运营商和一些WiFi。监测到的问题包括：
+    - 无视通信规则强制缓存页面。
+    - header被篡改。
+    - 页面被注入广告。
+    - 页面被重定向。
+    - 页面被重定向并重新iframe到新页面，框架嵌入广告。
+    - HTTPS请求被拦截。
+    - DNS劫持。
+- 针对页面注入的行为，有一些解决方案：
+    - 1.使用CSP（Content Security Policy）
+    - 2.HTTPS。
+        - HTTPS可以防止页面被劫持或者注入，然而其副作用也是明显的，网络传输的性能和成功率都会下降，而且HTTPS的页面会要求页面内所有引用的资源也是HTTPS的，对于大型网站其迁移成本并不算低。HTTPS的一个问题在于：一旦底层想要篡改或者劫持，会导致整个链接失效，页面无法展示。这会带来一个问题：本来页面只是会被注入广告，而且广告会被CSP拦截，而采用了HTTPS后，整个网页由于受到劫持完全无法展示。
+        - 对于安全要求不高的静态页面，就需要权衡HTTPS带来的利与弊了。
+    - 3.App使用Socket代理请求
+        - 如果HTTP请求容易被拦截，那么让App将其转换为一个Socket请求，并代理WebView的访问也是一个办法。
+        - 通常不法运营商或者WiFi都只能拦截HTTP（S）请求，对于自定义的包内容则无法拦截，因此可以基本解决注入和劫持的问题。
+        - Socket代理请求也存在问题：
+        - 首先，使用客户端代理的页面HTML请求将丧失边下载边解析的能力；根据前面所述，浏览器在HTML收到部分内容后就立刻开始解析，并加载解析出来的外链、图片等，执行内联的脚本……而目前WebView对外并没有暴露这种流式的HTML接口，只能由客户端完全下载好HTML后，注入到WebView中。因此其性能将会受到影响。
+        - 其次，其技术问题也是较多的，例如对跳转的处理，对缓存的处理，对CDN的处理等等……稍不留神就会埋下若干大坑。
+        - 此外还有一些其他的办法，例如页面的MD5检测，页面静态页打包下载等等方式，具体如何选择还要根据具体的场景抉择。
+
+
+
+### 4.2.1 解决资源加载缓慢问题
+- 在资源预加载方面，其实也有很多种方式，下面主要列举了一些：
+    - 第一种方式是使用 WebView 自身的缓存机制：如果我们在 APP 里面访问一个页面，短时间内再次访问这个页面的时候，就会感觉到第二次打开的时候顺畅很多，加载速度比第一次的时间要短，这个就是因为 WebView 自身内部会做一些缓存，只要打开过的资源，他都会试着缓存到本地，第二次需要访问的时候他直接从本地读取，但是这个读取其实是不太稳定的东西，关掉之后，或者说这种缓存失效之后，系统会自动把它清除，我们没办法进行控制。基于这个 WebView 自身的缓存，有一种资源预加载的方案就是，我们在应用启动的时候可以开一个像素的 WebView ，事先去访问一下我们常用的资源，后续打开页面的时候如果再用到这些资源他就可以从本地获取到，页面加载的时间会短一些。
+    - 第二种方案是，自己去构建和管理缓存：把这些需要预加载的资源放在 APP 里面，可能是预先放进去的，也可能是后续下载的，问题在于前端这些页面怎么去缓存，两个方案，第一种是前端可以在 H5 打包的时候把里面的资源 URL 进行替换，这样可以直接访问本地的地址；第二种是客户端可以拦截这些网页发出的所有请求做替换。
+    - 具体可以看美团的技术文章：[美团大众点评 Hybrid 化建设](https://mp.weixin.qq.com/s/rNGD6SotKoO8frmxIU8-xw?)
+
+
+
+### 4.2.2 判断是否已经滚动到页面底端
+- getScrollY()方法返回的是当前可见区域的顶端距整个页面顶端的距离,也就是当前内容滚动的距离.
+- getHeight()或者getBottom()方法都返回当前WebView 这个容器的高度
+- getContentHeight 返回的是整个html的高度,但并不等同于当前整个页面的高度,因为WebView有缩放功能，所以当前整个页面的高度实际上应该是原始html 的高度再乘上缩放比例. 因此,更正后的结果,准确的判断方法应该是：
+    ```
+    if(WebView.getContentHeight*WebView.getScale() == (webview.getHeight()+WebView.getScrollY())){
+        //已经处于底端
+    }
+    ```
+
+
+
+### 4.9.9 掘金问题反馈记录
+- 使用JsBridge遇到的坑
+    - 由于JsBridge采用 json字符串，客户端传给前端数据中/进行了转义，导致前端收到数据后解析不出来。二，当前端给Native端发消息时，如果发送的消息频率过快，导致队列清空 shouldurl不回调，最终callback不回调，客户端也就收不到消息了。
 
 
 
