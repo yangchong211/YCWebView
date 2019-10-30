@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ycbjie.webviewlib" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ycbjie.webviewlib">
 
     <!--x5需要的权限-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,6 +20,25 @@
                 <action android:name="com.tencent.smtt.tbs.video.PLAY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+
+
+        <activity
+            android:name=".X5WebViewActivity"
+            android:configChanges="orientation|screenSize"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <!--需要添加下面的intent-filter配置-->
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!--使用http，则只能打开http开头的网页-->
+                <data android:scheme="https" />
+            </intent-filter>
+
         </activity>
     </application>
 

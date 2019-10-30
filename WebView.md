@@ -5,6 +5,8 @@
 - 04.WebView.loadUrl(url)流程
 - 05.js的调用时机分析
 - 06.清除缓存数据方式有哪些
+- 07.如何使用DeepLink
+- 10.应用被作为第三方浏览器打开
 
 
 
@@ -236,6 +238,14 @@
     Webview.clearFormData()；
     ```
 
+
+### 07.如何使用DeepLink
+- https://www.jianshu.com/p/127c80f62655
+
+
+
+### 10.应用被作为第三方浏览器打开
+- https://www.jianshu.com/p/272bfb6c0779
 
 
 ### 参考博客

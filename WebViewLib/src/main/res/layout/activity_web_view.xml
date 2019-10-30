@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <android.support.v7.widget.Toolbar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/title_tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/white"
+        app:contentInsetStartWithNavigation="0dp"
+        app:navigationContentDescription="返回"
+        app:navigationIcon="@drawable/icon_back"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:visibility="visible" />
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.ycbjie.webviewlib.X5WebView
+            android:id="@+id/web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <!--仿微信横向进度条-->
+        <ProgressBar
+            android:id="@+id/pb"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/layer_progress_bar" />
+    </FrameLayout>
+
+</LinearLayout>
+
+
