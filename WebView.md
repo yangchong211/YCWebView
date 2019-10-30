@@ -1,4 +1,5 @@
 #### 基础使用目录介绍
+- 01.常用的基础介绍
 - 02.Android调用Js
 - 03.Js调用Android
 - 04.WebView.loadUrl(url)流程
@@ -8,10 +9,45 @@
 
 
 
+### 01.常用的基础介绍
 
 
 
 ### 02.Android调用Js
+- 第一种方式：native 调用 js 的方法，方法为：
+    - 注意的是名字一定要对应上，要不然是调用不成功的，而且还有一点是 JS 的调用一定要在 onPageFinished 函数回调之后才能调用，要不然也是会失败的。
+    ```
+    //java
+    mWebView.loadUrl("javascript:show(" + result + ")");
+    
+    //javascript
+    <script type="text/javascript">
+    
+    function show(result){
+        alert("result"=result);
+        return "success";
+    }
+    
+    </script>
+    ```
+- 第二种方式：
+    - 如果现在有需求，我们要得到一个 Native 调用 Web 的回调怎么办，Google 在 Android4.4 为我们新增加了一个新方法，这个方法比 loadUrl 方法更加方便简洁，而且比 loadUrl 效率更高，因为 loadUrl 的执行会造成页面刷新一次，这个方法不会，因为这个方法是在 4.4 版本才引入的，所以使用的时候需要添加版本的判断：
+    ```
+    if (Build.VERSION.SDK_INT < 18) {
+        mWebView.loadUrl(jsStr);
+    } else {
+        mWebView.evaluateJavascript(jsStr, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                //此处为 js 返回的结果
+            }
+        });
+    }
+    ```
+- 两种方式的对比
+    - 一般最常使用的就是第一种方法，但是第一种方法获取返回的值比较麻烦，而第二种方法由于是在 4.4 版本引入的，所以局限性比较大。
+
+
 
 
 ### 03.Js调用Android
