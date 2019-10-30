@@ -180,8 +180,17 @@
     ```
 - **其他api说明**
 ```
-
+//X5WebView中
+//设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
+mWebView.setSavePassword(false);
+//是否开启软硬件加速
+mWebView.setOpenLayerType(false);
+//获取x5WebChromeClient对象
+x5WebChromeClient = mWebView.getX5WebChromeClient();
+//获取x5WebViewClient对象
+x5WebViewClient = mWebView.getX5WebViewClient();
 ```
+
 
 #### 2.4 使用建议
 - **优化一下相关的操作**
@@ -236,6 +245,7 @@
     ```
     function.onCallBack("回调数据");
     ```
+
 
 
 #### 3.2 js的调用时机分析
@@ -299,6 +309,7 @@
     - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
 - 参考博客
     - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
+    - [WebView详解，常见漏洞详解和安全源码](https://juejin.im/post/58a037df86b599006b3fade4)
 
 
 

@@ -9,6 +9,7 @@
 - 5.0.8 如何设置白名单操作
 - 5.0.9 后台无法释放js导致发热耗电
 - 5.1.0 可以提前显示加载进度条
+- 5.1.1 WebView密码明文存储漏洞优化
 
 
 ### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
@@ -223,7 +224,7 @@
 
 
 ### 5.0.9 后台无法释放js导致发热耗电
-- 在有些手机你如果webView加载的html里，有一些js一直在执行比如动画之类的东西，如果此刻webview 挂在了后台这些资源是不会被释放用户也无法感知。
+- 在有些手机你如果webView加载的html里，有一些js一直在执行比如动画之类的东西，如果此刻webView 挂在了后台这些资源是不会被释放用户也无法感知。
 - 导致一直占有cpu 耗电特别快，所以如果遇到这种情况，处理方式如下所示。大概意思就是在后台的时候，会调用onStop方法，即此时关闭js交互，回到前台调用onResume再开启js交互。
     ```
     //在onStop里面设置setJavaScriptEnabled(false);
@@ -234,7 +235,6 @@
         if (mWebView != null) {
             mWebView.getSettings().setJavaScriptEnabled(true);
         }
-    
     }
     @Override
     protected void onStop() {
@@ -288,9 +288,12 @@
     ```
 
 
-
-
-
-
+### 5.1.1 WebView密码明文存储漏洞优化
+- WebView 默认开启密码保存功能 mWebView.setSavePassword(true)，如果该功能未关闭，在用户输入密码时，会弹出提示框，询问用户是否保存密码，如果选择”是”，密码会被明文保到 /data/data/com.package.name/databases/webview.db 中，这样就有被盗取密码的危险，所以需要通过 WebSettings.setSavePassword(false) 关闭密码保存提醒功能。
+    - 具体代码操作如下所示
+    ```
+    /设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
+    mX5WebView.setSavePassword(false);
+    ```
 
 

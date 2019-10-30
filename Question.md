@@ -21,6 +21,7 @@
 - 4.2.0 被运营商劫持和注入问题
 - 4.2.1 解决资源加载缓慢问题
 - 4.2.2 判断是否已经滚动到页面底端
+- 4.2.3 使用loadData加载html乱码
 
 
 
@@ -184,6 +185,13 @@
     ```
 
 
+
+### 4.0.7 webView防止内存泄漏
+- https://my.oschina.net/zhibuji/blog/100580
+
+
+
+
 ### 4.0.9 视频播放宽度超过屏幕
 - 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
 
@@ -311,8 +319,8 @@
 ### 4.1.7 WebView嵌套ScrollView问题
 - 问题描述
     - 当 WebView 嵌套在 ScrollView 里面的时候，如果 WebView 先加载了一个高度很高的网页，然后加载了一个高度很低的网页，就会造成 WebView 的高度无法自适应，底部出现大量空白的情况出现。
-- 为何出现这种情况
-
+- 解决办法
+    - 可以参考这篇博客：https://blog.csdn.net/self_study/article/details/54378978
 
 
 ### 4.1.8 WebView中图片点击放大
@@ -449,6 +457,27 @@
     }
     ```
 
+
+### 4.2.3 使用loadData加载html乱码
+- 可以通过使用 WebView.loadData(String data, String mimeType, String encoding)) 方法来加载一整个 HTML 页面的一小段内容，第一个就是我们需要 WebView 展示的内容，第二个是我们告诉 WebView 我们展示内容的类型，一般，第三个是字节码，但是使用的时候，这里会有一些坑
+    - 明明已经指定了编码格式为 UTF-8，加载却还会出现乱码……
+    ```
+    String html = new String("<h3>我是loadData() 的标题</h3><p>&nbsp&nbsp我是他的内容</p>");
+    webView.loadData(html, "text/html", "UTF-8");
+    ```
+- 使用loadData()或 loadDataWithBaseURL()加载一段HTML代码片段
+    - data:是要加载的数据类型，但在数据里面不能出现英文字符：'#', '%', '\' , '?' 这四个字符，如果有的话可以用 %23, %25, %27, %3f，这些字符来替换，在平时测试时，你的数据时，你的数据里含有这些字符，但不会出问题，当出问题时，你可以替换下。
+        * %，会报找不到页面错误，页面全是乱码。乱码样式见符件。
+        * #，会让你的goBack失效，但canGoBAck是可以使用的。于是就会产生返回按钮生效，但不能返回的情况。
+        * \ 和? 我在转换时，会报错，因为它会把\当作转义符来使用，如果用两级转义，也不生效，我是对它无语了。
+    - 我们在使用loadData时，就意味着需要把所有的非法字符全部转换掉，这样就会给运行速度带来很大的影响，因为在使用时，在页面stytle中会使用很多%号。页面的数据越多，运行的速度就会越慢。
+    - data中，有人会遇到中文乱码问题，解决办法：参数传"utf-8"，页面的编码格式也必须是utf-8，这样编码统一就不会乱了。别的编码我也没有试过。
+- 解决办法
+    - 
+    ```
+    String html = new String("<h3>我是loadData() 的标题</h3><p>&nbsp&nbsp我是他的内容</p>");
+    webView.loadData(html, "text/html;charset=UTF-8", "null");
+    ```
 
 
 ### 4.9.9 掘金问题反馈记录

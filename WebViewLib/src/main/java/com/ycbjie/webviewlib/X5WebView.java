@@ -108,6 +108,8 @@ public class X5WebView extends BridgeWebView {
         }
         //默认关闭硬件加速
         setOpenLayerType(false);
+        //默认不开启密码保存功能
+        setSavePassword(false);
     }
 
     /**
@@ -147,6 +149,20 @@ public class X5WebView extends BridgeWebView {
             } else {
                 this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             }
+        }
+    }
+
+    /**
+     * WebView 默认开启密码保存功能，但是存在漏洞。
+     * 如果该功能未关闭，在用户输入密码时，会弹出提示框，询问用户是否保存密码，如果选择”是”，
+     * 密码会被明文保到 /data/data/com.package.name/databases/webview.db 中，这样就有被盗取密码的危险
+     * @param save
+     */
+    public void setSavePassword(boolean save){
+        if (save){
+            this.getSettings().setSavePassword(true);
+        } else {
+            this.getSettings().setSavePassword(false);
         }
     }
 
