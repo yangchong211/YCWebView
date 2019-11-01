@@ -47,6 +47,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".SixActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".SixActivity2"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".WebViewActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".NativeActivity"
@@ -55,6 +57,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".FileDisplayActivity"/>
         <activity android:name=".ten.TenActivity"/>
+        <activity android:name=".DownActivity"/>
+        <activity android:name=".NativeActivity2"/>
     </application>
 
 </manifest>

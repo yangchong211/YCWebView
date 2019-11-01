@@ -47,9 +47,9 @@
 - 暴露进度条加载进度，结束，以及异常状态listener给开发者；
 - 支持视频播放，可以切换成全频播放视频，可旋转屏幕；
 - 集成了腾讯x5的WebView，最新版本，功能强大；
-- 支持打开文件的操作，比如打开相册，然后选中图片上传，兼容版本(5.0)
-- 支持加载word，xls，ppt，pdf，txt等文件文档，使用方法十分简单
-- 
+- 支持打开文件的操作，比如打开相册，然后选中图片上传，兼容版本(5.0)；
+- 支持加载word，xls，ppt，pdf，txt等文件文档，使用方法十分简单；
+- 支持设置仿微信加载H5页面进度条，完全无耦合，操作简单，极大提高用户体验；
 
 
 
@@ -180,17 +180,33 @@
     });
     ```
 - **其他api说明**
-```
-//X5WebView中
-//设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
-mWebView.setSavePassword(false);
-//是否开启软硬件加速
-mWebView.setOpenLayerType(false);
-//获取x5WebChromeClient对象
-x5WebChromeClient = mWebView.getX5WebChromeClient();
-//获取x5WebViewClient对象
-x5WebViewClient = mWebView.getX5WebViewClient();
-```
+    ```
+    //X5WebView中
+    //设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
+    mWebView.setSavePassword(false);
+    //是否开启软硬件加速
+    mWebView.setOpenLayerType(false);
+    //获取x5WebChromeClient对象
+    x5WebChromeClient = mWebView.getX5WebChromeClient();
+    //获取x5WebViewClient对象
+    x5WebViewClient = mWebView.getX5WebViewClient();
+    ```
+- **关于如何使用仿微信加载H5页面进度条**
+    - 前端页面时受到网路环境，页面内容大小的影响有时候会让用户等待很久。显示一个加载进度条可以说很大程度上提升用户的体验。
+    ```
+    private WebProgress pb;
+    //显示进度条
+    pb.show();
+    //设置进度条过度颜色
+    pb.setColor(Color.BLUE,Color.RED);
+    //设置单色进度条
+    pb.setColor(Color.BLUE);
+    //为单独处理WebView进度条
+    pb.setWebProgress(newProgress);
+    //进度完成后消失
+    pb.hide();
+    ```
+
 
 
 #### 2.4 使用建议
@@ -306,8 +322,9 @@ x5WebViewClient = mWebView.getX5WebViewClient();
 
 ### 06.关于参考
 - 感谢开源库
-    - [x5开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
+    - [x5官方开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
     - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
+    - [WebViewStudy开源库](https://github.com/youlookwhat/WebViewStudy)
 - 参考博客
     - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
     - [WebView详解，常见漏洞详解和安全源码](https://juejin.im/post/58a037df86b599006b3fade4)

@@ -106,6 +106,7 @@ public class NativeActivity extends AppCompatActivity {
                         new CallBackFunction() {
                     @Override
                     public void onCallBack(String data) {
+                        Toast.makeText(NativeActivity.this,"你个逗比" + data,Toast.LENGTH_SHORT).show();
                         Log.i("java调用web----", "reponse data from js " + data);
                     }
 
@@ -169,7 +170,7 @@ public class NativeActivity extends AppCompatActivity {
         mWebView.registerHandler("submitFromWeb", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
-                Toast.makeText(NativeActivity.this,data,Toast.LENGTH_LONG).show();
+                Toast.makeText(NativeActivity.this,data+"yc",Toast.LENGTH_LONG).show();
                 Log.i("registerHandler", "handler = submitFromWeb, data from web = " + data);
                 //这个是回调给web端，比如
                 function.onCallBack("submitFromWeb exe, response data 中文 from Java");
@@ -179,7 +180,7 @@ public class NativeActivity extends AppCompatActivity {
         mWebView.callHandler("functionInJs", "小杨逗比", new CallBackFunction() {
             @Override
             public void onCallBack(String data) {
-                Toast.makeText(NativeActivity.this,data,Toast.LENGTH_LONG).show();
+                Toast.makeText(NativeActivity.this,data+"逗比",Toast.LENGTH_LONG).show();
             }
         });
     }

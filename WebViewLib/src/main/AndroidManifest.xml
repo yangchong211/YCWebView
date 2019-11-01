@@ -38,7 +38,6 @@
                 <!--使用http，则只能打开http开头的网页-->
                 <data android:scheme="https" />
             </intent-filter>
-
         </activity>
     </application>
 

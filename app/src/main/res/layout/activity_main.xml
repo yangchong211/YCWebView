@@ -61,24 +61,45 @@
         android:text="5.播放网页中的视频，包括全频播放"/>
 
     <TextView
-        android:id="@+id/tv_6"
+        android:id="@+id/tv_6_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:textSize="12sp"
         android:background="@color/colorAccent"
-        android:text="6.在h5中打开相册上传图片"/>
+        android:text="6.1 在h5中打开相册上传图片"/>
 
     <TextView
-        android:id="@+id/tv_7"
+        android:id="@+id/tv_6_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:textSize="12sp"
         android:background="@color/colorAccent"
-        android:text="7.原生native和h5交互，该案例是参考JsBridge"/>
+        android:text="6.2 在h5中上传身份证图片"/>
+
+
+    <TextView
+        android:id="@+id/tv_7_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:textSize="12sp"
+        android:background="@color/colorAccent"
+        android:text="7.1 原生native和h5交互，该案例是参考JsBridge"/>
+
+    <TextView
+        android:id="@+id/tv_7_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:textSize="12sp"
+        android:background="@color/colorAccent"
+        android:text="7.2 原生native和h5交互案例2"/>
 
 
     <TextView
@@ -110,6 +131,26 @@
         android:textSize="12sp"
         android:background="@color/colorAccent"
         android:text="10.和scrollView结合使用，比如商城商品详情页使用场景"/>
+
+    <TextView
+        android:id="@+id/tv_11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:textSize="12sp"
+        android:background="@color/colorAccent"
+        android:text="11.使用手机浏览器打开网络链接"/>
+
+    <TextView
+        android:id="@+id/tv_12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:textSize="12sp"
+        android:background="@color/colorAccent"
+        android:text="12.监听web网页中下载的进度操作，待完善"/>
 
 
 </LinearLayout>

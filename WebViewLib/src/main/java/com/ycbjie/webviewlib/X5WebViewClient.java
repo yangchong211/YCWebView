@@ -122,6 +122,9 @@ public class X5WebViewClient extends WebViewClient {
         X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String url = request.getUrl().toString();
+            if (TextUtils.isEmpty(url)) {
+                return false;
+            }
             try {
                 url = URLDecoder.decode(url, "UTF-8");
             } catch (UnsupportedEncodingException ex) {

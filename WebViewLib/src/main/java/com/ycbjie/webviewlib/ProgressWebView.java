@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -57,8 +58,9 @@ public class ProgressWebView extends FrameLayout {
         View view = LayoutInflater.from(context).inflate(
                 R.layout.view_progress_web_view, this, false);
         webView = view.findViewById(R.id.web_view);
-        final ProgressBar pbProgress = view.findViewById(R.id.pb_progress);
-        pbProgress.setVisibility(VISIBLE);
+        final WebProgress pbProgress = view.findViewById(R.id.progress);
+        pbProgress.show();
+        pbProgress.setColor(Color.BLUE);
         webView.getX5WebChromeClient().setWebListener(new InterWebListener() {
             @Override
             public void hindProgressBar() {
@@ -72,7 +74,7 @@ public class ProgressWebView extends FrameLayout {
 
             @Override
             public void startProgress(int newProgress) {
-                pbProgress.setProgress(newProgress);
+                pbProgress.setWebProgress(newProgress);
             }
 
             @Override

@@ -22,6 +22,7 @@
 - 4.2.1 解决资源加载缓慢问题
 - 4.2.2 判断是否已经滚动到页面底端
 - 4.2.3 使用loadData加载html乱码
+- 4.2.4 WebView下载进度无法监听
 
 
 
@@ -478,6 +479,10 @@
     String html = new String("<h3>我是loadData() 的标题</h3><p>&nbsp&nbsp我是他的内容</p>");
     webView.loadData(html, "text/html;charset=UTF-8", "null");
     ```
+
+
+### 4.2.4 WebView下载进度无法监听
+- https://www.jianshu.com/p/6e38e1ef203a
 
 
 ### 4.9.9 掘金问题反馈记录

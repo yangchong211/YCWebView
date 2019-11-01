@@ -2,6 +2,7 @@ package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -31,7 +31,7 @@ import android.widget.TextView;
 public class X5WebViewActivity extends AppCompatActivity {
 
     private X5WebView webView;
-    private ProgressBar pb;
+    private WebProgress pb;
     private TextView tvTitle;
     private Toolbar mTitleToolBar;
     private X5WebChromeClient x5WebChromeClient;
@@ -114,18 +114,24 @@ public class X5WebViewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
-        webView = findViewById(R.id.web_view);
-        pb = findViewById(R.id.pb);
-        tvTitle = findViewById(R.id.tv_title);
-        mTitleToolBar = findViewById(R.id.title_tool_bar);
+        initFindViewById();
         initToolBar();
-        x5WebChromeClient = webView.getX5WebChromeClient();
-        x5WebViewClient = webView.getX5WebViewClient();
-        x5WebChromeClient.setVideoWebListener(videoWebListener);
-        x5WebViewClient.setWebListener(interWebListener);
-        x5WebChromeClient.setWebListener(interWebListener);
+        initWebView();
         // 处理 作为三方浏览器打开传过来的值
         getDataFromBrowser(getIntent());
+    }
+
+    private void initFindViewById() {
+        webView = findViewById(R.id.web_view);
+        pb = findViewById(R.id.progress);
+        tvTitle = findViewById(R.id.tv_title);
+        mTitleToolBar = findViewById(R.id.title_tool_bar);
+        //显示进度条
+        pb.show();
+        //设置进度条过度颜色
+        pb.setColor(Color.BLUE,Color.RED);
+        //设置单色进度条
+        pb.setColor(Color.BLUE);
     }
 
     private void initToolBar() {
@@ -143,6 +149,14 @@ public class X5WebViewActivity extends AppCompatActivity {
             }
         }, 1000);
         tvTitle.setText("加载中……");
+    }
+
+    private void initWebView() {
+        x5WebChromeClient = webView.getX5WebChromeClient();
+        x5WebViewClient = webView.getX5WebViewClient();
+        x5WebChromeClient.setVideoWebListener(videoWebListener);
+        x5WebViewClient.setWebListener(interWebListener);
+        x5WebChromeClient.setWebListener(interWebListener);
     }
 
     /**
@@ -217,7 +231,9 @@ public class X5WebViewActivity extends AppCompatActivity {
     private InterWebListener interWebListener = new InterWebListener() {
         @Override
         public void hindProgressBar() {
-            pb.setVisibility(View.GONE);
+            //pb.setVisibility(View.GONE);
+            //进度完成后消失
+            pb.hide();
         }
 
         @Override
@@ -227,7 +243,8 @@ public class X5WebViewActivity extends AppCompatActivity {
 
         @Override
         public void startProgress(int newProgress) {
-            pb.setProgress(newProgress);
+            //为单独处理WebView进度条
+            pb.setWebProgress(newProgress);
         }
 
         @Override

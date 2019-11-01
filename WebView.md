@@ -19,16 +19,23 @@
     - 注意的是名字一定要对应上，要不然是调用不成功的，而且还有一点是 JS 的调用一定要在 onPageFinished 函数回调之后才能调用，要不然也是会失败的。
     ```
     //java
-    mWebView.loadUrl("javascript:show(" + result + ")");
+    //调用无参方法
+    mWebView.loadUrl("javascript:callByAndroid()");
+    //调用有参方法
+    mWebView.loadUrl("javascript:showData(" + result + ")");
     
-    //javascript
+    //javascript，下面是对应的js代码
     <script type="text/javascript">
     
-    function show(result){
+    function showData(result){
         alert("result"=result);
         return "success";
     }
     
+    function callByAndroid(){
+        console.log("callByAndroid")
+        showElement("Js:无参方法callByAndroid被调用");
+    }
     </script>
     ```
 - 第二种方式：
@@ -47,8 +54,8 @@
     ```
 - 两种方式的对比
     - 一般最常使用的就是第一种方法，但是第一种方法获取返回的值比较麻烦，而第二种方法由于是在 4.4 版本引入的，所以局限性比较大。
-
-
+- 注意问题
+    - 记得添加ws.setJavaScriptEnabled(true)代码
 
 
 ### 03.Js调用Android
@@ -71,6 +78,25 @@
             Toast.show(mContext, text, Toast.LENGTH_SHORT).show();
             return "success";
         }
+        
+        /**
+         * 前端代码嵌入js：
+         * imageClick 名应和js函数方法名一致
+         *
+         * @param src 图片的链接
+         */
+        @JavascriptInterface
+        public void imageClick(String src) {
+            Log.e("imageClick", "----点击了图片");
+        }
+        
+        /**
+         * 网页使用的js，方法无参数
+         */
+        @JavascriptInterface
+        public void startFunction() {
+            Log.e("startFunction", "----无参");
+        }
     }
 
     //特定版本下会存在漏洞
@@ -81,6 +107,14 @@
     ```
     function showToast(){
         var result = myObj.showToast("我是来自web的Toast");
+    }
+    
+    function showToast(){
+        myObj.imageClick("图片");
+    }
+    
+    function showToast(){
+        myObj.startFunction();
     }
     ```
 - 第二种方式：利用 WebViewClient 接口回调方法拦截 url
@@ -239,12 +273,85 @@
 
 
 ### 07.如何使用DeepLink
-- https://www.jianshu.com/p/127c80f62655
-
+- 具体可以看这篇文章：https://www.jianshu.com/p/127c80f62655
 
 
 ### 10.应用被作为第三方浏览器打开
-- https://www.jianshu.com/p/272bfb6c0779
+- 微信里的文章页面，可以选择“在浏览器打开”。现在很多应用都内嵌了WebView，那是否可以使自己的应用作为第三方浏览器打开此文章呢？
+- 在Manifest文件中，给想要接收跳转的Activity添加<intent-filter>配置：
+    ```
+    <activity
+        android:name=".X5WebViewActivity"
+        android:configChanges="orientation|screenSize"
+        android:hardwareAccelerated="true"
+        android:launchMode="singleTask"
+        android:screenOrientation="portrait"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <!--需要添加下面的intent-filter配置-->
+        <intent-filter tools:ignore="AppLinkUrlError">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!--使用http，则只能打开http开头的网页-->
+            <data android:scheme="https" />
+        </intent-filter>
+    </activity>
+    ```
+- 然后在 X5WebViewActivity 中获取相关传递数据。具体可以看lib中的X5WebViewActivity类代码。
+    ```
+    public class X5WebViewActivity extends AppCompatActivity {
+    
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_web_view);
+            getIntentData();
+            initTitle();
+            initWebView();
+            webView.loadUrl(mUrl);
+           // 处理 作为三方浏览器打开传过来的值
+            getDataFromBrowser(getIntent());
+        }
+    
+       /**
+         * 使用singleTask启动模式的Activity在系统中只会存在一个实例。
+         * 如果这个实例已经存在，intent就会通过onNewIntent传递到这个Activity。
+         * 否则新的Activity实例被创建。
+         */
+        @Override
+        protected void onNewIntent(Intent intent) {
+            super.onNewIntent(intent);
+            getDataFromBrowser(intent);
+        }
+    
+        /**
+         * 作为三方浏览器打开传过来的值
+         * Scheme: https
+         * host: www.jianshu.com
+         * path: /p/yc
+         * url = scheme + "://" + host + path;
+         */
+        private void getDataFromBrowser(Intent intent) {
+            Uri data = intent.getData();
+            if (data != null) {
+                try {
+                    String scheme = data.getScheme();
+                    String host = data.getHost();
+                    String path = data.getPath();
+                    String text = "Scheme: " + scheme + "\n" + "host: " + host + "\n" + "path: " + path;
+                    Log.e("data", text);
+                    String url = scheme + "://" + host + path;
+                    webView.loadUrl(url);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    ```
+- 一些重点说明
+    - 在微信中“通过浏览器”打开自己的应用，然后将自己的应用切到后台。重复上面的操作，会一直创建应用的实例，这样肯定是不好的，为了避免这种情况我们设置启动模式为：launchMode="singleTask"。
+
 
 
 ### 参考博客

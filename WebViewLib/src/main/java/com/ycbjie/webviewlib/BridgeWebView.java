@@ -147,6 +147,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
      * @param responseCallback CallBackFunction
      */
 	private void doSend(String handlerName, String data, CallBackFunction responseCallback) {
+		//创建message对象，主要是将js的方法名称，传递的数据，封装到对象中
 		Message m = new Message();
 		if (!TextUtils.isEmpty(data)) {
 			m.setData(data);
@@ -295,6 +296,25 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 		if (handlerName != null) {
 			messageHandlers.remove(handlerName);
 		}
+	}
+
+	/**
+	 * call javascript registered handler
+	 * 调用javascript处理程序注册
+	 * @param handlerName handlerName
+	 */
+	public void callHandler(String handlerName) {
+		send(handlerName);
+	}
+
+	/**
+	 * call javascript registered handler
+	 * 调用javascript处理程序注册
+	 * @param handlerName handlerName
+	 * @param callBack CallBackFunction
+	 */
+	public void callHandler(String handlerName,CallBackFunction callBack) {
+		send(handlerName, callBack);
 	}
 
 	/**
