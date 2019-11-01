@@ -29,6 +29,7 @@ import android.graphics.Paint;
 import android.graphics.Shader;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
@@ -112,6 +113,9 @@ public class WebProgress extends FrameLayout {
     public static final int UN_START = 0;
     public static final int STARTED = 1;
     public static final int FINISH = 2;
+    /**
+     * 百分比进度值
+     */
     private float mCurrentProgress = 0F;
 
     public WebProgress(Context context) {
@@ -127,10 +131,42 @@ public class WebProgress extends FrameLayout {
         init(context, attrs, defStyleAttr);
     }
 
+    /**
+     * 创建的时候
+     */
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+    }
+
+    /**
+     * 销毁的时候，注意记得清楚动画资源
+     */
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        /**
+         * animator cause leak , if not cancel;
+         */
+        if (mAnimator != null && mAnimator.isStarted()) {
+            mAnimator.cancel();
+            mAnimator = null;
+        }
+    }
+
+
+    /**
+     * 初始化操作
+     * @param context                           上下文
+     * @param attrs                             attrs属性
+     * @param defStyleAttr                      defStyleAttr
+     */
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+        //创建画笔，设置属性
         mPaint = new Paint();
         mColor = Color.parseColor(WEB_PROGRESS_COLOR);
         mPaint.setAntiAlias(true);
+        //设置颜色
         mPaint.setColor(mColor);
         mPaint.setDither(true);
         mPaint.setStrokeCap(Paint.Cap.SQUARE);
@@ -147,36 +183,51 @@ public class WebProgress extends FrameLayout {
         mPaint.setColor(color);
     }
 
+    /**
+     * 设置单色进度条
+     * @param color                     颜色
+     */
     public void setColor(String color) {
         this.setColor(Color.parseColor(color));
     }
 
+    /**
+     * 设置渐变色进度条
+     *
+     * @param startColor                        开始颜色
+     * @param endColor                          结束颜色
+     */
     public void setColor(int startColor, int endColor) {
-        LinearGradient linearGradient = new LinearGradient(0, 0, mTargetWidth, mTargetHeight, startColor, endColor, Shader.TileMode.CLAMP);
+        LinearGradient linearGradient = new LinearGradient(0, 0, mTargetWidth,
+                mTargetHeight, startColor, endColor, Shader.TileMode.CLAMP);
         mPaint.setShader(linearGradient);
     }
 
     /**
      * 设置渐变色进度条
      *
-     * @param startColor 开始颜色
-     * @param endColor   结束颜色
+     * @param startColor                        开始颜色
+     * @param endColor                          结束颜色
      */
     public void setColor(String startColor, String endColor) {
         this.setColor(Color.parseColor(startColor), Color.parseColor(endColor));
     }
 
+    /**
+     * 测量方法
+     * @param widthMeasureSpec                  widthMeasureSpec
+     * @param heightMeasureSpec                 heightMeasureSpec
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
         int wMode = MeasureSpec.getMode(widthMeasureSpec);
-        int w = MeasureSpec.getSize(widthMeasureSpec);
-
         int hMode = MeasureSpec.getMode(heightMeasureSpec);
+        int w = MeasureSpec.getSize(widthMeasureSpec);
         int h = MeasureSpec.getSize(heightMeasureSpec);
 
         if (wMode == MeasureSpec.AT_MOST) {
-            w = w <= getContext().getResources().getDisplayMetrics().widthPixels ? w : getContext().getResources().getDisplayMetrics().widthPixels;
+            DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+            w = w <= displayMetrics.widthPixels ? w : displayMetrics.widthPixels;
         }
         if (hMode == MeasureSpec.AT_MOST) {
             h = mTargetHeight;
@@ -191,7 +242,8 @@ public class WebProgress extends FrameLayout {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        canvas.drawRect(0, 0, mCurrentProgress / 100 * Float.valueOf(this.getWidth()), this.getHeight(), mPaint);
+        canvas.drawRect(0, 0,
+                mCurrentProgress / 100 * Float.valueOf(this.getWidth()), this.getHeight(), mPaint);
     }
 
     @Override
@@ -215,16 +267,19 @@ public class WebProgress extends FrameLayout {
         TAG = FINISH;
     }
 
+    /**
+     * 开始动画
+     */
     private void startAnim(boolean isFinished) {
-
         float v = isFinished ? 100 : 95;
-
+        //先清除动画资源
         if (mAnimator != null && mAnimator.isStarted()) {
             mAnimator.cancel();
         }
         mCurrentProgress = ((int)mCurrentProgress) == 0f ? 0.00000001f : mCurrentProgress;
 
         if (!isFinished) {
+            //如果还没有完成
             ValueAnimator mAnimator = ValueAnimator.ofFloat(mCurrentProgress, v);
             float residue = 1f - mCurrentProgress / 100 - 0.05f;
             mAnimator.setInterpolator(new LinearInterpolator());
@@ -233,7 +288,7 @@ public class WebProgress extends FrameLayout {
             mAnimator.start();
             this.mAnimator = mAnimator;
         } else {
-
+            //如果还没有完成
             ValueAnimator segment95Animator = null;
             if (mCurrentProgress < 95f) {
                 segment95Animator = ValueAnimator.ofFloat(mCurrentProgress, 95);
@@ -244,7 +299,8 @@ public class WebProgress extends FrameLayout {
                 segment95Animator.addUpdateListener(mAnimatorUpdateListener);
             }
 
-            ObjectAnimator mObjectAnimator = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f);
+            ObjectAnimator mObjectAnimator = ObjectAnimator.ofFloat(
+                    this, "alpha", 1f, 0f);
             mObjectAnimator.setDuration(DO_END_ALPHA_DURATION);
             ValueAnimator mValueAnimatorEnd = ValueAnimator.ofFloat(95f, 100f);
             mValueAnimatorEnd.setDuration(DO_END_PROGRESS_DURATION);
@@ -258,7 +314,7 @@ public class WebProgress extends FrameLayout {
                 mAnimatorSet1.play(mAnimatorSet).after(segment95Animator);
                 mAnimatorSet = mAnimatorSet1;
             }
-            mAnimatorSet.addListener(mAnimatorListenerAdapter);
+            mAnimatorSet.addListener(mAnimatorListener);
             mAnimatorSet.start();
             mAnimator = mAnimatorSet;
         }
@@ -266,33 +322,40 @@ public class WebProgress extends FrameLayout {
         TAG = STARTED;
     }
 
-    private ValueAnimator.AnimatorUpdateListener mAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+    /**
+     * 创建属性动画监听进度变化的对象
+     */
+    private ValueAnimator.AnimatorUpdateListener mAnimatorUpdateListener =
+            new ValueAnimator.AnimatorUpdateListener() {
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
             float t = (float) animation.getAnimatedValue();
+            //更改进度
             WebProgress.this.mCurrentProgress = t;
+            //调用invalidate方法刷新UI
             WebProgress.this.invalidate();
         }
     };
 
-    private AnimatorListenerAdapter mAnimatorListenerAdapter = new AnimatorListenerAdapter() {
+    /**
+     * 创建属性动画监听的对象
+     */
+    private AnimatorListenerAdapter mAnimatorListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animation) {
             doEnd();
         }
-    };
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        /**
-         * animator cause leak , if not cancel;
-         */
-        if (mAnimator != null && mAnimator.isStarted()) {
-            mAnimator.cancel();
-            mAnimator = null;
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            super.onAnimationCancel(animation);
         }
-    }
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+            super.onAnimationStart(animation);
+        }
+    };
 
     private void doEnd() {
         if (TAG == FINISH && ((int)mCurrentProgress) == 100f) {
@@ -310,13 +373,16 @@ public class WebProgress extends FrameLayout {
         }
     }
 
+    /**
+     * 设置进度
+     * @param progress                          进度值
+     */
     public void setProgress(int progress) {
         // fix 同时返回两个 100，产生两次进度条的问题；
         if (TAG == UN_START && progress == 100f) {
             setVisibility(View.GONE);
             return;
         }
-
         if (getVisibility() == View.GONE) {
             setVisibility(View.VISIBLE);
         }
@@ -327,7 +393,6 @@ public class WebProgress extends FrameLayout {
             startAnim(true);
         }
     }
-
 
     public LayoutParams offerLayoutParams() {
         return new LayoutParams(mTargetWidth, mTargetHeight);
