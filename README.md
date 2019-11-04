@@ -328,6 +328,13 @@
 - 4.1.6 allowFileAccess漏洞
 - 4.1.7 WebView嵌套ScrollView问题
 - 4.1.8 WebView中图片点击放大
+- 4.1.9 页面滑动期间不渲染/执行
+- 4.2.0 被运营商劫持和注入问题
+- 4.2.1 解决资源加载缓慢问题
+- 4.2.2 判断是否已经滚动到页面底端
+- 4.2.3 使用loadData加载html乱码
+- 4.2.4 WebView下载进度无法监听
+- 4.2.5 webView出现302/303重定向
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
