@@ -200,6 +200,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 					BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
 			// 必须要找主线程才会将数据传递出去 --- 划重点
 			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+				X5LogUtils.d("分发message--------------"+javascriptCommand);
 				this.loadUrl(javascriptCommand);
 			}
 		}

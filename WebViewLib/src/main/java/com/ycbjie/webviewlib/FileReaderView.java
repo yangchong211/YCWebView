@@ -51,16 +51,20 @@ public class FileReaderView extends FrameLayout implements TbsReaderView.ReaderC
      */
     public void show(String filePath) {
         if (!TextUtils.isEmpty(filePath)) {
-            //加载文件
-            Bundle localBundle = new Bundle();
-            localBundle.putString("filePath", filePath);
-            localBundle.putString("tempPath", Environment.getExternalStorageDirectory() + "/" + "TbsReaderTemp");
-            if (this.mTbsReaderView == null) {
-                this.mTbsReaderView = getTbsReaderView(context);
-            }
-            boolean bool = this.mTbsReaderView.preOpen(getFileType(filePath), false);
-            if (bool) {
-                this.mTbsReaderView.openFile(localBundle);
+            try {
+                //加载文件
+                Bundle localBundle = new Bundle();
+                localBundle.putString("filePath", filePath);
+                localBundle.putString("tempPath", Environment.getExternalStorageDirectory() + "/" + "TbsReaderTemp");
+                if (this.mTbsReaderView == null) {
+                    this.mTbsReaderView = getTbsReaderView(context);
+                }
+                boolean bool = this.mTbsReaderView.preOpen(getFileType(filePath), false);
+                if (bool) {
+                    this.mTbsReaderView.openFile(localBundle);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
             }
         } else {
             Log.e("TAG", "文件路径无效！");
