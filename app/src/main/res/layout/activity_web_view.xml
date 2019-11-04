@@ -14,14 +14,10 @@
             android:layout_height="match_parent"/>
 
         <!--仿微信横向进度条-->
-        <ProgressBar
-            android:id="@+id/pb"
+        <com.ycbjie.webviewlib.WebProgress
+            android:id="@+id/progress"
             android:layout_width="match_parent"
-            android:layout_height="3dp"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:max="100"
-            android:progress="0"
-            android:progressDrawable="@drawable/layer_progress_bar" />
+            android:layout_height="3dp"/>
     </FrameLayout>
 
 

@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.ycbjie.webviewlib.InterWebListener;
+import com.ycbjie.webviewlib.WebProgress;
+import com.ycbjie.webviewlib.X5WebUtils;
 import com.ycbjie.webviewlib.X5WebView;
 
 /**
@@ -26,7 +28,7 @@ import com.ycbjie.webviewlib.X5WebView;
 public class WebViewActivity extends AppCompatActivity {
 
     private X5WebView mWebView;
-    private ProgressBar pb;
+    private WebProgress progress;
     private String url;
 
     @Override
@@ -89,8 +91,10 @@ public class WebViewActivity extends AppCompatActivity {
 
     public void initView() {
         mWebView = findViewById(R.id.web_view);
-        pb = findViewById(R.id.pb);
-        pb.setVisibility(View.VISIBLE);
+        progress = findViewById(R.id.progress);
+        progress.show();
+        progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
+
         mWebView.loadUrl("https://github.com/yangchong211/LifeHelper");
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
@@ -100,17 +104,35 @@ public class WebViewActivity extends AppCompatActivity {
     private InterWebListener interWebListener = new InterWebListener() {
         @Override
         public void hindProgressBar() {
-            pb.setVisibility(View.GONE);
+            progress.hide();
         }
 
         @Override
-        public void showErrorView() {
+        public void showErrorView(@X5WebUtils.ErrorType int type) {
+            switch (type){
+                //没有网络
+                case X5WebUtils.ErrorMode.NO_NET:
+                    break;
+                //404，网页无法打开
+                case X5WebUtils.ErrorMode.STATE_404:
 
+                    break;
+                //onReceivedError，请求网络出现error
+                case X5WebUtils.ErrorMode.RECEIVED_ERROR:
+
+                    break;
+                //在加载资源时通知主机应用程序发生SSL错误
+                case X5WebUtils.ErrorMode.SSL_ERROR:
+
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override
         public void startProgress(int newProgress) {
-            pb.setProgress(newProgress);
+            progress.setWebProgress(newProgress);
         }
 
         @Override

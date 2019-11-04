@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_10).setOnClickListener(this);
         findViewById(R.id.tv_11).setOnClickListener(this);
         findViewById(R.id.tv_12).setOnClickListener(this);
+        findViewById(R.id.tv_13).setOnClickListener(this);
     }
 
     @Override
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_12:
                 startActivity(new Intent(this, DownActivity.class));
+                break;
+            case R.id.tv_13:
+                startActivity(new Intent(this, ScrollViewActivity.class));
                 break;
             default:
                 break;

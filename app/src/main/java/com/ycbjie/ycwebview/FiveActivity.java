@@ -6,10 +6,15 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
+import com.ycbjie.webviewlib.InterWebListener;
 import com.ycbjie.webviewlib.VideoWebListener;
+import com.ycbjie.webviewlib.WebProgress;
 import com.ycbjie.webviewlib.X5WebChromeClient;
+import com.ycbjie.webviewlib.X5WebUtils;
 import com.ycbjie.webviewlib.X5WebView;
 import com.ycbjie.webviewlib.X5WebViewClient;
 
@@ -18,7 +23,7 @@ public class FiveActivity extends AppCompatActivity {
     private X5WebView webView;
     private X5WebChromeClient x5WebChromeClient;
     private X5WebViewClient x5WebViewClient;
-
+    private WebProgress progress;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -78,13 +83,19 @@ public class FiveActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
         String movieUrl = "https://sv.baidu.com/videoui/page/videoland?context=%7B%22nid%22%3A%22sv_5861863042579737844%22%7D&pd=feedtab_h5";
         webView.loadUrl(movieUrl);
+        progress = findViewById(R.id.progress);
+        progress.show();
+        progress.setColor(this.getResources().getColor(R.color.colorAccent));
+
         x5WebChromeClient = webView.getX5WebChromeClient();
         x5WebViewClient = webView.getX5WebViewClient();
+        x5WebChromeClient.setWebListener(interWebListener);
+        x5WebViewClient.setWebListener(interWebListener);
         x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
             @Override
             public void showVideoFullView() {
@@ -107,4 +118,46 @@ public class FiveActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+    private InterWebListener interWebListener = new InterWebListener() {
+        @Override
+        public void hindProgressBar() {
+            progress.hide();
+        }
+
+        @Override
+        public void showErrorView(@X5WebUtils.ErrorType int type) {
+            switch (type){
+                //没有网络
+                case X5WebUtils.ErrorMode.NO_NET:
+                    break;
+                //404，网页无法打开
+                case X5WebUtils.ErrorMode.STATE_404:
+
+                    break;
+                //onReceivedError，请求网络出现error
+                case X5WebUtils.ErrorMode.RECEIVED_ERROR:
+
+                    break;
+                //在加载资源时通知主机应用程序发生SSL错误
+                case X5WebUtils.ErrorMode.SSL_ERROR:
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void startProgress(int newProgress) {
+            progress.setWebProgress(newProgress);
+        }
+
+        @Override
+        public void showTitle(String title) {
+
+        }
+    };
 }

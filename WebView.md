@@ -11,6 +11,26 @@
 
 
 ### 01.常用的基础介绍
+- 在activity中最简单的使用
+    ```
+    webview.loadUrl("http://www.baidu.com/");                    //加载web资源
+    //webView.loadUrl("file:///android_asset/example.html");       //加载本地资源
+    //这个时候发现一个问题，启动应用后，自动的打开了系统内置的浏览器，解决这个问题需要为webview设置 WebViewClient，并重写方法：
+    webview.setWebViewClient(new WebViewClient(){
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            //返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+            return true;
+        }
+        //还可以重写其他的方法
+    });
+    ```
+- 那些因素影响页面加载速度
+    - 影响页面加载速度的因素有非常多，在对 WebView 加载一个网页的过程进行调试发现
+        - 每次加载的过程中都会有较多的网络请求，除了 web 页面自身的 URL 请求
+        - 有 web 页面外部引用的JS、CSS、字体、图片等等都是个独立的http请求。这些请求都是串行的，这些请求加上浏览器的解析、渲染时间就会导致 WebView 整体加载时间变长，消耗的流量也对应的真多。
+
 
 
 

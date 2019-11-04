@@ -8,7 +8,7 @@
 - 4.0.6 如何处理加载错误
 - 4.0.7 webView防止内存泄漏
 - 4.0.8 关于js注入时机修改
-- 4.0.9 视频播放宽度超过屏幕
+- 4.0.9 视频/图片宽度超过屏幕
 - 4.1.0 如何保证js安全性
 - 4.1.1 如何代码开启硬件加速
 - 4.1.2 WebView设置Cookie
@@ -194,10 +194,23 @@
 
 
 
-### 4.0.9 视频播放宽度超过屏幕
-- 视频播放宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
-
-
+### 4.0.9 视频/图片宽度超过屏幕
+- 视频播放宽度或者图片宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
+- 另外一种让图片不超出屏幕范围的方法，可以用的是css
+    ```
+    <script type="text/javascript">
+       var tables = document.getElementsByTagName("img");  //找到table标签
+         for(var i = 0; i<tables.length; i++){  // 逐个改变
+                tables[i].style.width = "100%";  // 宽度改为100%
+                 tables[i].style.height = "auto";
+         }
+    </script>
+    ```
+- 通过webView的setting属性设置
+    ```
+    // 网页内容的宽度是否可大于WebView控件的宽度
+    ws.setLoadWithOverviewMode(false);
+    ```
 
 
 ### 4.1.0 如何保证js安全性

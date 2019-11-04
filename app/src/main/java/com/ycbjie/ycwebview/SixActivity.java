@@ -55,7 +55,7 @@ public class SixActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
         String url = "file:///android_asset/upload_photo.html";
         webView.loadUrl(url);

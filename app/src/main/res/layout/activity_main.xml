@@ -1,156 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.ycbjie.ycwebview.MainActivity"
-    android:padding="10dp"
-    android:orientation="vertical">
-
-
-    <TextView
-        android:id="@+id/tv_1"
+    android:layout_height="match_parent">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="match_parent"
+        tools:context="com.ycbjie.ycwebview.MainActivity"
         android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="1.浏览普通的网页"/>
-
-    <TextView
-        android:id="@+id/tv_2_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="2.1 带加载进度条的网页"/>
-
-    <TextView
-        android:id="@+id/tv_2_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="2.2 带加载进度条的网页"/>
-
-    <TextView
-        android:id="@+id/tv_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="3.电话，短信，邮件注入js"/>
+        android:orientation="vertical">
 
 
-    <TextView
-        android:id="@+id/tv_5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="5.播放网页中的视频，包括全频播放"/>
+        <TextView
+            android:id="@+id/tv_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="1.浏览普通的网页"/>
 
-    <TextView
-        android:id="@+id/tv_6_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="6.1 在h5中打开相册上传图片"/>
+        <TextView
+            android:id="@+id/tv_2_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="2.1 带加载进度条的网页"/>
 
-    <TextView
-        android:id="@+id/tv_6_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="6.2 在h5中上传身份证图片"/>
+        <TextView
+            android:id="@+id/tv_2_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="2.2 带加载进度条的网页"/>
 
-
-    <TextView
-        android:id="@+id/tv_7_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="7.1 原生native和h5交互，该案例是参考JsBridge"/>
-
-    <TextView
-        android:id="@+id/tv_7_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="7.2 原生native和h5交互案例2"/>
+        <TextView
+            android:id="@+id/tv_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="3.电话，短信，邮件注入js"/>
 
 
-    <TextView
-        android:id="@+id/tv_8"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="8.长按web页面处理，可以复制web页面文字，以及图片"/>
+        <TextView
+            android:id="@+id/tv_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="5.播放网页中的视频，包括全频播放"/>
 
-    <TextView
-        android:id="@+id/tv_9"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="9.加载word，ppt，pdf等文档文件"/>
+        <TextView
+            android:id="@+id/tv_6_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="6.1 在h5中打开相册上传图片"/>
 
-    <TextView
-        android:id="@+id/tv_10"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="10.和scrollView结合使用，比如商城商品详情页使用场景"/>
-
-    <TextView
-        android:id="@+id/tv_11"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="11.使用手机浏览器打开网络链接"/>
-
-    <TextView
-        android:id="@+id/tv_12"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:text="12.监听web网页中下载的进度操作，待完善"/>
+        <TextView
+            android:id="@+id/tv_6_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="6.2 在h5中上传身份证图片"/>
 
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_7_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="7.1 原生native和h5交互，该案例是参考JsBridge"/>
+
+        <TextView
+            android:id="@+id/tv_7_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="7.2 原生native和h5交互案例2"/>
+
+
+        <TextView
+            android:id="@+id/tv_8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="8.长按web页面处理，可以复制web页面文字，以及图片"/>
+
+        <TextView
+            android:id="@+id/tv_9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="9.加载word，ppt，pdf等文档文件"/>
+
+        <TextView
+            android:id="@+id/tv_10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="10.和scrollView结合使用，比如商城商品详情页使用场景"/>
+
+        <TextView
+            android:id="@+id/tv_11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="11.使用手机浏览器打开网络链接"/>
+
+        <TextView
+            android:id="@+id/tv_12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="12.监听web网页中下载的进度操作，待完善"/>
+
+        <TextView
+            android:id="@+id/tv_13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="13.类似购物网站下拉webView后回弹效果"/>
+
+
+    </LinearLayout>
+
+</ScrollView>

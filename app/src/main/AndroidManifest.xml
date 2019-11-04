@@ -59,6 +59,7 @@
         <activity android:name=".ten.TenActivity"/>
         <activity android:name=".DownActivity"/>
         <activity android:name=".NativeActivity2"/>
+        <activity android:name=".ScrollViewActivity"/>
     </application>
 
 </manifest>

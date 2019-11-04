@@ -54,7 +54,7 @@ public class FirstActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
         String url = "https://github.com/yangchong211";

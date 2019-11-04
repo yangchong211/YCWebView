@@ -114,8 +114,8 @@ public final class X5WebUtils {
     /**
      * 同步cookie
      * 建议调用webView.loadUrl(url)之前一句调用此方法就可以给WebView设置Cookie
-     * @param url               地址
-     * @param cookieList        需要添加的Cookie值,以键值对的方式:key=value
+     * @param url                   地址
+     * @param cookieList            需要添加的Cookie值,以键值对的方式:key=value
      */
     public static void syncCookie(Context context , String url, ArrayList<String> cookieList) {
         //初始化
@@ -138,6 +138,16 @@ public final class X5WebUtils {
         } else {
             CookieSyncManager.getInstance().sync();
         }
+    }
+
+    /**
+     * 清除cookie操作
+     * @param context               上下文
+     */
+    public static void removeCookie(Context context){
+        CookieSyncManager.createInstance(context);
+        CookieSyncManager.getInstance().startSync();
+        CookieManager.getInstance().removeSessionCookie();
     }
 
 

@@ -206,6 +206,7 @@ public class X5WebViewClient extends WebViewClient {
      * 作用：加载页面的服务器出现错误时（如404）调用。
      * App里面使用webView控件的时候遇到了诸如404这类的错误的时候，若也显示浏览器里面的那种错误提示页面就显得很丑陋，
      * 那么这个时候我们的app就需要加载一个本地的错误提示页面，即webView如何加载一个本地的页面
+     * 该方法传回了错误码，根据错误类型可以进行不同的错误分类处理
      * @param view                              view
      * @param errorCode                         错误🐎
      * @param description                       description
@@ -244,10 +245,16 @@ public class X5WebViewClient extends WebViewClient {
         }
     }
 
-    // 向主机应用程序报告Web资源加载错误。这些错误通常表明无法连接到服务器。
-    // 值得注意的是，不同的是过时的版本的回调，新的版本将被称为任何资源（iframe，图像等）
-    // 不仅为主页。因此，建议在回调过程中执行最低要求的工作。
-    // 6.0 之后
+    /**
+     * 6.0 之后
+     * 向主机应用程序报告Web资源加载错误。这些错误通常表明无法连接到服务器。
+     * 值得注意的是，不同的是过时的版本的回调，新的版本将被称为任何资源（iframe，图像等）
+     * 不仅为主页。因此，建议在回调过程中执行最低要求的工作。
+     * 该方法传回了错误码，根据错误类型可以进行不同的错误分类处理
+     * @param view                              view
+     * @param request                           request
+     * @param error                             error
+     */
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
@@ -273,6 +280,8 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 通知主机应用程序在加载资源时从服务器接收到HTTP错误
+     * onReceivedHttpError这个方法主要用于响应服务器返回的Http错误(状态码大于等于400)，
+     * 这个回调将被调用任何资源（IFRAME，图像等），而不仅仅是主页面。
      * @param view                              view
      * @param request                           request
      * @param errorResponse                     错误内容

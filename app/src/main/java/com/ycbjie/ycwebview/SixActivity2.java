@@ -58,7 +58,7 @@ public class SixActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_web_view);
         init();
         webView = findViewById(R.id.web_view);
         String url = "file:///android_asset/upload_file/jsuploadfile.html";

@@ -18,7 +18,10 @@ import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.BridgeUtil;
 import com.ycbjie.webviewlib.BridgeWebView;
+import com.ycbjie.webviewlib.InterWebListener;
+import com.ycbjie.webviewlib.WebProgress;
 import com.ycbjie.webviewlib.X5WebChromeClient;
+import com.ycbjie.webviewlib.X5WebUtils;
 import com.ycbjie.webviewlib.X5WebView;
 import com.ycbjie.webviewlib.X5WebViewClient;
 
@@ -28,6 +31,7 @@ import java.net.URLDecoder;
 public class EightActivity extends AppCompatActivity {
 
     private X5WebView webView;
+    private WebProgress progress;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -69,8 +73,11 @@ public class EightActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
+        progress = findViewById(R.id.progress);
+        progress.show();
+        progress.setColor(this.getResources().getColor(R.color.colorAccent));
         String url = "https://juejin.im/post/5d401cabf265da03a53a12fe";
         webView.loadUrl(url);
         webView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -83,8 +90,50 @@ public class EightActivity extends AppCompatActivity {
         webView.setWebViewClient(webViewClient);
         MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(webView,this);
         webView.setWebChromeClient(webChromeClient);
+        webView.getX5WebChromeClient().setWebListener(interWebListener);
+        webView.getX5WebViewClient().setWebListener(interWebListener);
     }
 
+
+    private InterWebListener interWebListener = new InterWebListener() {
+        @Override
+        public void hindProgressBar() {
+            progress.hide();
+        }
+
+        @Override
+        public void showErrorView(@X5WebUtils.ErrorType int type) {
+            switch (type){
+                //没有网络
+                case X5WebUtils.ErrorMode.NO_NET:
+                    break;
+                //404，网页无法打开
+                case X5WebUtils.ErrorMode.STATE_404:
+
+                    break;
+                //onReceivedError，请求网络出现error
+                case X5WebUtils.ErrorMode.RECEIVED_ERROR:
+
+                    break;
+                //在加载资源时通知主机应用程序发生SSL错误
+                case X5WebUtils.ErrorMode.SSL_ERROR:
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void startProgress(int newProgress) {
+            progress.setWebProgress(newProgress);
+        }
+
+        @Override
+        public void showTitle(String title) {
+
+        }
+    };
 
     private class MyX5WebViewClient extends X5WebViewClient {
         public MyX5WebViewClient(BridgeWebView webView, Context context) {

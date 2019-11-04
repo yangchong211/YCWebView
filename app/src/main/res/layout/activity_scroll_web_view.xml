@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<com.ycbjie.ycwebview.ReboundScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="50dp">
+        android:layout_height="match_parent">
 
         <com.ycbjie.webviewlib.X5WebView
             android:id="@+id/web_view"
@@ -19,14 +18,8 @@
             android:id="@+id/progress"
             android:layout_width="match_parent"
             android:layout_height="3dp"/>
-    </FrameLayout>
+    </RelativeLayout>
 
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="java调用web操作"/>
 
-</RelativeLayout>
+</com.ycbjie.ycwebview.ReboundScrollView>
