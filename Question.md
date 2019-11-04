@@ -311,9 +311,9 @@
 
 
 ### 4.1.6 allowFileAccess漏洞
-- 如果webview.getSettings().setAllowFileAccess(boolean)设置为true，则会面临该问题；该漏洞是通过WebView对Javascript的延时执行和html文件替换产生的。
-    - 解决方案是禁止WebView页面打开本地文件，即：webview.getSettings().setAllowFileAccess(false);
-    - 或者更直接的禁止使用JavaScript：webview.getSettings().setJavaScriptEnabled(false);
+- 如果webView.getSettings().setAllowFileAccess(boolean)设置为true，则会面临该问题；该漏洞是通过WebView对Javascript的延时执行和html文件替换产生的。
+    - 解决方案是禁止WebView页面打开本地文件，即：webView.getSettings().setAllowFileAccess(false);
+    - 或者更直接的禁止使用JavaScript：webView.getSettings().setJavaScriptEnabled(false);
 
 
 
@@ -483,6 +483,7 @@
 
 ### 4.2.4 WebView下载进度无法监听
 - https://www.jianshu.com/p/6e38e1ef203a
+
 
 
 ### 4.9.9 掘金问题反馈记录
