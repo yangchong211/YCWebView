@@ -24,6 +24,11 @@
 - 4.2.3 使用loadData加载html乱码
 - 4.2.4 WebView下载进度无法监听
 - 4.2.5 webView出现302/303重定向
+- 4.2.6 webView出现302/303白屏
+- 4.2.8 onReceiveError问题
+- 4.2.9 loadUrl在19以上超过2097152个字符失效
+
+
 
 
 
@@ -510,6 +515,33 @@
 - 实现WebView的滑动监听和优雅处理回退栈问题
     - WebView能否知道某个url是不是301/302呢？当然知道，WebView能够拿到url的请求信息和响应信息，根据header里的code很轻松就可以实现，事实正是如此，交给WebView来处理重定向(return false)，这时候按返回键，是可以正常地回到重定向之前的那个页面的。（PS：从上面的章节可知，WebView在5.0以后是一个独立的apk，可以单独升级，新版本的WebView实现肯定处理了重定向问题）
     - 但是，业务对url拦截有需求，肯定不能把所有的情况都交给系统WebView处理。为了解决url拦截问题，本文引入了另一种思想——通过用户的touch事件来判断重定向。具体可以看项目lib中的ScrollWebView！
+
+
+### 4.2.6 webView出现302/303白屏
+- 
+
+
+### 4.2.8 onReceiveError问题
+- https://www.jianshu.com/p/fcebd23cbebb
+
+
+
+### 4.2.9 loadUrl在19以上超过2097152个字符失效
+- 修改代码如下所示
+    ```
+    /**
+    * loadUrl方法在19以上超过2097152个字符失效
+    */
+    private static final int URL_MAX_CHARACTER_NUM=2097152;
+    
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+            javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
+        this.evaluateJavascript(javascriptCommand,null);
+    }else {
+        this.loadUrl(javascriptCommand);
+    }
+    ```
+
 
 
 ### 4.9.9 掘金问题反馈记录

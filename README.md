@@ -341,6 +341,9 @@
 - 4.2.3 使用loadData加载html乱码
 - 4.2.4 WebView下载进度无法监听
 - 4.2.5 webView出现302/303重定向
+- 4.2.6 webView出现302/303白屏
+- 4.2.8 onReceiveError问题
+- 4.2.9 loadUrl在19以上超过2097152个字符失效
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 

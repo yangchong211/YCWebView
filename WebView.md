@@ -120,11 +120,12 @@
         }
     }
 
-    //特定版本下会存在漏洞
-    mWebView.addJavascriptInterface(new JSObject(this), "yc逗比");
+    //特定版本下会存在漏洞，第一个是对象，第二个是名称
+    mWebView.addJavascriptInterface(new JSObject(this), "javascriptInterface");
     ```
     - JS 代码调用
         - 这种方式的好处在于使用简单明了，本地和 JS 的约定也很简单，就是对象名称和方法名称约定好即可，缺点就是要提到的漏洞问题。
+        - 在Js代码中就能直接通过“JSObject”的对象直接调用了该Native的类的方法。
     ```
     function showToast(){
         var result = myObj.showToast("我是来自web的Toast");

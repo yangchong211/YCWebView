@@ -53,6 +53,11 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	private List<Message> startupMessage = new ArrayList<>();
 	private X5WebViewClient x5WebViewClient;
 	private X5WebChromeClient x5WebChromeClient;
+	/**
+	 * loadUrl方法在19以上超过2097152个字符失效
+	 */
+	private static final int URL_MAX_CHARACTER_NUM=2097152;
+
 
 	/**
 	 * 获取消息list集合
@@ -201,7 +206,13 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 			// 必须要找主线程才会将数据传递出去 --- 划重点
 			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 				X5LogUtils.d("分发message--------------"+javascriptCommand);
-				this.loadUrl(javascriptCommand);
+				//this.loadUrl(javascriptCommand);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+						javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
+					this.evaluateJavascript(javascriptCommand,null);
+				}else {
+					this.loadUrl(javascriptCommand);
+				}
 			}
 		}
     }
