@@ -201,12 +201,14 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 			messageJson = messageJson.replaceAll("%7B", URLEncoder.encode("%7B"));
 			messageJson = messageJson.replaceAll("%7D", URLEncoder.encode("%7D"));
 			messageJson = messageJson.replaceAll("%22", URLEncoder.encode("%22"));
+			//转化格式为javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');
 			String javascriptCommand = String.format(
 					BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
 			// 必须要找主线程才会将数据传递出去 --- 划重点
 			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 				X5LogUtils.d("分发message--------------"+javascriptCommand);
 				//this.loadUrl(javascriptCommand);
+				//开始执行js中_handleMessageFromNative方法
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
 						javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
 					this.evaluateJavascript(javascriptCommand,null);

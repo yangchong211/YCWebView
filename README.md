@@ -8,6 +8,8 @@
     - 2.2 最简单使用
     - 2.3 常用api
     - 2.4 使用建议
+    - 2.5 异常状态类型区分
+    - 2.6 该库流程图
 - 03.js调用
     - 3.1 如何使用项目js调用
     - 3.2 js的调用时机分析
@@ -253,7 +255,7 @@
     ```
 
 
-#### 2.5 关于web页面页面状态时区分类型
+#### 2.5 关于web页面异常状态区分类型
 - 对于web加载异常，分为多种状态，比如常见的有，没有网络；404加载异常；onReceivedError，请求网络出现error；在加载资源时通知主机应用程序发生SSL错误
     ```
     @Override
@@ -277,6 +279,17 @@
     }
     ```
 
+
+#### 2.6 该库流程图
+- java调用js的流程图
+    - 第一步操作：mWebView.callHandler("functionInJs", "小杨逗比", new CallBackFunction() {//这里面是回调});
+    - 第二步操作：将handlerName，data，responseCallback，封装到Message对象中，然后开始分发数据，最后webView执行_handleMessageFromNative；
+    - 第三步操作：去WebViewJavascriptBridge.js类中找到_handleMessageFromNative方法，js根据"functionInJs"找到对应的js方法并且执行；
+    - 第四步操作：js把运行结果保存到message对象中，然后添加到js消息队列中；
+    - 第五步操作：在_dispatchMessageFromNative方法中，可以看到，js向native发送 "消息队列中有消息" 的通知；
+    - 第六步操作：webView执行js的_fetchQueue（WebViewJavascriptBridge.js类）方法；
+    - 第七步操作：js把消息队列中的所有消息都一起回传给webView；
+    - 第八步操作：webView收到所有的消息，一个一个串行处理，注意其中包括 "functionInJs"方法运行的结果的消息；
 
 
 ### 03.js调用

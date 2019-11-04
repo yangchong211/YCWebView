@@ -107,8 +107,7 @@ public class NativeActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mWebView.callHandler("functionInJs", "data from Java",
-                        new CallBackFunction() {
+                mWebView.callHandler("functionInJs", "data from Java", new CallBackFunction() {
                     @Override
                     public void onCallBack(String data) {
                         Toast.makeText(NativeActivity.this,"你个逗比" + data,Toast.LENGTH_SHORT).show();
@@ -207,6 +206,7 @@ public class NativeActivity extends AppCompatActivity {
                 Toast.makeText(NativeActivity.this,data+"逗比",Toast.LENGTH_LONG).show();
             }
         });
+        mWebView.callHandler("functionInJs");
     }
 
 }

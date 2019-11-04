@@ -74,7 +74,8 @@
         messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
     }
 
-    // 提供给native调用,该函数作用:获取sendMessageQueue返回给native,由于android不能直接获取返回的内容,所以使用url shouldOverrideUrlLoading 的方式返回内容
+    // 提供给native调用,该函数作用:获取sendMessageQueue返回给native,
+    // 由于android不能直接获取返回的内容,所以使用url shouldOverrideUrlLoading 的方式返回内容
     function _fetchQueue() {
         var messageQueueString = JSON.stringify(sendMessageQueue);
         sendMessageQueue = [];
