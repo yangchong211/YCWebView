@@ -88,7 +88,12 @@ public class X5WebView extends BridgeWebView {
         ws.setDomStorageEnabled(true);
         //防止中文乱码
         ws.setDefaultTextEncodingName("UTF -8");
-        // 排版适应屏幕
+        /*
+         * 排版适应屏幕
+         * 用WebView显示图片，可使用这个参数
+         * 设置网页布局类型： 1、LayoutAlgorithm.NARROW_COLUMNS ：
+         * 适应内容大小 2、LayoutAlgorithm.SINGLE_COLUMN:适应屏幕，内容将自动缩放
+         */
         ws.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
         // WebView是否新窗口打开(加了后可能打不开网页)
         //ws.setSupportMultipleWindows(true);
