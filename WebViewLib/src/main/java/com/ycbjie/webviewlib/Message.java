@@ -37,22 +37,27 @@ public class Message {
 
     /**
      * callbackId
+     * 回调id
      */
 	private String callbackId;
     /**
      * responseId
+     * 响应id
      */
 	private String responseId;
     /**
      * responseData
+     * 响应内容
      */
 	private String responseData;
     /**
      * data of message
+     * 消息内容
      */
 	private String data;
     /**
      * name of handler
+     * 消息名称
      */
 	private String handlerName;
 

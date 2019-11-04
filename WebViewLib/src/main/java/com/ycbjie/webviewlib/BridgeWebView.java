@@ -149,9 +149,11 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	private void doSend(String handlerName, String data, CallBackFunction responseCallback) {
 		//创建message对象，主要是将js的方法名称，传递的数据，封装到对象中
 		Message m = new Message();
+		//判断是否有data数据
 		if (!TextUtils.isEmpty(data)) {
 			m.setData(data);
 		}
+		//判断responseCallback是否为null
 		if (responseCallback != null) {
 			String callbackStr = String.format(BridgeUtil.CALLBACK_ID_FORMAT,
 					++uniqueId + (BridgeUtil.UNDERLINE_STR +
@@ -159,9 +161,11 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 			responseCallbacks.put(callbackStr, responseCallback);
 			m.setCallbackId(callbackStr);
 		}
+		//判断是否有handlerName数据
 		if (!TextUtils.isEmpty(handlerName)) {
 			m.setHandlerName(handlerName);
 		}
+		//开始分发数据
 		queueMessage(m);
 	}
 

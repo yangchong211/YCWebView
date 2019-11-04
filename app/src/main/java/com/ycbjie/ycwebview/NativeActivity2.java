@@ -196,37 +196,6 @@ public class NativeActivity2 extends AppCompatActivity {
     @JavascriptInterface
     public void initWebViewBridge() {
         mWebView.setDefaultHandler(new DefaultHandler());
-        mWebView.addJavascriptInterface(new AndroidInterface(mWebView,this), "android");
     }
-
-    public class AndroidInterface {
-
-        private X5WebView superWeb;
-        private Context context;
-
-        public AndroidInterface(X5WebView superWeb, Context context) {
-            this.superWeb = superWeb;
-            this.context = context;
-        }
-
-        private Handler deliver = new Handler(Looper.getMainLooper());
-
-        @JavascriptInterface
-        public void callAndroid(final String msg) {
-            deliver.post(new Runnable() {
-                @Override
-                public void run() {
-
-                    Log.i("Info", "main Thread:" + Thread.currentThread());
-                    Toast.makeText(context.getApplicationContext(), "" + msg, Toast.LENGTH_LONG).show();
-                }
-            });
-            Log.i("Info", "Thread:" + Thread.currentThread());
-
-            //对外接口
-        }
-
-    }
-
 
 }
