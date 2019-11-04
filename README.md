@@ -206,7 +206,13 @@
     //进度完成后消失
     pb.hide();
     ```
-
+- 设置cookie和清除cookie操作
+    ```
+    //同步cookie
+    X5WebUtils.syncCookie(this,"url",cookieList);
+    //清除cookie
+    X5WebUtils.removeCookie(this);
+    ```
 
 
 #### 2.4 使用建议
