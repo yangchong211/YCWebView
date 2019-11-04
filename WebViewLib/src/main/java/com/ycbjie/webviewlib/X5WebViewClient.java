@@ -207,6 +207,12 @@ public class X5WebViewClient extends WebViewClient {
      * App里面使用webView控件的时候遇到了诸如404这类的错误的时候，若也显示浏览器里面的那种错误提示页面就显得很丑陋，
      * 那么这个时候我们的app就需要加载一个本地的错误提示页面，即webView如何加载一个本地的页面
      * 该方法传回了错误码，根据错误类型可以进行不同的错误分类处理
+     * onReceivedError只有在遇到不可用的(unrecoverable)错误时，才会被调用）
+     * 当WebView加载链接www.ycdoubi.com时，"不可用"的情况有可以包括有：
+     *          1.没有网络连接
+     *          2.连接超时
+     *          3.找不到页面www.ycdoubi.com
+     *
      * @param view                              view
      * @param errorCode                         错误🐎
      * @param description                       description
@@ -248,9 +254,14 @@ public class X5WebViewClient extends WebViewClient {
     /**
      * 6.0 之后
      * 向主机应用程序报告Web资源加载错误。这些错误通常表明无法连接到服务器。
-     * 值得注意的是，不同的是过时的版本的回调，新的版本将被称为任何资源（iframe，图像等）
      * 不仅为主页。因此，建议在回调过程中执行最低要求的工作。
-     * 该方法传回了错误码，根据错误类型可以进行不同的错误分类处理
+     * 该方法传回了错误码，根据错误类型可以进行不同的错误分类处理，比如
+     * onReceivedError只有在遇到不可用的(unrecoverable)错误时，才会被调用）
+     * 当WebView加载链接www.ycdoubi.com时，"不可用"的情况有可以包括有：
+     *          1.没有网络连接
+     *          2.连接超时
+     *          3.找不到页面www.ycdoubi.com
+     *
      * @param view                              view
      * @param request                           request
      * @param error                             error
@@ -266,6 +277,9 @@ public class X5WebViewClient extends WebViewClient {
         //当加载错误时，就让它加载本地错误网页文件
         //mWebView.loadUrl("file:///android_asset/errorpage/error.html");
         int errorCode = error.getErrorCode();
+        //获取当前的网络请求是否是为main frame创建的.
+        boolean forMainFrame = request.isForMainFrame();
+        boolean redirect = request.isRedirect();
         if (errorCode == 404) {
             //用javascript隐藏系统定义的404页面信息
             String data = "Page NO FOUND！";
@@ -280,8 +294,6 @@ public class X5WebViewClient extends WebViewClient {
 
     /**
      * 通知主机应用程序在加载资源时从服务器接收到HTTP错误
-     * onReceivedHttpError这个方法主要用于响应服务器返回的Http错误(状态码大于等于400)，
-     * 这个回调将被调用任何资源（IFRAME，图像等），而不仅仅是主页面。
      * @param view                              view
      * @param request                           request
      * @param errorResponse                     错误内容
@@ -290,7 +302,12 @@ public class X5WebViewClient extends WebViewClient {
     public void onReceivedHttpError(WebView view, WebResourceRequest request,
                                     WebResourceResponse errorResponse) {
         super.onReceivedHttpError(view, request, errorResponse);
-        X5LogUtils.i("-------onReceivedError-------"+ errorResponse.getReasonPhrase());
+        int statusCode = errorResponse.getStatusCode();
+        String reasonPhrase = errorResponse.getReasonPhrase();
+        X5LogUtils.i("-------onReceivedError-------"+ statusCode + "-------"+reasonPhrase);
+        if (webListener!=null){
+            webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
+        }
     }
 
 

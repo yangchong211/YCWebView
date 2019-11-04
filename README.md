@@ -367,8 +367,9 @@
     - [WebViewStudy开源库](https://github.com/youlookwhat/WebViewStudy)
 - 参考博客
     - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
-    - [WebView详解，常见漏洞详解和安全源码](https://juejin.im/post/58a037df86b599006b3fade4)
-
+    - [WebView详解，常见漏洞详解和安全源码上](https://juejin.im/post/58a037df86b599006b3fade4)
+    - [WebView详解，常见漏洞详解和安全源码下](https://blog.csdn.net/self_study/article/details/55046348)
+    - [如何设计一个优雅健壮的Android WebView](https://juejin.im/post/5a94f9d15188257a63113a74)
 
 
 ### 07.其他说明介绍
