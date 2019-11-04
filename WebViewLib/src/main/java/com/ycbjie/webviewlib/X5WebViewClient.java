@@ -160,6 +160,10 @@ public class X5WebViewClient extends WebViewClient {
         super.onPageStarted(webView, s, bitmap);
         //设定加载开始的操作
         X5LogUtils.i("-------onPageStarted-------"+s);
+        if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
+            //显示异常页面
+            webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
+        }
     }
 
     /**
@@ -173,6 +177,8 @@ public class X5WebViewClient extends WebViewClient {
         if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
             //隐藏进度条方法
             webListener.hindProgressBar();
+            //显示异常页面
+            webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
         }
         super.onPageFinished(view, url);
         //设置网页在加载的时候暂时不加载图片
@@ -216,7 +222,7 @@ public class X5WebViewClient extends WebViewClient {
             view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
         } else {
             if (webListener!=null){
-                webListener.showErrorView();
+                webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
         }
     }
@@ -252,8 +258,15 @@ public class X5WebViewClient extends WebViewClient {
         //ToastUtils.showToast("服务器异常6.0之后");
         //当加载错误时，就让它加载本地错误网页文件
         //mWebView.loadUrl("file:///android_asset/errorpage/error.html");
-        if (webListener!=null){
-            webListener.showErrorView();
+        int errorCode = error.getErrorCode();
+        if (errorCode == 404) {
+            //用javascript隐藏系统定义的404页面信息
+            String data = "Page NO FOUND！";
+            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+        } else {
+            if (webListener!=null){
+                webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
+            }
         }
     }
 
@@ -301,6 +314,9 @@ public class X5WebViewClient extends WebViewClient {
         X5LogUtils.i("-------onReceivedSslError-------"+ error.getUrl());
         if (error!=null){
             String url = error.getUrl();
+            if (webListener!=null){
+                webListener.showErrorView(X5WebUtils.ErrorMode.SSL_ERROR);
+            }
             X5LogUtils.i("onReceivedSslError----异常url----"+url);
         }
         //https忽略证书问题

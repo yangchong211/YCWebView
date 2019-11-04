@@ -143,7 +143,7 @@
         }
     
         @Override
-        public void showErrorView() {
+        public void showErrorView(@X5WebUtils.ErrorType int type) {
             //设置自定义异常错误页面
         }
     
@@ -245,6 +245,32 @@
         super.onDestroy();
     }
     ```
+
+
+#### 2.5 关于web页面页面状态时区分类型
+- 对于web加载异常，分为多种状态，比如常见的有，没有网络；404加载异常；onReceivedError，请求网络出现error；在加载资源时通知主机应用程序发生SSL错误
+    ```
+    @Override
+    public void showErrorView(@X5WebUtils.ErrorType int type) {
+        switch (type){
+            //没有网络
+            case X5WebUtils.ErrorMode.NO_NET:
+                break;
+            //404，网页无法打开
+            case X5WebUtils.ErrorMode.STATE_404:
+                break;
+            //onReceivedError，请求网络出现error
+            case X5WebUtils.ErrorMode.RECEIVED_ERROR:
+                break;
+            //在加载资源时通知主机应用程序发生SSL错误
+            case X5WebUtils.ErrorMode.SSL_ERROR:
+                break;
+            default:
+                break;
+        }
+    }
+    ```
+
 
 
 ### 03.js调用

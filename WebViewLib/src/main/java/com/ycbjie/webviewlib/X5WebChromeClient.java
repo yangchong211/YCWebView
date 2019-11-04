@@ -134,7 +134,7 @@ public class X5WebChromeClient extends WebChromeClient {
         super.onReceivedTitle(view, title);
         if (title.contains("404") || title.contains("网页无法打开")){
             if (webListener!=null){
-                webListener.showErrorView();
+                webListener.showErrorView(X5WebUtils.ErrorMode.STATE_404);
             }
         } else {
             // 设置title

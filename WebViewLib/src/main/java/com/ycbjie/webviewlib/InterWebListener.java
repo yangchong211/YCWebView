@@ -36,8 +36,9 @@ public interface InterWebListener {
 
     /**
      * 展示异常页面
+     * @param type                           异常类型
      */
-    void showErrorView();
+    void showErrorView(@X5WebUtils.ErrorType int type);
 
     /**
      * 进度条变化时调用，这里添加注解限定符，必须是在0到100之间

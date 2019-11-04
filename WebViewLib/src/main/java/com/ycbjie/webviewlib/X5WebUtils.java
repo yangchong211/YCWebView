@@ -22,12 +22,15 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 /**
@@ -136,5 +139,29 @@ public final class X5WebUtils {
             CookieSyncManager.getInstance().sync();
         }
     }
+
+
+    /**
+     * 注解限定符
+     */
+    @IntDef({ErrorMode.NO_NET,ErrorMode.STATE_404, ErrorMode.RECEIVED_ERROR, ErrorMode.SSL_ERROR})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ErrorType{}
+
+    /**
+     * 异常状态模式
+     * NO_NET                       没有网络
+     * STATE_404                    404，网页无法打开
+     * RECEIVED_ERROR               onReceivedError，请求网络出现error
+     * SSL_ERROR                    在加载资源时通知主机应用程序发生SSL错误
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ErrorMode {
+        int NO_NET = 1001;
+        int STATE_404 = 1002;
+        int RECEIVED_ERROR = 1003;
+        int SSL_ERROR = 1004;
+    }
+
 
 }

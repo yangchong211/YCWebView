@@ -68,8 +68,26 @@ public class ProgressWebView extends FrameLayout {
             }
 
             @Override
-            public void showErrorView() {
+            public void showErrorView(@X5WebUtils.ErrorType int type) {
+                switch (type){
+                    //没有网络
+                    case X5WebUtils.ErrorMode.NO_NET:
+                        break;
+                    //404，网页无法打开
+                    case X5WebUtils.ErrorMode.STATE_404:
 
+                        break;
+                    //onReceivedError，请求网络出现error
+                    case X5WebUtils.ErrorMode.RECEIVED_ERROR:
+
+                        break;
+                    //在加载资源时通知主机应用程序发生SSL错误
+                    case X5WebUtils.ErrorMode.SSL_ERROR:
+
+                        break;
+                    default:
+                        break;
+                }
             }
 
             @Override
