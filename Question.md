@@ -27,8 +27,12 @@
 - 4.2.6 webView出现302/303白屏
 - 4.2.8 onReceiveError问题
 - 4.2.9 loadUrl在19以上超过2097152个字符失效
-
-
+- 4.3.0 WebViewJavascriptBridge: WARNING
+- 4.3.1 Android与js传递数据大小有限制
+- 4.3.2 多次调用callHandler部分回调函数未被调用
+- 4.3.3 字符串转义bug探讨
+- 4.3.8 Javascript调用原生方法会偶现失败
+- 4.3.9 dispatchMessage运行主线程问题
 
 
 
@@ -541,6 +545,66 @@
         this.loadUrl(javascriptCommand);
     }
     ```
+
+
+### 4.3.0 WebViewJavascriptBridge: WARNING
+- 有时候会出现这种报错日志：WebViewJavascriptBridge: WARNING: javascript handler threw.", source: (1) 
+    - 发生这种错误的原因。在作者库的library下的assets中有个js文件，错误是在那里面出现的。
+    - 这里总结如下：两边互传数据最好做的是严格意义上的json字符串。最后一点，也是最重要的一点。
+        ```
+        try {
+            handler(message.data, responseCallback);
+        } catch (exception) {
+            if (typeof console != 'undefined') {
+                console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
+            }
+        }
+        ```
+    - 上面的错误，是发生在WebViewJavascriptBridge.js的这里。。这里try catch发生错误。handler是js端给到的处理函数，也就是在js端的这个处理函数里发生任何错误，都会出现这个错误提示。导致大家无法获取准确的错误。
+- 出现这个错误。
+    - 首先检查js端的代码。js端发生错误，就报上面的错误。所以首要是去找js端的错误。
+
+
+
+### 4.3.1 Android与js传递数据大小有限制
+
+
+
+### 4.3.2 多次调用callHandler部分回调函数未被调用
+- https://github.com/lzyzsd/JsBridge/issues/178
+- https://github.com/lzyzsd/JsBridge/issues/170
+
+
+### 4.3.3 字符串转义bug探讨
+- 字符串转义bug。很多时候侨接不成功，这些问题本质上的原因都是通过js bridge传递数据转义有误导致。 
+- 此bug会导致严重问题，如果传递的数据转义发生错误时，将导致不可用，像WebViewJavascriptBridge: WARNING: javascript handler threw.", source: (1) 这种错误很多时候都是因为js收到的数据和期望不符导致的异常（当然有些也有可能是js hanlder 处理不当抛出的）。这是一个偶现的致命bug 。要彻底解决这个问题最根本的方法就是不应该去转义，因为在传递数据格式未限定的情况下，只要转义，正常的数据字符串中都有可能匹配到转义规则（而这些字符串本身是不需要转义），这将会导致对于一部分数据能够正常转义，而一部分数据不能，这样的bug很难测试。 如果非要转义，就必须得限定jsbridge数据传递的格式，比如必须以json形式传递（不能直接传递string、bool等基础类型），这样才可以应用固定的转义规则解析。
+
+
+
+### 4.3.8 Javascript调用原生方法会偶现失败
+- 在测试过程中发现，失败的时机往往是webview调用 onPageFinished 前后，具体的表现是js调用native方法时 shouldOverrideUrlLoading（包括两种重载）没有被触发，所以端上没有去刷新js调用的message queue. 至于为什么没有就调用shouldOverrideUrlLoading，这是因为js和webview通信机制有问题，通过改变iframe src属性的这种方式并不能保证shouldOverrideUrlLoading每次都会被调用，这也是一些其它android jsbridge 会出现此问题的原因。
+
+
+
+### 4.3.9 dispatchMessage运行主线程问题
+- 先看一下案例代码
+    ```
+    // 必须要找主线程才会将数据传递出去 --- 划重点
+    if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+        X5LogUtils.d("分发message--------------"+javascriptCommand);
+        //this.loadUrl(javascriptCommand);
+        //开始执行js中_handleMessageFromNative方法
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+                javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
+            this.evaluateJavascript(javascriptCommand,null);
+        }else {
+            this.loadUrl(javascriptCommand);
+        }
+    }
+    ```
+- 可以看到，只有当是主线程时，才会执行分发的js，那么如果不是主线程呢？那自然就不会被分发，如果要确保这段代码没问题，那么就必须保证dispatchMessage是在主线程中被调用，而callHandler最终会调用dispatchMessage，所以就得保证callHandler必须在主线程调用。如果强制让用户去遵守这个规则是不靠谱的，况且有些时候，用户也不知道自己是否在主线程，示例代码中有在 onPageFinished时调用callHandler，不错onPageFinished在大多数情况下都会在主线程中被回调，但是我查了一圈，从没看到任何官方文档有说onPageFinished会在主线程中被回调。所以，那些出现的callHanlder不能调用bug的魅族手机，最好先去检查一下是否在主线程调用的。 所以，库中是应该保证callHandler无论是在哪个线程发起的调用, 最终的js都能在主线程被执行（因为webview要执行 s代码只能在主线程）。
+
+
 
 
 

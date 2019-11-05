@@ -54,6 +54,7 @@
 - 支持打开文件的操作，比如打开相册，然后选中图片上传，兼容版本(5.0)；
 - 支持加载word，xls，ppt，pdf，txt等文件文档，使用方法十分简单；
 - 支持设置仿微信加载H5页面进度条，完全无耦合，操作简单，极大提高用户体验；
+- 支持用户按照规范自定义WebViewClient和WebChromeClient，不影响js通信；
 
 
 
@@ -397,6 +398,12 @@
 - 4.2.6 webView出现302/303白屏
 - 4.2.8 onReceiveError问题
 - 4.2.9 loadUrl在19以上超过2097152个字符失效
+- 4.3.0 WebViewJavascriptBridge: WARNING
+- 4.3.1 Android与js传递数据大小有限制
+- 4.3.2 多次调用callHandler部分回调函数未被调用
+- 4.3.3 字符串转义bug探讨
+- 4.3.8 Javascript调用原生方法会偶现失败
+- 4.3.9 dispatchMessage运行主线程问题
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
