@@ -48,6 +48,7 @@ public class X5WebViewClient extends WebViewClient {
 
     private InterWebListener webListener;
     private BridgeWebView webView;
+    private Context context;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -64,6 +65,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     public X5WebViewClient(BridgeWebView webView, Context context) {
         this.webView = webView;
+        this.context = context;
         //将js对象与java对象进行映射
         webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
@@ -80,6 +82,11 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         X5LogUtils.i("-------shouldOverrideUrlLoading----1---"+url);
+        //页面关闭后，直接返回，不要执行网络请求和js方法
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
         if (TextUtils.isEmpty(url)) {
             return false;
         }
@@ -120,6 +127,11 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
+        //页面关闭后，直接返回，不要执行网络请求和js方法
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String url = request.getUrl().toString();
             if (TextUtils.isEmpty(url)) {

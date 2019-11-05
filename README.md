@@ -420,6 +420,7 @@
 - 5.0.9 后台无法释放js导致发热耗电
 - 5.1.0 可以提前显示加载进度条
 - 5.1.1 WebView密码明文存储漏洞优化
+- 5.1.2 页面关闭后不要执行web中js
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 

@@ -10,6 +10,7 @@
 - 5.0.9 后台无法释放js导致发热耗电
 - 5.1.0 可以提前显示加载进度条
 - 5.1.1 WebView密码明文存储漏洞优化
+- 5.1.2 页面关闭后不要执行web中js
 
 
 ### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
@@ -295,5 +296,22 @@
     /设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
     mX5WebView.setSavePassword(false);
     ```
+
+### 5.1.2 页面关闭后不要执行web中js
+- 页面关闭后，直接返回，不要执行网络请求和js方法。代码如下所示：
+    ```
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
+        //页面关闭后，直接返回，不要执行网络请求和js方法
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
+    }
+    ```
+
+
+
 
 

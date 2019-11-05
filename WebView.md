@@ -31,6 +31,15 @@
     - 影响页面加载速度的因素有非常多，在对 WebView 加载一个网页的过程进行调试发现
         - 每次加载的过程中都会有较多的网络请求，除了 web 页面自身的 URL 请求
         - 有 web 页面外部引用的JS、CSS、字体、图片等等都是个独立的http请求。这些请求都是串行的，这些请求加上浏览器的解析、渲染时间就会导致 WebView 整体加载时间变长，消耗的流量也对应的真多。
+- js交互介绍
+    - Java调用js方法有两种：
+        - WebView.loadUrl("javascript:" + javascript);
+        - WebView.evaluateJavascript(javascript, callbacck);
+    - js调用Java的方法有四种，分别是：
+        - JavascriptInterface
+        - WebViewClient.shouldOverrideUrlLoading()
+        - WebChromeClient.onConsoleMessage()
+        - WebChromeClient.onJsPrompt()
 
 
 
