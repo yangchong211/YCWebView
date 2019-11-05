@@ -7,8 +7,9 @@
 - 06.清除缓存数据方式有哪些
 - 07.如何使用DeepLink
 - 08.为什么WebView那么难搞
+- 09.如何处理加载错误
 - 10.应用被作为第三方浏览器打开
-
+- 11.理解WebView独立进程
 
 
 ### 01.常用的基础介绍
@@ -320,6 +321,50 @@
 
 
 
+### 09.如何处理加载错误
+- 对于WebView加载一个网页过程中所产生的错误回调，大致有三种：
+- WebViewClient.onReceivedHttpError(webView, webResourceRequest, webResourceResponse)
+    - 任何HTTP请求产生的错误都会回调这个方法，包括主页面的html文档请求，iframe、图片等资源请求。在这个回调中，由于混杂了很多请求，不适合用来展示加载错误的页面，而适合做监控报警。当某个URL，或者某个资源收到大量报警时，说明页面或资源可能存在问题，这时候可以让相关运营及时响应修改。
+- WebViewClient.onReceivedSslError(webview, sslErrorHandler, sslError)
+    - 任何HTTPS请求，遇到SSL错误时都会回调这个方法。比较正确的做法是让用户选择是否信任这个网站，这时候可以弹出信任选择框供用户选择（大部分正规浏览器是这么做的）。但人都是有私心的，何况是遇到自家的网站时。我们可以让一些特定的网站，不管其证书是否存在问题，都让用户信任它。
+    ```
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        if (UrlUtils.isKaolaHost(getUrl())) {
+            handler.proceed();
+        } else {
+            super.onReceivedSslError(view, handler, error);
+        }
+    }
+    ```
+- WebViewClient.onReceivedError(webView, webResourceRequest, webResourceError)
+    - 只有在主页面加载出现错误时，才会回调这个方法。这正是展示加载错误页面最合适的方法。然鹅，如果不管三七二十一直接展示错误页面的话，那很有可能会误判，给用户造成经常加载页面失败的错觉。由于不同的WebView实现可能不一样，所以我们首先需要排除几种误判的例子：
+        - 加载失败的url跟WebView里的url不是同一个url，排除；
+        - errorCode=-1，表明是ERROR_UNKNOWN的错误，为了保证不误判，排除
+        - failingUrl=null&errorCode=-12，由于错误的url是空而不是ERROR_BAD_URL，排除
+    - 代码如下所示
+    ```
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        super.onReceivedError(view, errorCode, description, failingUrl);
+    
+        // -12 == EventHandle.ERROR_BAD_URL, a hide return code inside android.net.http package
+        if ((failingUrl != null && !failingUrl.equals(view.getUrl()) && !failingUrl.equals(view.getOriginalUrl())) /* not subresource error*/
+                || (failingUrl == null && errorCode != -12) /*not bad url*/
+                || errorCode == -1) { //当 errorCode = -1 且错误信息为 net::ERR_CACHE_MISS
+            return;
+        }
+    
+        if (!TextUtils.isEmpty(failingUrl)) {
+            if (failingUrl.equals(view.getUrl())) {
+                if (null != mIWebViewClient) {
+                    mIWebViewClient.onReceivedError(view);
+                }
+            }
+        }
+    }
+    ```
+
 
 ### 10.应用被作为第三方浏览器打开
 - 微信里的文章页面，可以选择“在浏览器打开”。现在很多应用都内嵌了WebView，那是否可以使自己的应用作为第三方浏览器打开此文章呢？
@@ -396,6 +441,29 @@
     ```
 - 一些重点说明
     - 在微信中“通过浏览器”打开自己的应用，然后将自己的应用切到后台。重复上面的操作，会一直创建应用的实例，这样肯定是不好的，为了避免这种情况我们设置启动模式为：launchMode="singleTask"。
+
+
+
+### 11.理解WebView独立进程
+- WebView实例在Android7.0系统以后，已经可以选择运行在一个独立进程上7；8.0以后默认就是运行在独立的沙盒进程中。
+- Android7.0系统以后，WebView相对来说是比较稳定的，无论承载WebView的容器是否在主进程，都不需要担心WebView崩溃导致应用也跟着崩溃。然后7.0以下的系统就没有这么幸运了，特别是低版本的WebView。考虑应用的稳定性，我们可以把7.0以下系统的WebView使用一个独立进程的Activity来包装，这样即使WebView崩溃了，也只是WebView所在的进程发生了崩溃，主进程还是不受影响的。
+    - 该方案是考拉的分享，具体内容可以看这篇文章。[如何设计一个优雅健壮的Android WebView](https://blog.klmobile.app/2018/02/27/design-an-elegant-and-powerful-android-webview-part-two/)
+    ```
+    public static Intent getWebViewIntent(Context context) {
+        Intent intent;
+        if (isWebInMainProcess()) {
+            intent = new Intent(context, MainWebviewActivity.class);
+        } else {
+            intent = new Intent(context, WebviewActivity.class);
+        }
+        return intent;
+    }
+    
+    public static boolean isWebInMainProcess() {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N;
+    }
+    ```
+
 
 
 

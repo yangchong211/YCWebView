@@ -33,7 +33,7 @@
 - 4.3.3 字符串转义bug探讨
 - 4.3.8 Javascript调用原生方法会偶现失败
 - 4.3.9 dispatchMessage运行主线程问题
-
+- 4.4.0 怎么实现WebView免流方案
 
 
 ### 4.0.0 WebView进化史介绍
@@ -604,6 +604,16 @@
     ```
 - 可以看到，只有当是主线程时，才会执行分发的js，那么如果不是主线程呢？那自然就不会被分发，如果要确保这段代码没问题，那么就必须保证dispatchMessage是在主线程中被调用，而callHandler最终会调用dispatchMessage，所以就得保证callHandler必须在主线程调用。如果强制让用户去遵守这个规则是不靠谱的，况且有些时候，用户也不知道自己是否在主线程，示例代码中有在 onPageFinished时调用callHandler，不错onPageFinished在大多数情况下都会在主线程中被回调，但是我查了一圈，从没看到任何官方文档有说onPageFinished会在主线程中被回调。所以，那些出现的callHanlder不能调用bug的魅族手机，最好先去检查一下是否在主线程调用的。 所以，库中是应该保证callHandler无论是在哪个线程发起的调用, 最终的js都能在主线程被执行（因为webview要执行 s代码只能在主线程）。
 
+
+
+### 4.4.0 怎么实现WebView免流方案
+- 市面上常见的免流应用，原理无非就是走“特殊通道”，让这一部分的流量不计入运营商的流量统计平台中。Android中要实现这种“特殊通道”，有几种方案。
+    - vpn。目前运营商貌似没有采用这种方案，但确实是可行的。
+    - 全局代理。把所有的流量中转到代理服务器中，代理服务器再根据流量判断是否属于免流流量。
+    - IP直连。走这个IP的所有流量，服务器判断是否免流。
+- 对于上面提到的几种方案，native页面所有的请求都是应用层发起的，实际上都比较好实现，但WebView的页面和资源请求是通过JNI发起的，想要拦截请求的话，需要一些功夫。
+    - 网罗网上的所有方案，目前觉得可行的有两种，分别是全局代理和拦截WebViewClient.shouldInterceptRequest()。
+    - 更多参考[如何设计一个优雅健壮的Android WebView](https://blog.klmobile.app/2018/02/27/design-an-elegant-and-powerful-android-webview-part-two/)
 
 
 
