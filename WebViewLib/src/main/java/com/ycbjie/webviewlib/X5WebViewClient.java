@@ -188,6 +188,7 @@ public class X5WebViewClient extends WebViewClient {
             webView.getSettings().setLoadsImagesAutomatically(true);
         }
         //这个时候添加js注入方法
+        //WebViewJavascriptBridge.js
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
         if (webView.getStartupMessage() != null) {
             for (Message m : webView.getStartupMessage()) {

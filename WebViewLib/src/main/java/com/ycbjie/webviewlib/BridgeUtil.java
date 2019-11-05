@@ -35,19 +35,19 @@ import java.io.InputStreamReader;
  */
 public final class BridgeUtil {
 
-	public final static String YY_OVERRIDE_SCHEMA = "yy://";
+	final static String YY_OVERRIDE_SCHEMA = "yy://";
 	/**
 	 * 格式为   yy://return/{function}/returncontent
 	 */
-	public final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";
-	public final static String YY_FETCH_QUEUE = YY_RETURN_DATA + "_fetchQueue/";
-	public final static String EMPTY_STR = "";
-	public final static String UNDERLINE_STR = "_";
-	public final static String SPLIT_MARK = "/";
-	public final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
-	public final static String JS_HANDLE_MESSAGE_FROM_JAVA =
+	final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";
+	private final static String YY_FETCH_QUEUE = YY_RETURN_DATA + "_fetchQueue/";
+	private final static String EMPTY_STR = "";
+	final static String UNDERLINE_STR = "_";
+	private final static String SPLIT_MARK = "/";
+	final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
+	final static String JS_HANDLE_MESSAGE_FROM_JAVA =
 			"javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');";
-	public final static String JS_FETCH_QUEUE_FROM_JAVA =
+	final static String JS_FETCH_QUEUE_FROM_JAVA =
 			"javascript:WebViewJavascriptBridge._fetchQueue();";
 	public final static String JAVASCRIPT_STR = "javascript:";
 

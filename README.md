@@ -11,8 +11,10 @@
     - 2.5 异常状态类型区分
     - 2.6 该库流程图
 - 03.js调用
-    - 3.1 如何使用项目js调用
-    - 3.2 js的调用时机分析
+    - 3.1 Java调用js方法
+    - 3.2 js调用java方法
+    - 3.3 js的调用时机分析
+    - 3.4 js交互原理分析
 - 04.问题反馈
 - 05.webView优化
 - 06.关于参考
@@ -290,27 +292,55 @@
     - 第六步操作：webView执行js的_fetchQueue（WebViewJavascriptBridge.js类）方法；
     - 第七步操作：js把消息队列中的所有消息都一起回传给webView；
     - 第八步操作：webView收到所有的消息，一个一个串行处理，注意其中包括 "functionInJs"方法运行的结果的消息；
+- js调用Android的流程图
+    - 第一步操作：mWebView.registerHandler("toPhone", new BridgeHandler() { //回调});
+    - 第二步操作：调用messageHandlers.put(handlerName, handler)，将名称和BridgeHandler对象放到map集合中
+    - 第三步操作：在shouldOverrideUrlLoading方法中拦截url，与网页约定好一个协议，匹配则执行相应操作，也就是利用WebViewClient接口回调方法拦截url
+    - 第四步操作：如果是url.startsWith(BridgeUtil.YY_RETURN_DATA)则有数据返回；如果是BridgeUtil.YY_OVERRIDE_SCHEMA则刷新消息队列
+    - 第五步操作：通过BridgeHandler对象，将data和callBackFunction返回交给开发者
 
 
-### 03.js调用
-#### 3.1 如何使用项目js调用
-- **代码如下所示，下面中的jsname代表的是js这边提供给客户端的方法名称**
+### 03.js交互操作
+#### 3.1 Java调用js的使用方法
+- 代码如下所示，下面updateAttentionStatus代表js这边的方法名称
+    - webView.callHandler(“updateAttentionStatus”, …, new CallBackFunction());这是Java层主动调用Js的”updateAttentionStatus”方法。
     ```
-    mWebView.registerHandler("jsname", new BridgeHandler() {
+    mWebView.callHandler("updateAttentionStatus", attention, new CallBackFunction() {
+        @Override
+        public void onCallBack(String data) {
+    
+        }
+    });
+    ```
+
+
+
+#### 3.2 js调用java的使用方法
+- **代码如下所示，下面中的toPhone代表的是Android这边提供给js的方法名称**
+    - webView.registerHandler(“toPhone”, …);这是Java层注册了一个叫”toPhone”的接口方法，目的是提供给Js来调用。这个”toPhone”的接口方法的回调就是BridgeHandler.handler()。
+    ```
+    mWebView.registerHandler("toPhone", new BridgeHandler() {
         @Override
         public void handler(String data, CallBackFunction function) {
-            
+            try {
+                JSONObject jsonData = new JSONObject(data);
+                String phone = jsonData.optString("phone");
+                //todo 打电话
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     });
     ```
 - **如何回调数据给web那边**
     ```
+    //注意，这里回传数据目前只是支持String字符串类型
     function.onCallBack("回调数据");
     ```
 
 
 
-#### 3.2 js的调用时机分析
+#### 3.3 js的调用时机分析
 - **onPageFinished()或者onPageStarted()方法中注入js代码**
     - 做过WebView开发，并且需要和js交互，大部分都会认为js在WebViewClient.onPageFinished()方法中注入最合适，此时dom树已经构建完成，页面已经完全展现出来。但如果做过页面加载速度的测试，会发现WebViewClient.onPageFinished()方法通常需要等待很久才会回调（首次加载通常超过3s），这是因为WebView需要加载完一个网页里主文档和所有的资源才会回调这个方法。
     - 能不能在WebViewClient.onPageStarted()中注入呢？答案是不确定。经过测试，有些机型可以，有些机型不行。在WebViewClient.onPageStarted()中注入还有一个致命的问题——这个方法可能会回调多次，会造成js代码的多次注入。
@@ -325,6 +355,16 @@
         - 2 重新加载一个URL之前，需要重置boolean值变量，让重新加载后的页面再次注入js
         - 3 如果做过本地js，css等缓存，则先判断本地是否存在，若存在则加载本地，否则加载网络js
         - 4 注入的进度阈值可以自由定制，理论上10%-100%都是合理的，不过建议使用了75%到90%之间可以。
+
+
+
+#### [3.4 js交互原理分析](https://github.com/yangchong211/YCWebView/blob/master/Method.md)
+- 01.WebView加载html页面
+- 02.加载WebViewJavascriptBridge.js
+- 03.分析WebViewJavascriptBridge.js
+- 04.页面Html注册”functionInJs”方法
+- 05.“functionInJs”执行结果回传Java
+- [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
 
@@ -401,8 +441,9 @@
 - 5.[其他汇总](https://www.jianshu.com/p/53017c3fc75d)
 
 
+
 #### 其他推荐
-- 博客笔记大汇总【15年10月到至今】，包括Java基础及深入知识点，Android技术博客，Python学习笔记等等，还包括平时开发中遇到的bug汇总，当然也在工作之余收集了大量的面试题，长期更新维护并且修正，持续完善……开源的文件是markdown格式的！同时也开源了生活博客，从12年起，积累共计47篇[近20万字]，转载请注明出处，谢谢！
+- 博客笔记大汇总【15年10月到至今】，包括Java基础及深入知识点，Android技术博客，Python学习笔记等等，还包括平时开发中遇到的bug汇总，当然也在工作之余收集了大量的面试题，长期更新维护并且修正，持续完善……开源的文件是markdown格式的！同时也开源了生活博客，从12年起，积累共计47篇[近100万字]，转载请注明出处，谢谢！
 - 链接地址：https://github.com/yangchong211/YCBlogs
 - 如果觉得好，可以star一下，谢谢！当然也欢迎提出建议，万事起于忽微，量变引起质变！
 

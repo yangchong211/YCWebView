@@ -164,6 +164,11 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 					++uniqueId + (BridgeUtil.UNDERLINE_STR +
 							SystemClock.currentThreadTimeMillis()));
 			responseCallbacks.put(callbackStr, responseCallback);
+			//m.setCallbackId(callbackStr)方法的作用？
+			//该方法设置的callbackId生成后不仅仅会被传到Js，
+			//而且会以key-value对的形式和responseCallback配对保存到responseCallbacks这个Map里面。
+			//它的目的，就是为了等Js把处理结果回调给Java层后，
+			//Java层能根据callbackId找到对应的responseCallback，做后续的回调处理。
 			m.setCallbackId(callbackStr);
 		}
 		//判断是否有handlerName数据
