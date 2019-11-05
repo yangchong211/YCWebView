@@ -11,6 +11,7 @@
 - 5.1.0 可以提前显示加载进度条
 - 5.1.1 WebView密码明文存储漏洞优化
 - 5.1.2 页面关闭后不要执行web中js
+- 5.1.3 WebView + HttpDns优化
 
 
 ### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
@@ -310,6 +311,15 @@
         }
     }
     ```
+
+
+### 5.1.3 WebView + HttpDns优化
+- 阿里云HTTP-DNS是避免dns劫持的一种有效手段，在许多特殊场景如HTTPS/SNI、okhttp等都有最佳实践，事实上很多场景依然可以通过HTTP-DNS进行IP直连，这个方案具体可以看阿里的官方demo和文档，我自己本身也没有实践过，这里只是提一下。
+    - 参考链接：[Android Webview + HttpDns最佳实践](https://help.aliyun.com/document_detail/60181.html?spm=5176.11065259.1996646101.searchclickresult.431f492dDakb73)
+
+
+
+
 
 
 

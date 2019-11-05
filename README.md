@@ -74,6 +74,22 @@
 - X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要集成此类，一定要继承该类，因为注入js监听是在该类中操作的
 
 
+#### [1.4 WebView基础知识点](https://github.com/yangchong211/YCWebView/blob/master/WebView.md)
+- 01.常用的基础介绍
+- 02.Android调用Js
+- 03.Js调用Android
+- 04.WebView.loadUrl(url)流程
+- 05.js的调用时机分析
+- 06.清除缓存数据方式有哪些
+- 07.如何使用DeepLink
+- 08.为什么WebView那么难搞
+- 09.如何处理加载错误
+- 10.应用被作为第三方浏览器打开
+- 11.理解WebView独立进程
+- [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
+
+
+
 
 ### 02.如何使用
 #### 2.1 如何引入
@@ -404,6 +420,7 @@
 - 4.3.3 字符串转义bug探讨
 - 4.3.8 Javascript调用原生方法会偶现失败
 - 4.3.9 dispatchMessage运行主线程问题
+- 4.4.0 怎么实现WebView免流方案
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
@@ -421,6 +438,7 @@
 - 5.1.0 可以提前显示加载进度条
 - 5.1.1 WebView密码明文存储漏洞优化
 - 5.1.2 页面关闭后不要执行web中js
+- 5.1.3 WebView + HttpDns优化
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 
