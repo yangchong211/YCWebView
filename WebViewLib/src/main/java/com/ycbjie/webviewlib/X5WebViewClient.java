@@ -15,11 +15,17 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Message;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 
+import com.tencent.smtt.export.external.interfaces.ClientCertRequest;
+import com.tencent.smtt.export.external.interfaces.HttpAuthHandler;
 import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
@@ -47,7 +53,7 @@ import java.net.URLDecoder;
 public class X5WebViewClient extends WebViewClient {
 
     private InterWebListener webListener;
-    private BridgeWebView webView;
+    private WebView webView;
     private Context context;
 
     /**
@@ -63,13 +69,12 @@ public class X5WebViewClient extends WebViewClient {
      * @param webView                           需要传进来webview
      * @param context                           上下文
      */
-    public X5WebViewClient(BridgeWebView webView, Context context) {
-        this.webView = webView;
+    public X5WebViewClient(WebView webView ,Context context) {
         this.context = context;
+        this.webView = webView;
         //将js对象与java对象进行映射
         webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
-
 
     /**
      * 这个方法中可以做拦截
@@ -81,40 +86,8 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        X5LogUtils.i("-------shouldOverrideUrlLoading----1---"+url);
-        //页面关闭后，直接返回，不要执行网络请求和js方法
-        boolean activityAlive = X5WebUtils.isActivityAlive(context);
-        if (!activityAlive){
-            return false;
-        }
-        if (TextUtils.isEmpty(url)) {
-            return false;
-        }
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        // 如果是返回数据
-        if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
-            webView.handlerReturnData(url);
-            return true;
-        } else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
-            webView.flushMessageQueue();
-            return true;
-        } else {
-            if (this.onCustomShouldOverrideUrlLoading(url)){
-                return true;
-            } else {
-                return super.shouldOverrideUrlLoading(view, url);
-            }
-        }
+        return super.shouldOverrideUrlLoading(view, url);
     }
-
-    protected boolean onCustomShouldOverrideUrlLoading(String url) {
-        return false;
-    }
-
 
     /**
      * 增加shouldOverrideUrlLoading在api>=24时
@@ -126,39 +99,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
-        //页面关闭后，直接返回，不要执行网络请求和js方法
-        boolean activityAlive = X5WebUtils.isActivityAlive(context);
-        if (!activityAlive){
-            return false;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            String url = request.getUrl().toString();
-            if (TextUtils.isEmpty(url)) {
-                return false;
-            }
-            try {
-                url = URLDecoder.decode(url, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                ex.printStackTrace();
-            }
-            //如果是返回数据
-            if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
-                webView.handlerReturnData(url);
-                return true;
-            } else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
-                webView.flushMessageQueue();
-                return true;
-            } else {
-                if (this.onCustomShouldOverrideUrlLoading(url)){
-                    return true;
-                } else {
-                    return super.shouldOverrideUrlLoading(view, request);
-                }
-            }
-        }else {
-            return super.shouldOverrideUrlLoading(view, request);
-        }
+        return super.shouldOverrideUrlLoading(view, request);
     }
 
     /**
@@ -198,16 +139,6 @@ public class X5WebViewClient extends WebViewClient {
         //页面finish后再发起图片加载
         if(!webView.getSettings().getLoadsImagesAutomatically()) {
             webView.getSettings().setLoadsImagesAutomatically(true);
-        }
-        //这个时候添加js注入方法
-        //WebViewJavascriptBridge.js
-        BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
-        if (webView.getStartupMessage() != null) {
-            for (Message m : webView.getStartupMessage()) {
-                //分发message 必须在主线程才分发成功
-                webView.dispatchMessage(m);
-            }
-            webView.setStartupMessage(null);
         }
         //html加载完成之后，添加监听图片的点击js函数
         //addImageClickListener();
@@ -376,6 +307,126 @@ public class X5WebViewClient extends WebViewClient {
     public void onLoadResource(WebView webView, String s) {
         super.onLoadResource(webView, s);
         X5LogUtils.i("-------onLoadResource-------"+ s);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     */
+    @Override
+    public void onPageCommitVisible(WebView webView, String s) {
+        super.onPageCommitVisible(webView, s);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     */
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView webView, String s) {
+        return super.shouldInterceptRequest(webView, s);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param webResourceRequest                request
+     * @return
+     */
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
+        return super.shouldInterceptRequest(webView, webResourceRequest);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param webResourceRequest                request
+     * @param bundle                            bundle
+     * @return
+     */
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest, Bundle bundle) {
+        return super.shouldInterceptRequest(webView, webResourceRequest, bundle);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param message                           message
+     * @param message1                          message1
+     */
+    @Override
+    public void onTooManyRedirects(WebView webView, Message message, Message message1) {
+        super.onTooManyRedirects(webView, message, message1);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param message                           message
+     * @param message1                          message1
+     */
+    @Override
+    public void onFormResubmission(WebView webView, Message message, Message message1) {
+        super.onFormResubmission(webView, message, message1);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     * @param b                                 b
+     */
+    @Override
+    public void doUpdateVisitedHistory(WebView webView, String s, boolean b) {
+        super.doUpdateVisitedHistory(webView, s, b);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param clientCertRequest                 request
+     */
+    @Override
+    public void onReceivedClientCertRequest(WebView webView, ClientCertRequest clientCertRequest) {
+        super.onReceivedClientCertRequest(webView, clientCertRequest);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param httpAuthHandler                   handler
+     * @param s                                 s
+     * @param s1                                s1
+     */
+    @Override
+    public void onReceivedHttpAuthRequest(WebView webView, HttpAuthHandler httpAuthHandler, String s, String s1) {
+        super.onReceivedHttpAuthRequest(webView, httpAuthHandler, s, s1);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param keyEvent                          event
+     * @return
+     */
+    @Override
+    public boolean shouldOverrideKeyEvent(WebView webView, KeyEvent keyEvent) {
+        return super.shouldOverrideKeyEvent(webView, keyEvent);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param keyEvent                          event
+     * @return
+     */
+    @Override
+    public void onUnhandledKeyEvent(WebView webView, KeyEvent keyEvent) {
+        super.onUnhandledKeyEvent(webView, keyEvent);
     }
 
     /**

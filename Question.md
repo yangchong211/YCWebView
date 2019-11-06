@@ -34,6 +34,8 @@
 - 4.3.8 Javascript调用原生方法会偶现失败
 - 4.3.9 dispatchMessage运行主线程问题
 - 4.4.0 怎么实现WebView免流方案
+- 4.4.1 Channel is unrecoverably broken and will be disposed!
+- 4.4.2 定制js的alert,confirm和prompt对话框
 
 
 ### 4.0.0 WebView进化史介绍
@@ -616,6 +618,16 @@
     - 更多参考[如何设计一个优雅健壮的Android WebView](https://blog.klmobile.app/2018/02/27/design-an-elegant-and-powerful-android-webview-part-two/)
 
 
+
+### 4.4.1 Channel is unrecoverably broken and will be disposed!
+- 程序崩溃，但是不报错原因，在网上翻了好久，网上好多说是jni错误，但是有种情况也会出现这种错误，就是bitmap.recycle()调用不对
+- 把bitmap注释掉，不报错。
+
+
+
+### 4.4.2 定制js的alert,confirm和prompt对话框
+- https://www.iteye.com/blog/gundumw100-1158719
+- https://blog.csdn.net/u012246458/article/details/53665597
 
 
 ### 4.9.9 掘金问题反馈记录

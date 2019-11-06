@@ -18,16 +18,20 @@ package com.ycbjie.webviewlib;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebStorage;
 import com.tencent.smtt.sdk.WebView;
 import static android.app.Activity.RESULT_OK;
 
@@ -60,7 +64,8 @@ public class X5WebChromeClient extends WebChromeClient {
     private View customView;
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
-    private BridgeWebView webView;
+    private WebView webView;
+    int max = 85;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -78,23 +83,13 @@ public class X5WebChromeClient extends WebChromeClient {
         this.videoWebListener = videoWebListener;
     }
 
-
     /**
      * 构造方法
      * @param activity                          上下文
      */
-    public X5WebChromeClient(BridgeWebView webView ,Activity activity) {
+    public X5WebChromeClient(WebView webView , Activity activity) {
+        this.activity = activity;
         this.webView = webView;
-        this.activity = activity;
-    }
-
-
-    /**
-     * 构造方法
-     * @param activity                          上下文
-     */
-    private X5WebChromeClient(Activity activity) {
-        this.activity = activity;
     }
 
     /**
@@ -108,17 +103,8 @@ public class X5WebChromeClient extends WebChromeClient {
         super.onProgressChanged(view, newProgress);
         if (webListener!=null){
             webListener.startProgress(newProgress);
-            int max = 85;
             if (newProgress> max && !isShowContent){
                 webListener.hindProgressBar();
-                //在这个时候添加js注入方法，具体可以看readme文档
-                /*BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
-                if (webView.getStartupMessage() != null) {
-                    for (Message m : webView.getStartupMessage()) {
-                        webView.dispatchMessage(m);
-                    }
-                    webView.setStartupMessage(null);
-                }*/
                 isShowContent = true;
             }
         }
@@ -146,7 +132,21 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 处理confirm弹出框
+     * result.confirm() 和 return true 一起用，才能保证弹框不会出现。
+     * @param webView                           view
+     * @param s                                 s
+     * @param s1                                s1
+     * @param jsResult                          jsResult
+     * @return
+     */
+    @Override
+    public boolean onJsConfirm(WebView webView, String s, String s1, JsResult jsResult) {
+        return super.onJsConfirm(webView, s, s1, jsResult);
+    }
+
+    /**
+     * 处理prompt弹出框
      * @param webView                           view
      * @param s                                 s
      * @param s1                                s1
@@ -161,7 +161,11 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 处理alert弹出框
+     * 调用javascript的调试过程中，有时候需要使用onJsAlert来输出javascript方法的信息，以帮助进行问题定位。
+     * onJsAlert方法即可，为什么onJsAlert只调用了一次
+     * 发现onJsAlert只调用了一次,为什么呢,实际上,你可能忽略了一句调用.就是处理JsResult.
+     * 需要调用result.confirm()或者result.cancel()来处理jsResult,否则会出问题.
      * @param webView                           view
      * @param s                                 s
      * @param s1                                s1
@@ -187,6 +191,8 @@ public class X5WebChromeClient extends WebChromeClient {
 
     /**
      * 播放网络视频时全屏会被调用的方法，播放视频切换为横屏
+     * @param view                              view
+     * @param callback                          callback
      */
     @Override
     public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
@@ -323,6 +329,131 @@ public class X5WebChromeClient extends WebChromeClient {
         openFileChooserImplForAndroid5(uploadMsg);
         return true;
     }
+
+    /**
+     *
+     * @param valueCallback                     callback
+     */
+    @Override
+    public void getVisitedHistory(ValueCallback<String[]> valueCallback) {
+        super.getVisitedHistory(valueCallback);
+    }
+
+    /**
+     *
+     * @return                                  bitmap
+     */
+    @Override
+    public Bitmap getDefaultVideoPoster() {
+        return super.getDefaultVideoPoster();
+    }
+
+    /**
+     *
+     * @param consoleMessage                    message
+     * @return
+     */
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        return super.onConsoleMessage(consoleMessage);
+    }
+
+    /**
+     *
+     * @return                                  boolean
+     */
+    @Override
+    public boolean onJsTimeout() {
+        return super.onJsTimeout();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onGeolocationPermissionsHidePrompt() {
+        super.onGeolocationPermissionsHidePrompt();
+    }
+
+    /**
+     *
+     * @param l                                 l
+     * @param l1                                l1
+     * @param quotaUpdater                      quotaUpdater
+     */
+    @Override
+    public void onReachedMaxAppCacheSize(long l, long l1, WebStorage.QuotaUpdater quotaUpdater) {
+        super.onReachedMaxAppCacheSize(l, l1, quotaUpdater);
+    }
+
+    /**
+     *
+     * @param s                                 s
+     * @param s1                                s1
+     * @param l                                 l
+     * @param l1                                l1
+     * @param l2                                l2
+     * @param quotaUpdater                      quotaUpdater
+     */
+    @Override
+    public void onExceededDatabaseQuota(String s, String s1, long l, long l1,
+                                        long l2, WebStorage.QuotaUpdater quotaUpdater) {
+        super.onExceededDatabaseQuota(s, s1, l, l1, l2, quotaUpdater);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param bitmap                            bitmap
+     */
+    @Override
+    public void onReceivedIcon(WebView webView, Bitmap bitmap) {
+        super.onReceivedIcon(webView, bitmap);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param s                                 s
+     * @param b                                 b
+     */
+    @Override
+    public void onReceivedTouchIconUrl(WebView webView, String s, boolean b) {
+        super.onReceivedTouchIconUrl(webView, s, b);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     * @param b                                 b
+     * @param b1                                b1
+     * @param message                           message
+     * @return
+     */
+    @Override
+    public boolean onCreateWindow(WebView webView, boolean b, boolean b1, Message message) {
+        return super.onCreateWindow(webView, b, b1, message);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     */
+    @Override
+    public void onRequestFocus(WebView webView) {
+        super.onRequestFocus(webView);
+    }
+
+    /**
+     *
+     * @param webView                           view
+     */
+    @Override
+    public void onCloseWindow(WebView webView) {
+        super.onCloseWindow(webView);
+    }
+
+
 
     /**
      * 打开文件夹
