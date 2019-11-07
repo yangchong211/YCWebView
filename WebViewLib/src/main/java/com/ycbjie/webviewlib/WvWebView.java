@@ -61,12 +61,11 @@ public class WvWebView extends WebView {
     private final static String HANDLER_NAME_STR = "handlerName";
     private MyHandler mainThreadHandler = null;
     private JavascriptCloseWindowListener javascriptCloseWindowListener=null;
-    private ArrayList<WVJBMessage> startupMessageQueue = null;
+    private ArrayList<WvMessage> startupMessageQueue = null;
     private Map<String, WVJBResponseCallback> responseCallbacks = null;
     private Map<String, WVJBHandler> messageHandlers = null;
     private long uniqueId = 0;
     private boolean alertBoxBlock=true;
-    
     
     @SuppressLint("HandlerLeak")
     private class MyHandler extends Handler {
@@ -112,7 +111,7 @@ public class WvWebView extends WebView {
         }
     }
 
-    private class WVJBMessage {
+    private class WvMessage {
         Object data = null;
         String callbackId = null;
         String handlerName = null;
@@ -137,7 +136,6 @@ public class WvWebView extends WebView {
     public interface WVJBMethodExistCallback {
         void onResult(boolean exist);
     }
-
 
     public interface JavascriptCloseWindowListener {
         /**
@@ -205,7 +203,7 @@ public class WvWebView extends WebView {
         if (data == null && (handlerName == null || handlerName.length() == 0)) {
             return;
         }
-        WVJBMessage message = new WVJBMessage();
+        WvMessage message = new WvMessage();
         if (data != null) {
             message.data = data;
         }
@@ -220,7 +218,7 @@ public class WvWebView extends WebView {
         queueMessage(message);
     }
 
-    private synchronized void queueMessage(WVJBMessage message) {
+    private synchronized void queueMessage(WvMessage message) {
         if (startupMessageQueue != null) {
             startupMessageQueue.add(message);
         } else {
@@ -228,8 +226,8 @@ public class WvWebView extends WebView {
         }
     }
 
-    private void dispatchMessage(WVJBMessage message) {
-        String messageJson = message2JSONObject(message).toString();
+    private void dispatchMessage(WvMessage message) {
+        String messageJson = messageToJsonObject(message).toString();
         evaluateJavascript(String.format("WvWebViewJavascriptBridge._handleMessageFromJava(%s)", messageJson));
     }
 
@@ -237,7 +235,7 @@ public class WvWebView extends WebView {
     private void handleMessage(String info) {
         try {
             JSONObject jo = new JSONObject(info);
-            WVJBMessage message = JSONObject2WVJBMessage(jo);
+            WvMessage message = JsonObjectToMessage(jo);
             if (message.responseId != null) {
                 WVJBResponseCallback responseCallback = responseCallbacks
                         .remove(message.responseId);
@@ -251,7 +249,7 @@ public class WvWebView extends WebView {
                     responseCallback = new WVJBResponseCallback() {
                         @Override
                         public void onResult(Object data) {
-                            WVJBMessage msg = new WVJBMessage();
+                            WvMessage msg = new WvMessage();
                             msg.responseId = callbackId;
                             msg.responseData = data;
                             dispatchMessage(msg);
@@ -270,7 +268,7 @@ public class WvWebView extends WebView {
         }
     }
 
-    private JSONObject message2JSONObject(WVJBMessage message) {
+    private JSONObject messageToJsonObject(WvMessage message) {
         JSONObject jo = new JSONObject();
         try {
             if (message.callbackId != null) {
@@ -294,22 +292,22 @@ public class WvWebView extends WebView {
         return jo;
     }
 
-    private WVJBMessage JSONObject2WVJBMessage(JSONObject jo) {
-        WVJBMessage message = new WVJBMessage();
+    private WvMessage JsonObjectToMessage(JSONObject jo) {
+        WvMessage message = new WvMessage();
         try {
-            if (jo.has("callbackId")) {
+            if (jo.has(CALLBACK_ID_STR)) {
                 message.callbackId = jo.getString(CALLBACK_ID_STR);
             }
-            if (jo.has("data")) {
+            if (jo.has(DATA_STR)) {
                 message.data = jo.get(DATA_STR);
             }
-            if (jo.has("handlerName")) {
+            if (jo.has(HANDLER_NAME_STR)) {
                 message.handlerName = jo.getString(HANDLER_NAME_STR);
             }
-            if (jo.has("responseId")) {
+            if (jo.has(RESPONSE_ID_STR)) {
                 message.responseId = jo.getString(RESPONSE_ID_STR);
             }
-            if (jo.has("responseData")) {
+            if (jo.has(RESPONSE_DATA_STR)) {
                 message.responseData = jo.get(RESPONSE_DATA_STR);
             }
         } catch (JSONException e) {
@@ -318,27 +316,12 @@ public class WvWebView extends WebView {
         return message;
     }
 
-
     @Keep
     void init() {
         mainThreadHandler = new MyHandler(getContext());
-        String APP_CACHE_DIRNAME = getContext().getFilesDir().getAbsolutePath() + "/webcache";
         this.responseCallbacks = new HashMap<>();
         this.messageHandlers = new HashMap<>();
         this.startupMessageQueue = new ArrayList<>();
-        com.tencent.smtt.sdk.WebSettings settings = getSettings();
-        settings.setDomStorageEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-        settings.setAllowFileAccess(false);
-        settings.setAppCacheEnabled(false);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setJavaScriptEnabled(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setAppCachePath(APP_CACHE_DIRNAME);
-        settings.setUseWideViewPort(true);
         super.setWebChromeClient(mWebChromeClient);
         super.setWebViewClient(mWebViewClient);
 
