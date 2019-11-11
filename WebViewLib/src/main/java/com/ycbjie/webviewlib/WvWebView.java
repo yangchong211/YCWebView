@@ -15,15 +15,11 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
-import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.WebView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -237,8 +233,7 @@ public class WvWebView extends WebView {
             JSONObject jo = new JSONObject(info);
             WvMessage message = JsonObjectToMessage(jo);
             if (message.responseId != null) {
-                WVJBResponseCallback responseCallback = responseCallbacks
-                        .remove(message.responseId);
+                WVJBResponseCallback responseCallback = responseCallbacks.remove(message.responseId);
                 if (responseCallback != null) {
                     responseCallback.onResult(message.responseData);
                 }
@@ -324,7 +319,6 @@ public class WvWebView extends WebView {
         this.startupMessageQueue = new ArrayList<>();
         super.setWebChromeClient(mWebChromeClient);
         super.setWebViewClient(mWebViewClient);
-
         registerHandler("_hasNativeMethod", new WVJBHandler() {
             @Override
             public void handler(Object data, WVJBResponseCallback callback) {
@@ -382,9 +376,8 @@ public class WvWebView extends WebView {
 
 
     /**
-     * This method can be called in any thread, and if it is not called in the main thread,
-     * it will be automatically distributed to the main thread.
-     * @param url
+     * 这个方法可以在任何线程中调用，如果在主线程中没有调用它，它将自动分配给主线程。通过handler实现不同线程
+     * @param url                                   url
      */
     @Override
     public void loadUrl(String url) {

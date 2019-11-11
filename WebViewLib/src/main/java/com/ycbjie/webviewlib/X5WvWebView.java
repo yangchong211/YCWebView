@@ -33,7 +33,7 @@ import static android.os.Build.VERSION_CODES.KITKAT;
  *     time  : 2019/9/10
  *     desc  : 自定义x5的webView
  *     revise: 可以使用这个类，方便统一初始化WebSettings的一些属性
- *             如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
+ *             如果不用这里的，想单独初始化setting属性，也可以直接使用WvWebView
  *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
