@@ -525,8 +525,7 @@ public class WvWebView extends WebView {
                     .setNegativeButton(android.R.string.cancel, listener)
                     .show();
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             int t = (int) (dpi * 16);
             layoutParams.setMargins(t, 0, t, 0);
             layoutParams.gravity = Gravity.CENTER_HORIZONTAL;

@@ -319,8 +319,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 		//判断responseCallback是否为null
 		if (responseCallback != null) {
 			String callbackStr = String.format(BridgeUtil.CALLBACK_ID_FORMAT,
-					++uniqueId + (BridgeUtil.UNDERLINE_STR +
-							SystemClock.currentThreadTimeMillis()));
+					++uniqueId + (BridgeUtil.UNDERLINE_STR + SystemClock.currentThreadTimeMillis()));
 			responseCallbacks.put(callbackStr, responseCallback);
 			//m.setCallbackId(callbackStr)方法的作用？
 			//该方法设置的callbackId生成后不仅仅会被传到Js，
