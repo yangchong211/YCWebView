@@ -134,6 +134,14 @@ public class X5WebView extends BridgeWebView {
     }
 
     /**
+     * 设置是否自定义视频视图
+     * @param isShowCustomVideo         设置是否自定义视频视图
+     */
+    public void setShowCustomVideo(boolean isShowCustomVideo){
+        getX5WebChromeClient().setShowCustomVideo(isShowCustomVideo);
+    }
+
+    /**
      * 刷新界面可以用这个方法
      */
     public void reLoadView(){

@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_2_2).setOnClickListener(this);
         findViewById(R.id.tv_3).setOnClickListener(this);
         findViewById(R.id.tv_5).setOnClickListener(this);
+        findViewById(R.id.tv_5_2).setOnClickListener(this);
         findViewById(R.id.tv_6_1).setOnClickListener(this);
         findViewById(R.id.tv_6_2).setOnClickListener(this);
         findViewById(R.id.tv_7_1).setOnClickListener(this);
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_5:
                 startActivity(new Intent(this,FiveActivity.class));
+                break;
+            case R.id.tv_5_2:
+                startActivity(new Intent(this,FiveActivity2.class));
                 break;
             case R.id.tv_6_1:
                 startActivity(new Intent(this,SixActivity.class));

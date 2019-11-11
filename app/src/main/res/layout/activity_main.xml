@@ -62,7 +62,17 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="5.播放网页中的视频，包括全频播放"/>
+            android:text="5.播放网页中的视频，包括全屏播放"/>
+
+        <TextView
+            android:id="@+id/tv_5_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="5.2 播放网页中的视频，包括全屏播放，优酷"/>
 
         <TextView
             android:id="@+id/tv_6_1"

@@ -65,6 +65,7 @@ public class X5WebChromeClient extends WebChromeClient {
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
     private WebView webView;
+    private boolean isShowCustomVideo = true;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -80,6 +81,14 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     public void setVideoWebListener(VideoWebListener videoWebListener){
         this.videoWebListener = videoWebListener;
+    }
+
+    /**
+     * 设置是否使用
+     * @param showCustomVideo                   是否使用自定义视频视图
+     */
+    public void setShowCustomVideo(boolean showCustomVideo) {
+        isShowCustomVideo = showCustomVideo;
     }
 
     /**
@@ -197,17 +206,19 @@ public class X5WebChromeClient extends WebChromeClient {
     @Override
     public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
         X5LogUtils.i("-------onShowCustomView-------");
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        videoWebListener.hindWebView();
-        // 如果一个视图已经存在，那么立刻终止并新建一个
-        if (customView != null) {
-            callback.onCustomViewHidden();
-            return;
+        if (isShowCustomVideo){
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            videoWebListener.hindWebView();
+            // 如果一个视图已经存在，那么立刻终止并新建一个
+            if (customView != null) {
+                callback.onCustomViewHidden();
+                return;
+            }
+            fullViewAddView(view);
+            customView = view;
+            customViewCallback = callback;
+            videoWebListener.showVideoFullView();
         }
-        fullViewAddView(view);
-        customView = view;
-        customViewCallback = callback;
-        videoWebListener.showVideoFullView();
     }
 
     /**
@@ -247,24 +258,26 @@ public class X5WebChromeClient extends WebChromeClient {
     @Override
     public void onHideCustomView() {
         X5LogUtils.i("-------onHideCustomView-------");
-        if (customView == null) {
-            // 不是全屏播放状态
-            return;
-        }
-        if (activity!=null){
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        customView.setVisibility(View.GONE);
-        if (getVideoFullView() != null) {
-            getVideoFullView().removeView(customView);
-        }
-        customView = null;
-        if (videoWebListener!=null){
-            videoWebListener.hindVideoFullView();
-        }
-        customViewCallback.onCustomViewHidden();
-        if (videoWebListener!=null){
-            videoWebListener.showWebView();
+        if (isShowCustomVideo){
+            if (customView == null) {
+                // 不是全屏播放状态
+                return;
+            }
+            if (activity!=null){
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+            customView.setVisibility(View.GONE);
+            if (getVideoFullView() != null) {
+                getVideoFullView().removeView(customView);
+            }
+            customView = null;
+            if (videoWebListener!=null){
+                videoWebListener.hindVideoFullView();
+            }
+            customViewCallback.onCustomViewHidden();
+            if (videoWebListener!=null){
+                videoWebListener.showWebView();
+            }
         }
     }
 

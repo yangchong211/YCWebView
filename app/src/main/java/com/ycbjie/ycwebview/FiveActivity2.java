@@ -6,9 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.ycbjie.webviewlib.InterWebListener;
 import com.ycbjie.webviewlib.VideoWebListener;
@@ -18,7 +16,7 @@ import com.ycbjie.webviewlib.X5WebUtils;
 import com.ycbjie.webviewlib.X5WebView;
 import com.ycbjie.webviewlib.X5WebViewClient;
 
-public class FiveActivity extends AppCompatActivity {
+public class FiveActivity2 extends AppCompatActivity {
 
     private X5WebView webView;
     private X5WebChromeClient x5WebChromeClient;
@@ -86,7 +84,7 @@ public class FiveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
-        String movieUrl = "https://sv.baidu.com/videoui/page/videoland?context=%7B%22nid%22%3A%22sv_5861863042579737844%22%7D&pd=feedtab_h5";
+        String movieUrl = "https://www.youku.com";
         webView.loadUrl(movieUrl);
         progress = findViewById(R.id.progress);
         progress.show();
@@ -97,7 +95,7 @@ public class FiveActivity extends AppCompatActivity {
         x5WebChromeClient.setWebListener(interWebListener);
         x5WebViewClient.setWebListener(interWebListener);
         //设置是否自定义视频视图
-        webView.setShowCustomVideo(false);
+        webView.setShowCustomVideo(true);
         x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
             @Override
             public void showVideoFullView() {

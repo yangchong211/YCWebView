@@ -45,6 +45,9 @@
         <activity android:name=".FiveActivity"
             android:hardwareAccelerated="true"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".FiveActivity2"
+            android:hardwareAccelerated="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".SixActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".SixActivity2"
