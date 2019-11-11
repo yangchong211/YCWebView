@@ -65,7 +65,6 @@ public class X5WebChromeClient extends WebChromeClient {
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
     private WebView webView;
-    int max = 85;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -103,6 +102,7 @@ public class X5WebChromeClient extends WebChromeClient {
         super.onProgressChanged(view, newProgress);
         if (webListener!=null){
             webListener.startProgress(newProgress);
+            int max = 95;
             if (newProgress> max && !isShowContent){
                 webListener.hindProgressBar();
                 isShowContent = true;

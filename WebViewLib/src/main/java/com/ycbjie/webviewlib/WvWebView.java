@@ -410,6 +410,7 @@ public class WvWebView extends WebView {
     private X5WebChromeClient mWebChromeClient = new X5WebChromeClient(this,(Activity) getContext()) {
 
         private boolean isShowContent = false;
+        private int max = 85;
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
