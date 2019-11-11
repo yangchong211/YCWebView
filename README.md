@@ -421,6 +421,10 @@
 - 4.3.8 Javascript调用原生方法会偶现失败
 - 4.3.9 dispatchMessage运行主线程问题
 - 4.4.0 怎么实现WebView免流方案
+- 4.4.1 Channel is unrecoverably broken and will be disposed!
+- 4.4.2 定制js的alert,confirm和prompt对话框
+- 4.4.3 x5长按图片如何操作
+- 4.4 4 x5长按文字内容如何自定义弹窗
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 

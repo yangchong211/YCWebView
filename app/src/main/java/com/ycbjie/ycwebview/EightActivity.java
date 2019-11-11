@@ -170,10 +170,10 @@ public class EightActivity extends AppCompatActivity {
      * 长按图片事件处理
      */
     private boolean handleLongImage() {
-        final com.tencent.smtt.sdk.WebView.HitTestResult hitTestResult = webView.getHitTestResult();
+        final WebView.HitTestResult hitTestResult = webView.getHitTestResult();
         // 如果是图片类型或者是带有图片链接的类型
-        if (hitTestResult.getType() == com.tencent.smtt.sdk.WebView.HitTestResult.IMAGE_TYPE ||
-                hitTestResult.getType() == com.tencent.smtt.sdk.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+        if (hitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
+                hitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
             // 弹出保存图片的对话框
             new AlertDialog.Builder(EightActivity.this)
                     .setItems(new String[]{"查看大图", "保存图片到相册"},

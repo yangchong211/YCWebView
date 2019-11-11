@@ -36,6 +36,8 @@
 - 4.4.0 怎么实现WebView免流方案
 - 4.4.1 Channel is unrecoverably broken and will be disposed!
 - 4.4.2 定制js的alert,confirm和prompt对话框
+- 4.4.3 x5长按图片如何操作
+- 4.4 4 x5长按文字内容如何自定义弹窗
 
 
 ### 4.0.0 WebView进化史介绍
@@ -628,6 +630,176 @@
 ### 4.4.2 定制js的alert,confirm和prompt对话框
 - https://www.iteye.com/blog/gundumw100-1158719
 - https://blog.csdn.net/u012246458/article/details/53665597
+
+
+### 4.4.3 x5长按图片如何操作
+- x5支持长按事件监听，代码如下所示：
+    ```
+    webView.setOnLongClickListener(new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            return handleLongImage();
+        }
+    });
+    
+    /**
+     * 长按图片事件处理
+     */
+    private boolean handleLongImage() {
+        final WebView.HitTestResult hitTestResult = webView.getHitTestResult();
+        // 如果是图片类型或者是带有图片链接的类型
+        if (hitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
+                hitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+            // 弹出保存图片的对话框
+            new AlertDialog.Builder(EightActivity.this)
+                    .setItems(new String[]{"查看大图", "保存图片到相册"},
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String picUrl = hitTestResult.getExtra();
+                            //获取图片
+                            Log.e("picUrl", picUrl);
+                            switch (which) {
+                                case 0:
+    
+                                    break;
+                                case 1:
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    })
+                    .show();
+            return true;
+        }
+        return false;
+    }
+    ```
+
+
+### 4.4 4 x5长按文字内容如何自定义弹窗
+- ActionMode的使用特别的简单，主要用到两个方法，startActionMode和ActionMode.Callback()，startActionMode:开启我们的菜单
+    ```
+    ActionMode.Callback mCallback=new ActionMode.Callback(){
+        /**
+         * 创建菜单的样式，返回true说明创建成功
+         * @param actionMode
+         * @param menu
+         * @return
+         */
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater menuInflater = actionMode.getMenuInflater();
+            menuInflater.inflate(R.menu.action_mode,menu);
+            return true;
+        }
+    
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+    
+        /**
+         * 当ActionMode的条目被点击的时候，调用这个方法
+         * @param actionMode
+         * @param menuItem
+         * @return
+         */
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            return false;
+        }
+    
+        /**
+         * 当ActionMode被销毁的时候调用
+         * @param actionMode
+         */
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            if(actionMode!=null){
+                actionMode.finish();
+            }
+        }
+    };
+    ```
+- 实现自定义ActionMode，重写startActionMode方法，拦截我们的ActionMode对象，然后对此进行一些处理就可以了，直接上代码
+    ```
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback) {
+        ActionMode actionMode = super.startActionMode(callback);
+        return resolveMode(actionMode);
+    }
+    
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+        ActionMode actionMode = super.startActionMode(callback, type);
+        return resolveMode(actionMode);
+    }
+    
+    public ActionMode resolveMode(ActionMode actionMode) {
+        if(actionMode!=null){
+            final Menu menu = actionMode.getMenu();
+            menu.clear();
+            for (int i = 0; i < title.length; i++) {
+                menu.add(title[i]);
+            }
+            for (int i = 0; i < title.length; i++) {
+                MenuItem item = menu.getItem(i);
+                item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+    
+                        String title = menuItem.getTitle().toString();
+                        getSelectedData(title); //获取选中的h5页面的文本
+                        releaseActionMode();
+                        return true;
+                    }
+                });
+            }
+            this.mActionMode = actionMode;
+        }
+        return actionMode;
+    }
+    ```
+- 当点击ActionMode的item的之后，将我们的actionMode finish掉
+    ```
+    public void releaseActionMode() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+            mActionMode = null;
+        }
+    }
+    ```
+- 获取h5页面的文本信息，需要使用到js方法来帮助我们实现这些功能，然后在通过js和java交互回传我们的文本内容（js和java如何交互，这里就不多说了......）
+    ```
+    /**
+     * 点击的时候，获取网页中选择的文本，回掉到原生中的js接口
+     * @param title 传入点击的item文本，一起通过js返回给原生接口
+     */
+    private void getSelectedData(String title) {
+    
+        String js = "(function getSelectedText() {" +
+                "var txt;" +
+                "var title = \"" + title + "\";" +
+                "if (window.getSelection) {" +
+                "txt = window.getSelection().toString();" +
+                "} else if (window.document.getSelection) {" +
+                "txt = window.document.getSelection().toString();" +
+                "} else if (window.document.selection) {" +
+                "txt = window.document.selection.createRange().text;" +
+                "}" +
+                "ActionModeJavaScript.callback(txt,title);" +           //回调java方法将js获取的结果传递过去
+                "})()";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {  //android系统4.4以上的时候调用js方法用这个
+            evaluateJavascript("javascript:" + js, null);
+        } else {
+            loadUrl("javascript:" + js);
+        }
+    }
+    ```
+
+
 
 
 ### 4.9.9 掘金问题反馈记录
