@@ -84,8 +84,7 @@ public class FiveActivity2 extends AppCompatActivity {
         setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
-//        String movieUrl = "https://www.youku.com";
-        String movieUrl = "https://wx.txbapp.com/app/goods/info?gid=1062&timestamp=1573466010095";
+        String movieUrl = "https://www.youku.com";
         webView.loadUrl(movieUrl);
         progress = findViewById(R.id.progress);
         progress.show();
