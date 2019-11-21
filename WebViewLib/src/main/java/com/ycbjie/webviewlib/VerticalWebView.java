@@ -92,4 +92,12 @@ public class VerticalWebView extends X5WebView {
         return getHeight() + getScrollY() >= getContentHeight() * getScale();
     }
 
+    /**
+     * 回到顶部
+     */
+    public void goTop() {
+        if (!isTop()){
+            scrollTo(0, 0);
+        }
+    }
 }

@@ -12,6 +12,7 @@
 - 5.1.1 WebView密码明文存储漏洞优化
 - 5.1.2 页面关闭后不要执行web中js
 - 5.1.3 WebView + HttpDns优化
+- 5.1.4 如何禁止WebView返回时刷新
 
 
 ### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
@@ -298,6 +299,7 @@
     mX5WebView.setSavePassword(false);
     ```
 
+
 ### 5.1.2 页面关闭后不要执行web中js
 - 页面关闭后，直接返回，不要执行网络请求和js方法。代码如下所示：
     ```
@@ -319,9 +321,70 @@
 
 
 
-
-
-
+### 5.1.4 如何禁止WebView返回时刷新
+- webView在内部跳转的新的链接的时候，发现总会在返回的时候reload()一遍，但有时候我们希望保持上个状态。两种解决办法
+- 第一种方法
+    - 如果仅仅是简单的不更新数据，可以设置： mX5WebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+    - 如果你在网上搜索，你会发现很多都是这个回答，我也不知道别人究竟有没有试过这种方法，这个方案是不可行的。
+- 第二种方法
+    - new一个WebView，有人说部分浏览器都是从新new的webView，借鉴这种方法亲测可用： 
+    - 布局里添加一个容器：
+        ```
+        <FrameLayout
+            android:id="@+id/webContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        ```
+    - 然后动态生成WebView，并且添加进去就可以
+        ```
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_web);
+            webContentLayout = (FrameLayout)findViewBy(R.id.webContentLayout);
+            addWeb(url);
+        }
+        
+        private void addWeb(String url) {
+            WebView mWeb = new WebView(MainActivity.this);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
+            mWeb.setLayoutParams(params);
+            mWeb.setWebChromeClient(new WebChromeClient());
+            mWeb.setWebViewClient(new MyWebViewClient());
+            mWeb.getSettings().setJavaScriptEnabled(true);
+            mWeb.loadUrl(url);
+            webContentLayout.addView(mWeb);
+        }
+        
+        //截获跳转
+        private class MyWebViewClient extends WebViewClient{
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Log.i(TAG, "shouldOverrideUrlLoading: " + url);
+                if (!urlList.contains(url)) {
+                    addWeb(url);
+                    urlList.add(url);
+                    return true;
+                } else {
+                    return super.shouldOverrideUrlLoading(view, url);
+                }
+            }
+        }
+        
+        //返回处理，和传统的mWeb.canGoBack()不一样了，而是直接remove
+        @Override
+        public void onBackPressed() {
+            int childCount = webContentLayout.getChildCount();
+            if (childCount > 1) {
+                webContentLayout.removeViewAt(childCount - 1);
+            } else {
+                super.onBackPressed();
+            }
+        }
+        ```
 
 
 

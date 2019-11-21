@@ -63,6 +63,7 @@
         <activity android:name=".DownActivity"/>
         <activity android:name=".NativeActivity2"/>
         <activity android:name=".ScrollViewActivity"/>
+        <activity android:name=".VertcalWebActivity"/>
     </application>
 
 </manifest>

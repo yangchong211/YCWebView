@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_11).setOnClickListener(this);
         findViewById(R.id.tv_12).setOnClickListener(this);
         findViewById(R.id.tv_13).setOnClickListener(this);
+        findViewById(R.id.tv_14).setOnClickListener(this);
     }
 
     @Override
@@ -85,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_13:
                 startActivity(new Intent(this, ScrollViewActivity.class));
+                break;
+            case R.id.tv_14:
+                startActivity(new Intent(this, VertcalWebActivity.class));
                 break;
             default:
                 break;

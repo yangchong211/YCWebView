@@ -57,8 +57,7 @@ public final class BridgeUtil {
 	 * @return					返回字符串，注意获取的时候判断空
 	 */
 	public static String parseFunctionName(String jsUrl){
-		return jsUrl.replace("javascript:WebViewJavascriptBridge.", "")
-				.replaceAll("\\(.*\\);", "");
+		return jsUrl.replace("javascript:WebViewJavascriptBridge.", "").replaceAll("\\(.*\\);", "");
 	}
 
 	/**

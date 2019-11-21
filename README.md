@@ -86,6 +86,7 @@
 - 09.如何处理加载错误
 - 10.应用被作为第三方浏览器打开
 - 11.理解WebView独立进程
+- 12.使用外部浏览器下载
 - [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
@@ -151,6 +152,9 @@
         //重写你需要的方法即可
     }
     ```
+- **针对类似购物的商品详情页面的webView**
+    - 当WebView在最顶部或者最底部的时候，不消费事件，则可以使用VerticalWebView
+
 
 
 #### 2.3 常用api
@@ -425,6 +429,9 @@
 - 4.4.2 定制js的alert,confirm和prompt对话框
 - 4.4.3 x5长按图片如何操作
 - 4.4 4 x5长按文字内容如何自定义弹窗
+- 4.4.5 webView.goBack()会刷新页面吗
+- 4.4.6 mWebView.scrollTo(0, 0)回顶部失效
+- 4.4.7 部分手机监听滑动顶部或底部失效
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
@@ -443,6 +450,7 @@
 - 5.1.1 WebView密码明文存储漏洞优化
 - 5.1.2 页面关闭后不要执行web中js
 - 5.1.3 WebView + HttpDns优化
+- 5.1.4 如何禁止WebView返回时刷新
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 

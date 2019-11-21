@@ -38,6 +38,9 @@
 - 4.4.2 定制js的alert,confirm和prompt对话框
 - 4.4.3 x5长按图片如何操作
 - 4.4 4 x5长按文字内容如何自定义弹窗
+- 4.4.5 webView.goBack()会刷新页面吗
+- 4.4.6 mWebView.scrollTo(0, 0)回顶部失效
+- 4.4.7 部分手机监听滑动顶部或底部失效
 
 
 ### 4.0.0 WebView进化史介绍
@@ -798,6 +801,39 @@
         }
     }
     ```
+
+
+### 4.4.5 webView.goBack()会刷新页面吗
+
+
+### 4.4.6 mWebView.scrollTo(0, 0)回顶部失效
+- 思考一下，为何会失效
+
+
+### 4.4.7 部分手机监听滑动顶部或底部失效
+- 先来看一下如何监听webView滑动到顶部和底部的逻辑代码，可以说网上绝大多数的都是这样
+    ```
+    /**
+     * 判断是否在顶部
+     * @return                              true表示在顶部
+     */
+    private boolean isTop() {
+        return mWebView.getScrollY() <= 0;
+    }
+    
+    /**
+     * 判断是否在底部
+     * @return                              true表示在底部
+     */
+    private boolean isBottom() {
+        //return  Math.abs(webContent - webNow)<1
+        return mWebView.getHeight() + mWebView.getScrollY() >= mWebView.getContentHeight() * mWebView.getScale();
+    }
+    ```
+- 出现问题，部分手机
+    - 在部分设备上会有问题，这些安卓手机可以隐藏掉下面的返回键,home键和菜单键的.也可以显示.可能因为如此，webView就不知道它的底部具体在哪里了.Math.abs(webContent - webNow)的值有可能等于1甚至大于1。
+- 建议添加下面逻辑
+    - 要完整实现网页加载完毕，监听网页滚动到底部才触发某些事件的话，那就可以设个标识，在onPageFinished的时候设为true，然后判断if(isLoadFinish &&  scrollY !=0) 再回调自定义listener的onPageEnd，再加上加载完毕的标识为true，这样就可以实现网页加载完毕后，滚动到底部的监听了。
 
 
 

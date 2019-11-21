@@ -39,6 +39,12 @@ import static android.os.Build.VERSION_CODES.KITKAT;
  */
 public class X5WebView extends BridgeWebView {
 
+    private OnScrollChangeListener mOnScrollChangeListener;
+
+    public void setOnScrollChangeListener(OnScrollChangeListener listener) {
+        this.mOnScrollChangeListener = listener;
+    }
+
     public X5WebView(Context arg0) {
         this(arg0,null);
     }
@@ -179,4 +185,43 @@ public class X5WebView extends BridgeWebView {
         }
     }
 
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        if (isBottom() && this.getX5WebViewClient().isLoadFinish()) {
+            //处于底端
+            mOnScrollChangeListener.onPageEnd(l, t, oldl, oldt);
+        } else if (isTop() && this.getX5WebViewClient().isLoadFinish()) {
+            //处于顶端
+            mOnScrollChangeListener.onPageTop(l, t, oldl, oldt);
+        } else {
+            mOnScrollChangeListener.onScrollChanged(l, t, oldl, oldt);
+        }
+    }
+
+    public interface OnScrollChangeListener {
+
+        void onPageEnd(int l, int t, int oldl, int oldt);
+
+        void onPageTop(int l, int t, int oldl, int oldt);
+
+        void onScrollChanged(int l, int t, int oldl, int oldt);
+
+    }
+
+    /**
+     * 判断是否在顶部
+     * @return                              true表示在顶部
+     */
+    private boolean isTop() {
+        return getScrollY() <= 0;
+    }
+
+    /**
+     * 判断是否在底部
+     * @return                              true表示在底部
+     */
+    private boolean isBottom() {
+        return getHeight() + getScrollY() >= getContentHeight() * getScale();
+    }
 }

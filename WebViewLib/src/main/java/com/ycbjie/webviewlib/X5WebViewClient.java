@@ -55,6 +55,18 @@ public class X5WebViewClient extends WebViewClient {
     private InterWebListener webListener;
     private WebView webView;
     private Context context;
+    /**
+     * 是否加载完毕
+     */
+    private boolean isLoadFinish = false;
+
+    /**
+     * 获取是否加载完毕
+     * @return                                  布尔值
+     */
+    public boolean isLoadFinish() {
+        return isLoadFinish;
+    }
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -117,6 +129,7 @@ public class X5WebViewClient extends WebViewClient {
             //显示异常页面
             webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
         }
+        isLoadFinish = false;
     }
 
     /**
@@ -143,6 +156,7 @@ public class X5WebViewClient extends WebViewClient {
         //html加载完成之后，添加监听图片的点击js函数
         //addImageClickListener();
         addImageArrayClickListener(webView);
+        isLoadFinish = true;
     }
 
     /**
