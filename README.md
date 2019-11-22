@@ -87,6 +87,7 @@
 - 10.应用被作为第三方浏览器打开
 - 11.理解WebView独立进程
 - 12.使用外部浏览器下载
+- 13.tel,sms等协议用法
 - [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
@@ -440,6 +441,7 @@
 - 4.5.2 WebView域控制不严格漏洞
 - 4.5.3 下载文件时的路径穿越问题
 - 4.5.4 WebView中http和https混合使用问题
+- 4.5.5 调用系统EMAIL发送邮件崩溃
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
