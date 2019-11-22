@@ -49,7 +49,7 @@
 - 4.5.2 WebView域控制不严格漏洞
 - 4.5.3 下载文件时的路径穿越问题
 - 4.5.4 WebView中http和https混合使用问题
-
+- 4.5.5 调用系统EMAIL发送邮件崩溃
 
 
 ### 4.0.0 WebView进化史介绍
@@ -973,6 +973,10 @@
     ```
 - 需要注意，MIXED_CONTENT_ALWAYS_ALLOW这个模式是不安全的，建议先使用MIXED_CONTENT_COMPATIBILITY_MODE模式。这个模式会尝试以安全的方式加载部分http资源，另一部分http资源则不会被加载。资源是否能被加载的判断依据可能会随着版本的不同而改变，因此需要根据实际情况决定是否采用这一模式。
 
+
+### 4.5.5 调用系统EMAIL发送邮件崩溃
+- 崩溃日志：ActivityNotFoundException: No Activity found to handle Intent { act=android.intent.action.SENDTO dat=mailto:xxxxxxxxxxxx@xxx.xxx }
+- 在调用系统EMAIL发从邮件时，如果手机没有能接受SENDTO和mailto的应用，将会出现如下崩溃，特别是一些国行手机，这些手机里面没有安卓原生GMAIL。
 
 
 
