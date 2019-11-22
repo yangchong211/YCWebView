@@ -125,7 +125,7 @@ public class NativeActivity extends AppCompatActivity {
                 });*/
             }
         });
-
+        mWebView.setInitialScale(250);
         //js交互方法
         initWebViewBridge();
     }

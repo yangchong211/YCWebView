@@ -43,6 +43,7 @@ public class FileDisplayActivity extends AppCompatActivity {
                                         switch (which) {
                                             case 0:
                                                 filePath = getFilePath(0);
+                                                int length = filePath.length();
                                                 mDocumentReaderView.show(filePath);
                                                 break;
                                             case 1:

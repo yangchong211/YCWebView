@@ -75,7 +75,7 @@ public class TenActivity extends AppCompatActivity {
 
     @SuppressLint({"ObsoleteSdkInt", "SetJavaScriptEnabled"})
     private void initWebView() {
-        webView.loadUrl("https://www.jianshu.com/p/d745ea0cb5bd");
+        webView.loadUrl("https://github.com/yangchong211/LifeHelper");
     }
 
 
