@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -46,7 +45,7 @@ import java.net.URLDecoder;
  *     revise: 如果要自定义WebViewClient必须要集成此类
  *             demo地址：https://github.com/yangchong211/YCWebView
  *
- *             作用：主要辅助 WebView 处理J avaScript 的对话框、网站 Logo、网站 title、load 进度等处理
+ *             作用：主要辅助 WebView 处理JavaScript 的对话框、网站 Logo、网站 title、load 进度等处理
  *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
@@ -98,6 +97,38 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        //页面关闭后，直接返回，不要执行网络请求和js方法
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
+        if (TextUtils.isEmpty(url)) {
+            return false;
+        }
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        WebView.HitTestResult hitTestResult = null;
+        if (url.startsWith("http:") || url.startsWith("https:")){
+            hitTestResult = view.getHitTestResult();
+        }
+        if (hitTestResult == null) {
+            return false;
+        }
+        //HitTestResult 描述
+        //WebView.HitTestResult.UNKNOWN_TYPE 未知类型
+        //WebView.HitTestResult.PHONE_TYPE 电话类型
+        //WebView.HitTestResult.EMAIL_TYPE 电子邮件类型
+        //WebView.HitTestResult.GEO_TYPE 地图类型
+        //WebView.HitTestResult.SRC_ANCHOR_TYPE 超链接类型
+        //WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE 带有链接的图片类型
+        //WebView.HitTestResult.IMAGE_TYPE 单纯的图片类型
+        //WebView.HitTestResult.EDIT_TEXT_TYPE 选中的文字类型
+        if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+            return false;
+        }
         return super.shouldOverrideUrlLoading(view, url);
     }
 
@@ -111,6 +142,38 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
+        String url = request.getUrl().toString();
+        if (TextUtils.isEmpty(url)) {
+            return false;
+        }
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        WebView.HitTestResult hitTestResult = null;
+        if (url.startsWith("http:") || url.startsWith("https:")){
+            hitTestResult = view.getHitTestResult();
+        }
+        if (hitTestResult == null) {
+            return false;
+        }
+        //HitTestResult 描述
+        //WebView.HitTestResult.UNKNOWN_TYPE 未知类型
+        //WebView.HitTestResult.PHONE_TYPE 电话类型
+        //WebView.HitTestResult.EMAIL_TYPE 电子邮件类型
+        //WebView.HitTestResult.GEO_TYPE 地图类型
+        //WebView.HitTestResult.SRC_ANCHOR_TYPE 超链接类型
+        //WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE 带有链接的图片类型
+        //WebView.HitTestResult.IMAGE_TYPE 单纯的图片类型
+        //WebView.HitTestResult.EDIT_TEXT_TYPE 选中的文字类型
+        if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+            return false;
+        }
         return super.shouldOverrideUrlLoading(view, request);
     }
 
@@ -177,16 +240,18 @@ public class X5WebViewClient extends WebViewClient {
      * @param failingUrl                        失败链接
      */
     @Override
-    public void onReceivedError(WebView view, int errorCode, String description, String
-            failingUrl) {
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
         X5LogUtils.i("-------onReceivedError-------"+failingUrl);
-        if (errorCode == 404) {
-            //用javascript隐藏系统定义的404页面信息
-            String data = "Page NO FOUND！";
-            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
-        } else {
-            if (webListener!=null){
+        if (webListener!=null){
+            if (errorCode == ERROR_TIMEOUT){
+                //网络连接超时
+                webListener.showErrorView(X5WebUtils.ErrorMode.TIME_OUT);
+            } else if (errorCode == ERROR_CONNECT){
+                //断网
+                webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
+            } {
+                //其他情况
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
         }
@@ -238,12 +303,15 @@ public class X5WebViewClient extends WebViewClient {
         //获取当前的网络请求是否是为main frame创建的.
         boolean forMainFrame = request.isForMainFrame();
         boolean redirect = request.isRedirect();
-        if (errorCode == 404) {
-            //用javascript隐藏系统定义的404页面信息
-            String data = "Page NO FOUND！";
-            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
-        } else {
-            if (webListener!=null){
+        if (webListener!=null){
+            if (errorCode == ERROR_TIMEOUT){
+                //网络连接超时
+                webListener.showErrorView(X5WebUtils.ErrorMode.TIME_OUT);
+            } else if (errorCode == ERROR_CONNECT){
+                //断网
+                webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
+            } {
+                //其他情况
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
         }
@@ -262,12 +330,20 @@ public class X5WebViewClient extends WebViewClient {
         super.onReceivedHttpError(view, request, errorResponse);
         int statusCode = errorResponse.getStatusCode();
         String reasonPhrase = errorResponse.getReasonPhrase();
-        X5LogUtils.i("-------onReceivedError-------"+ statusCode + "-------"+reasonPhrase);
-        if (webListener!=null){
-            webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
+        X5LogUtils.i("-------onReceivedHttpError-------"+ statusCode + "-------"+reasonPhrase);
+        if (statusCode == 404) {
+            //用javascript隐藏系统定义的404页面信息
+            String data = "Page NO FOUND！";
+            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+        } else if (statusCode == 500){
+            //避免出现默认的错误界面
+            view.loadUrl("about:blank");
+        } else {
+            if (webListener!=null){
+                webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
+            }
         }
     }
-
 
     /**
      * 通知主机应用程序已自动处理用户登录请求

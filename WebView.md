@@ -13,6 +13,7 @@
 - 12.使用外部浏览器下载
 
 
+
 ### 01.常用的基础介绍
 - 在activity中最简单的使用
     ```
@@ -88,6 +89,8 @@
     - 一般最常使用的就是第一种方法，但是第一种方法获取返回的值比较麻烦，而第二种方法由于是在 4.4 版本引入的，所以局限性比较大。
 - 注意问题
     - 记得添加ws.setJavaScriptEnabled(true)代码
+
+
 
 
 ### 03.Js调用Android
@@ -539,9 +542,5 @@
     ```
 
 
-
-### 参考博客
-- https://blog.csdn.net/carson_ho/article/details/64904691/
-- https://juejin.im/post/58a037df86b599006b3fade4
 
 

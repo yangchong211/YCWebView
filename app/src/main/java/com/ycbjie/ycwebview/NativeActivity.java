@@ -206,7 +206,6 @@ public class NativeActivity extends AppCompatActivity {
                 Toast.makeText(NativeActivity.this,data+"逗比",Toast.LENGTH_LONG).show();
             }
         });
-        mWebView.callHandler("functionInJs");
     }
 
 }

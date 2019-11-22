@@ -188,14 +188,16 @@ public class X5WebView extends BridgeWebView {
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
-        if (isBottom() && this.getX5WebViewClient().isLoadFinish()) {
-            //处于底端
-            mOnScrollChangeListener.onPageEnd(l, t, oldl, oldt);
-        } else if (isTop() && this.getX5WebViewClient().isLoadFinish()) {
-            //处于顶端
-            mOnScrollChangeListener.onPageTop(l, t, oldl, oldt);
-        } else {
-            mOnScrollChangeListener.onScrollChanged(l, t, oldl, oldt);
+        if (mOnScrollChangeListener!=null){
+            if (isBottom() && this.getX5WebViewClient().isLoadFinish()) {
+                //处于底端
+                mOnScrollChangeListener.onPageEnd(l, t, oldl, oldt);
+            } else if (isTop() && this.getX5WebViewClient().isLoadFinish()) {
+                //处于顶端
+                mOnScrollChangeListener.onPageTop(l, t, oldl, oldt);
+            } else {
+                mOnScrollChangeListener.onScrollChanged(l, t, oldl, oldt);
+            }
         }
     }
 

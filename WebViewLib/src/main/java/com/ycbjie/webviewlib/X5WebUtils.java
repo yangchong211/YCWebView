@@ -198,7 +198,8 @@ public final class X5WebUtils {
     /**
      * 注解限定符
      */
-    @IntDef({ErrorMode.NO_NET,ErrorMode.STATE_404, ErrorMode.RECEIVED_ERROR, ErrorMode.SSL_ERROR})
+    @IntDef({ErrorMode.NO_NET,ErrorMode.STATE_404, ErrorMode.RECEIVED_ERROR, ErrorMode.SSL_ERROR,
+            ErrorMode.TIME_OUT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorType{}
 
@@ -208,6 +209,7 @@ public final class X5WebUtils {
      * STATE_404                    404，网页无法打开
      * RECEIVED_ERROR               onReceivedError，请求网络出现error
      * SSL_ERROR                    在加载资源时通知主机应用程序发生SSL错误
+     * TIME_OUT                     网络连接超时
      */
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorMode {
@@ -215,6 +217,7 @@ public final class X5WebUtils {
         int STATE_404 = 1002;
         int RECEIVED_ERROR = 1003;
         int SSL_ERROR = 1004;
+        int TIME_OUT = 1005;
     }
 
 

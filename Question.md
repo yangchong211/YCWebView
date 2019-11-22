@@ -12,6 +12,7 @@
 - 4.1.0 如何保证js安全性
 - 4.1.1 如何代码开启硬件加速
 - 4.1.2 WebView设置Cookie
+- 4.1.3 开启硬件加速导致的闪烁问题
 - 4.1.4 webView加载网页不显示图片
 - 4.1.5 绕过证书校验漏洞
 - 4.1.6 allowFileAccess漏洞
@@ -41,6 +42,14 @@
 - 4.4.5 webView.goBack()会刷新页面吗
 - 4.4.6 mWebView.scrollTo(0, 0)回顶部失效
 - 4.4.7 部分手机监听滑动顶部或底部失效
+- 4.4.8 prompt的一个坑导致js挂掉
+- 4.4.9 webView背景设置为透明无效探索
+- 4.5.0 如何屏蔽掉WebView中长按事件
+- 4.5.1 WeView出现OOM影响主进程如何避免
+- 4.5.2 WebView域控制不严格漏洞
+- 4.5.3 下载文件时的路径穿越问题
+- 4.5.4 WebView中http和https混合使用问题
+
 
 
 ### 4.0.0 WebView进化史介绍
@@ -251,6 +260,12 @@
     - 在webView中使用js与html进行交互是一个不错的方式，但是，在Android4.2(16，包含4.2)及以下版本中，如果使用addJavascriptInterface，则会存在被注入js接口的漏洞；在4.2之后，由于Google增加了@JavascriptInterface，该漏洞得以解决。
 - @JavascriptInterface注解做了什么操作
     - 之前，任何Public的函数都可以在JS代码中访问，而Java对象继承关系会导致很多Public的函数都可以在JS中访问，其中一个重要的函数就是getClass()。然后JS可以通过反射来访问其他一些内容。通过引入 @JavascriptInterface注解，则在JS中只能访问 @JavascriptInterface注解的函数。这样就可以增强安全性。
+- 在4.2之前，存在漏洞，解决方案如下所示。移除android 4.2之前的默认接口
+    ```
+    removeJavascriptInterface(“searchBoxJavaBridge_”)
+    removeJavascriptInterface(“accessibility”)
+    removeJavascriptInterface(“accessibilityTraversal”)
+    ```
 
 
 
@@ -315,6 +330,13 @@
 
 
 
+### 4.1.3 开启硬件加速导致的闪烁问题
+- 在应用开启硬件加速后，WebView可能在加载过程出现闪烁现象。
+- 解决方案：为WebView关闭硬件加速功能。webView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+
+
+
+
 ### 4.1.4 webView加载网页不显示图片
 - webView从Lollipop(5.0)开始webView默认不允许混合模式, https当中不能加载http资源, 而开发的时候可能使用的是https的链接, 但是链接中的图片可能是http的, 所以需要设置开启。
     ```
@@ -327,7 +349,7 @@
 
 
 ### 4.1.5 绕过证书校验漏洞
-- webviewClient中有onReceivedError方法，当出现证书校验错误时，我们可以在该方法中使用handler.proceed()来忽略证书校验继续加载网页，或者使用默认的handler.cancel()来终端加载。
+- webViewClient中有onReceivedError方法，当出现证书校验错误时，我们可以在该方法中使用handler.proceed()来忽略证书校验继续加载网页，或者使用默认的handler.cancel()来终端加载。
     - 因为我们使用了handler.proceed()，由此产生了该“绕过证书校验漏洞”。如果确定所有页面都能满足证书校验，则不必要使用handler.proceed()
     ```
     @SuppressLint("NewApi")
@@ -810,6 +832,7 @@
 - 思考一下，为何会失效
 
 
+
 ### 4.4.7 部分手机监听滑动顶部或底部失效
 - 先来看一下如何监听webView滑动到顶部和底部的逻辑代码，可以说网上绝大多数的都是这样
     ```
@@ -838,9 +861,125 @@
 
 
 
+### 4.4.8 prompt的一个坑导致js挂掉
+- 使用onJsPrompt实现js通信，在js调用​window.alert​，​window.confirm​，​window.prompt​时，​会调用WebChromeClient​对应方法，可以此为入口，作为消息传递通道，​通常会选Prompt作为入口，在App中就是onJsPrompt作为jsbridge的调用入口。
+- 从表现上来看，onJsPrompt必须执行完毕，prompt函数才会返回，否则js线程会一直阻塞在这里。实际使用中确实会发生这种情况，尤其是APP中有很多线程的场景下，怀疑是这么一种场景：
+    - 第一步：js线程在执行prompt时被挂起，
+    - 第二部 ：UI线程被调度，恰好销毁了Webview，调用了 （webview的detroy），detroy之后，导致 onJsPrompt不会被回调，prompt一直等着，js线程就一直阻塞，导致所有webview打不开，一旦出现可能需要杀进程才能解决。
+- 解决方案
+    - 使用onJsPrompt实现js通信，建议使用handler处理消息，避免某些方法因为做了耗时操作导致js等待状态；还需要注意销毁webView的过程，在onStop设置setJavaScriptEnabled(false)，然后销毁。
+
+
+
+### 4.4.9 webView背景设置为透明无效探索
+- webView是一个使用方便、功能强大的控件，但由于webView的背景颜色默认是白色，在一些场合下会显得很突兀（比如背景是黑色，app中的夜间模式）。
+- 首先看一下，网上的解决方案
+    ```
+    android:layerType="software"（没效果）
+    mWebView.setBackgroundColor(0);（没效果）
+    mWebView.setBackgroundDrawable(R.color.transparent);（没效果）
+    ```
+- 最后解决方案如下所示
+    - 首先检查配置文件里application设置android:hardwareAccelerated=”false”，自己尝试后必须这样设置才行；
+    - 在loadUrl后设置mWebView.setBackgroundColor(0);mWebView.getBackground().setAlpha(1); // 设置填充透明度 范围：0-255
+    - 检查xml布局文件里的WebView的父层布局，也要设置背景为透明的；（之前也因为这个问题没发现，绕了很大一个圈）
+
+
+
+### 4.5.0 如何屏蔽掉WebView中长按事件
+- webView长按时将会调用系统的复制控件，具体可以看一下案例。案例中提到，你可以自定义长按逻辑，也可以屏蔽长按事件。具体屏蔽逻辑该如何操作呢？
+    ```
+    mWebView.setOnLongClickListener(new OnLongClickListener() {  
+        @Override 
+        public boolean onLongClick(View v) {  
+          return true;  
+        }  
+    });
+    ```
+
+
+### 4.5.1 WeView出现OOM影响主进程如何避免
+- WeView出现OOM，我在实际开发中没有遇到，倒是有点可惜。这个是看网上的，后期有待求证……
+- 问题描述：由于WebView默认运行在应用进程中，如果WebView加载的数据过大（例如加载大图片），就可能导致OOM问题，从而影响应用主进程。
+- 解决方案：为了避免WebView影响主进程，可以尝试将WebView所在的Activity运行在独立进程中。这样即使WebView出现了OOM问题，应用主进程也不会受到影响。具体做法也很简单，只要在AndroidManifest文件中为相应的Activity设置process属性即可。为Activity设置了process属性，意思就是让这个Activity运行在名为:remote的私有进程中。
+- 需要注意，这种方式可能会有进程通信方面的问题，因此需要根据实际情况决定是否需要使用。
+
+
+
+### 4.5.2 WebView域控制不严格漏洞
+- 由于应用中的WebView没有对file:///类型的url做限制，可能导致外部攻击者利用Javascript代码读取本地隐私数据。
+- 解决方案：
+    - 1.如果WebView不需要使用file协议，直接禁用所有与file协议相关的功能即可。需要注意，即使禁用了File协议，也不影响对assets和resources资源的加载。它们的url格式分别为：file:///android_asset、file:///android_res。
+    ```
+    webSettings.setAllowFileAccess(false);
+    webSettings.setAllowFileAccessFromFileURLs(false);
+    webSettings.setAllowUniversalAccessFromFileURLs(false);
+    ```
+    - 2.如果WebView需要使用file协议，则应该禁用file协议的Javascript功能。具体方法为：在调用loadUrl方法前，以及在shouldOverrideUrlLoading方法中判断url的scheme是否为file。如果是file协议，就禁用Javascript，否则启用Javascript。
+    ```
+    //WebSettings
+    webSettings.setAllowFileAccess(true);
+    webSettings.setAllowFileAccessFromFileURLs(false);
+    webSettings.setAllowUniversalAccessFromFileURLs(false);
+     
+    //调用loadUrl前
+    if("file".equals(Uri.parse(url).getScheme())){//判断是否为file协议
+        webView.getSettings().setJavaScriptEnabled(false);
+    }else{
+        webView.getSettings().setJavaScriptEnabled(true);
+    }
+    webView.loadUrl(url);
+     
+    //WebViewClient中做的操作
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        if("file".equals(request.getUrl().getScheme())){//判断是否为file协议
+            view.getSettings().setJavaScriptEnabled(false);
+        }else{
+            view.getSettings().setJavaScriptEnabled(true);
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        if("file".equals(Uri.parse(url).getScheme())){//判断是否为file协议
+            view.getSettings().setJavaScriptEnabled(false);
+        }else{
+            view.getSettings().setJavaScriptEnabled(true);
+        }
+        return false;
+    }
+    ```
+
+### 4.5.3 下载文件时的路径穿越问题
+- 下载文件时，如果文件名中包含“../”这样的字符，并且WebView并未对文件名进行过滤，就会出现文件路径穿越问题。攻击者可以借助这种方式将可执行文件写入一些特定的位置。
+- 解决方案：在下载文件时对文件名进行判断，过滤“../”这样的字符。
+
+
+### 4.5.4 WebView中http和https混合使用问题
+- 在Android 5.0及以上，WebView可能在加载混合使用http和https的网页时出现异常。比如在一个https的安全网页中加载使用http协议的资源将会失败。
+- 解决方案：在Android 5.0后利用WebSettings设置WebView支持http和https混合内容模式。
+    ```
+    if(Build.VERSION.SDK_INT>=21){
+        //方式1
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+    }
+    
+    //或者
+    if(Build.VERSION.SDK_INT>=21){
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+    }
+    ```
+- 需要注意，MIXED_CONTENT_ALWAYS_ALLOW这个模式是不安全的，建议先使用MIXED_CONTENT_COMPATIBILITY_MODE模式。这个模式会尝试以安全的方式加载部分http资源，另一部分http资源则不会被加载。资源是否能被加载的判断依据可能会随着版本的不同而改变，因此需要根据实际情况决定是否采用这一模式。
+
+
+
+
 ### 4.9.9 掘金问题反馈记录
 - 使用JsBridge遇到的坑
     - 由于JsBridge采用 json字符串，客户端传给前端数据中/进行了转义，导致前端收到数据后解析不出来。二，当前端给Native端发消息时，如果发送的消息频率过快，导致队列清空 shouldurl不回调，最终callback不回调，客户端也就收不到消息了。
+
 
 
 

@@ -96,7 +96,7 @@
 #### 2.1 如何引入
 - **如何引用，该x5的库已经更新到最新版本**
     ```
-    implementation 'cn.yc:WebViewLib:1.1.6'
+    implementation 'cn.yc:WebViewLib:1.2.0'
     ```
 
 #### 2.2 最简单使用
@@ -403,6 +403,7 @@
 - 4.1.0 如何保证js安全性
 - 4.1.1 如何代码开启硬件加速
 - 4.1.2 WebView设置Cookie
+- 4.1.3 开启硬件加速导致的闪烁问题
 - 4.1.4 webView加载网页不显示图片
 - 4.1.5 绕过证书校验漏洞
 - 4.1.6 allowFileAccess漏洞
@@ -432,6 +433,13 @@
 - 4.4.5 webView.goBack()会刷新页面吗
 - 4.4.6 mWebView.scrollTo(0, 0)回顶部失效
 - 4.4.7 部分手机监听滑动顶部或底部失效
+- 4.4.8 prompt的一个坑导致js挂掉
+- 4.4.9 webView背景设置为透明无效探索
+- 4.5.0 如何屏蔽掉WebView中长按事件
+- 4.5.1 WeView出现OOM影响主进程如何避免
+- 4.5.2 WebView域控制不严格漏洞
+- 4.5.3 下载文件时的路径穿越问题
+- 4.5.4 WebView中http和https混合使用问题
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 
@@ -451,6 +459,12 @@
 - 5.1.2 页面关闭后不要执行web中js
 - 5.1.3 WebView + HttpDns优化
 - 5.1.4 如何禁止WebView返回时刷新
+- 5.1.5 WebView处理404、500逻辑
+- 5.1.6 WebView判断断网和链接超时
+- 5.1.7 @JavascriptInterface注解方法注意点
+- 5.1.8 使用onJsPrompt实现js通信注意点
+- 5.1.9 Cookie同步场景和具体操作
+- 5.2.0 shouldOverrideUrlLoading处理多类型
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 

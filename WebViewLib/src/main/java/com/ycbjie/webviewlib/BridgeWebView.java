@@ -481,25 +481,6 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	/**
 	 * call javascript registered handler
 	 * 调用javascript处理程序注册
-	 * @param handlerName handlerName
-	 */
-	public void callHandler(String handlerName) {
-		send(handlerName);
-	}
-
-	/**
-	 * call javascript registered handler
-	 * 调用javascript处理程序注册
-	 * @param handlerName handlerName
-	 * @param callBack CallBackFunction
-	 */
-	public void callHandler(String handlerName,CallBackFunction callBack) {
-		send(handlerName, callBack);
-	}
-
-	/**
-	 * call javascript registered handler
-	 * 调用javascript处理程序注册
      * @param handlerName handlerName
 	 * @param data data
 	 * @param callBack CallBackFunction

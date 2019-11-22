@@ -13,6 +13,13 @@
 - 5.1.2 页面关闭后不要执行web中js
 - 5.1.3 WebView + HttpDns优化
 - 5.1.4 如何禁止WebView返回时刷新
+- 5.1.5 WebView处理404、500逻辑
+- 5.1.6 WebView判断断网和链接超时
+- 5.1.7 @JavascriptInterface注解方法注意点
+- 5.1.8 使用onJsPrompt实现js通信注意点
+- 5.1.9 Cookie同步场景和具体操作
+- 5.2.0 shouldOverrideUrlLoading处理多类型
+
 
 
 ### 5.0.1 视频全屏播放按返回页面被放大（部分手机出现)
@@ -385,6 +392,287 @@
             }
         }
         ```
+
+
+### 5.1.5 WebView处理404、500逻辑
+- 在Android6.0以下的系统我们如何处理404这样的问题呢？
+    - 通过获取网页的title，判断是否为系统默认的404页面。在WebChromeClient()子类中可以重写他的onReceivedTitle()方法
+    ```
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
+        super.onReceivedTitle(view, title);
+        // android 6.0 以下通过title获取
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (title.contains("404") || title.contains("500") || title.contains("Error")) {
+                // 避免出现默认的错误界面
+                view.loadUrl("about:blank");
+                //view.loadUrl(mErrorUrl);
+            }
+        }
+    }
+    ```
+- Android6.0以上判断404或者500
+    ```
+    @TargetApi(android.os.Build.VERSION_CODES.M)
+    @Override
+    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+        super.onReceivedHttpError(view, request, errorResponse);
+        // 这个方法在6.0才出现
+        int statusCode = errorResponse.getStatusCode();
+        System.out.println("onReceivedHttpError code = " + statusCode);
+        if (404 == statusCode || 500 == statusCode) {
+            //避免出现默认的错误界面
+            view.loadUrl("about:blank");
+            //view.loadUrl(mErrorUrl);
+        }
+    }
+    ```
+
+
+
+### 5.1.6 WebView判断断网和链接超时
+- 第一种方法，可以直接使用，在WebViewClient中的onReceivedError方法中捕获
+    ```
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        super.onReceivedError(view, errorCode, description, failingUrl);
+        // 断网或者网络连接超时
+        if (errorCode == ERROR_HOST_LOOKUP || errorCode == ERROR_CONNECT || errorCode == ERROR_TIMEOUT) {
+            // 避免出现默认的错误界面
+            view.loadUrl("about:blank"); 
+            //view.loadUrl(mErrorUrl);
+        }
+    }
+    ```
+- 第二种方法，只是提供思路，但是不建议使用，既然是请求url，那么可不可以通过HttpURLConnection来获取状态码，是不是回到了最初学习的时候，哈哈
+    - 注意一定是要开启子线程，因为网络请求是耗时操作，就不解释这多呢
+    ```
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            int responseCode = getResponseCode(mUrl);
+            if (responseCode == 404 || responseCode == 500) {
+                Message message = mHandler.obtainMessage();
+                message.what = responseCode;
+                mHandler.sendMessage(message);
+            }
+        }
+    }).start();
+    ```
+    - 在主线程中处理消息
+    ```
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            int code = msg.what;
+            if (code == 404 || code == 500) {
+                System.out.println("handler = " + code);
+                mWebView.loadUrl(mErrorUrl);
+            }
+        }
+    };
+    ```
+    - 那么看看getResponseCode(mUrl)是如何操作的
+    ```
+    /**
+     * 获取请求状态码
+     * @param url
+     * @return 请求状态码
+     */
+    private int getResponseCode(String url) {
+        try {
+            URL getUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(5000);
+            return connection.getResponseCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    ```
+
+
+### 5.1.7 @JavascriptInterface注解方法注意点
+- 在js调用Android原生方法时，会用@JavascriptInterface注解标注那些需要被调用的Android原生方法，那么思考一下，这些原生方法是否可以执行耗时操作，如果有会阻塞通信吗？
+- JS会阻塞等待当前原生函数（耗时操作的那个）执行完毕再往下走，所以 @JavascriptInterface注解的方法里面最好也不要做耗时操作，最好利用Handler封装一下，让每个任务自己处理，耗时的话就开线程自己处理，这样是最好的。
+- JavascriptInterface注入的方法被js调用时，可以看做是一个同步调用，虽然两者位于不同线程，但是应该存在一个等待通知的机制来保证，所以Native中被回调的方法里尽量不要处理耗时操作，否则js会阻塞等待较长时间。
+- 那么具体的实践案例，可以看lib中的WvWebView类，就是通过handler处理消息的。具体的代码可以看项目中的案例……
+
+
+
+### 5.1.8 使用onJsPrompt实现js通信注意点
+- 在WvWebView类中，就是使用onJsPrompt实现js调用Android通信，具体可以看一下代码。
+- 在js调用​window.alert​，​window.confirm​，​window.prompt​时，​会调用WebChromeClient​对应方法，可以此为入口，作为消息传递通道，考虑到开发习惯，一般不会选择alert跟confirm，​通常会选promopt作为入口，在App中就是onJsPrompt作为jsbridge的调用入口。由于onJsPrompt是在UI线程执行，所以尽量不要做耗时操作，可以借助Handler灵活处理。对于回调的处理跟上面的addJavascriptInterface的方式一样即可
+    ```
+    @Override
+    public boolean onJsPrompt(WebView view, String url, final String message,
+                              String defaultValue, final JsPromptResult result) {
+        if(Build.VERSION.SDK_INT<= Build.VERSION_CODES.JELLY_BEAN){
+            String prefix="_wvjbxx";
+            if(message.equals(prefix)){
+                Message msg = mainThreadHandler.obtainMessage(HANDLE_MESSAGE, defaultValue);
+                mainThreadHandler.sendMessage(msg);
+            }
+            return true;
+        }
+        //省略部分代码……
+        return true;
+    };
+    ```
+- 然后主线程中处理接受的消息，这里仅仅展示部分代码，具体逻辑请下载demo查看。
+    ```
+    @SuppressLint("HandlerLeak")
+    private class MyHandler extends Handler {
+    
+        private WeakReference<Context> mContextReference;
+    
+        MyHandler(Context context) {
+            super(Looper.getMainLooper());
+            mContextReference = new WeakReference<>(context);
+        }
+    
+        @Override
+        public void handleMessage(Message msg) {
+            final Context context = mContextReference.get();
+            if (context != null) {
+                switch (msg.what) {
+                    case HANDLE_MESSAGE:
+                        WvWebView.this.handleMessage((String) msg.obj);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    ```
+
+
+### 5.1.9 Cookie同步场景和具体操作
+- 场景：C/S->B/S Cookie同步
+    - 在Android混合应用开发中，一般来说，有些页面通过Native方式实现，有些通过WebView实现。对于登录而已，假设我们通过Native登录，需要把SessionID传递给WebView，这种情况需要同步。
+- 场景：不同域名之间的Cookie同步
+    - 对于分布式应用，或者灰度发布的应用，他的缓存服务器是同一个，那么域名的切换时会导致获取不到sessionID，因此，不同域名也需要特别处理。
+    ```
+    public static void synCookies(Context context, String url) {
+        try {
+            if (!UserManager.hasLogin()) {  
+                //判断用户是否已经登录
+                setCookie(context, url, "SESSIONID", "invalid");
+            } else {
+                setCookie(context, url, "SESSIONID", SharePref.getSessionId());
+    
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    private static void setCookie( Context context,String url, String key, String value) {
+        if (Build.VERSION.SDK_INT < 21) {
+            CookieSyncManager.createInstance(context);
+        }
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);  //同样允许接受cookie
+        URL pathInfo = new URL(url);
+        String[] whitelist = new String{".abc.com","abc.cn","abc.com.cn"}; //白名单
+        String domain = null;
+    
+        for(int i=0;i<whitelist.length;i++){
+            if(pathInfo.getHost().endsWith(whitelist[i])){
+                domain  = whitelist[i];
+                break;
+            }
+        }
+        if(TextUtils.isEmpty(domain)) return; //不符合白名单的不同步cookie
+        StringBuilder sbCookie = new StringBuilder();
+        sbCookie.append(String.format("%s=%s", key, value));
+        sbCookie.append(String.format(";Domain=%s", domain));
+        sbCookie.append(String.format(";path=%s", "/"));
+        String cookieValue = sbCookie.toString();
+        cookieManager.setCookie(url, cookieValue);
+        if (Build.VERSION.SDK_INT < 21) {
+            CookieSyncManager.getInstance().sync();
+        } else {
+            CookieManager.getInstance().flush();
+        }
+    }
+    ```
+    - 调用位置：shouldOverrideUrlLoading中调用
+    ```
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        //同步，当然还可以优化，如果前一个域名和后一个域名不同时我们再同步
+        syncCookie(view.getContext(),url);   
+        //省略代码……
+    }
+    ```
+- 场景三：从B/S->C/S
+    - 这种情况多发生于第三方登录，但是获取cookie通过CookieManager即可，但是的好时机是页面加载完成。
+    - 注意：在页面加载之前一定要调用cookieManager.setAcceptCookie(true);  允许接受cookie，否则可能产生问题。
+    ```
+    public void onPageFinished(WebView view, String url) {  
+        CookieManager cookieManager = CookieManager.getInstance();  
+        String CookieStr = cookieManager.getCookie(url);  
+        LogUtil.i("Cookies", "Cookies = " + CookieStr);  
+        super.onPageFinished(view, url);  
+    } 
+    ```
+
+
+### 5.2.0 shouldOverrideUrlLoading处理多类型
+- 这个方法很强大，平时一般很少涉及处理多类型，比如电子邮件类型，地图类型，选中的文字类型等等。我在X5WebViewClient中的shouldOverrideUrlLoading方法中只是处理了未知类型
+    - 还是很可惜，没遇到过复杂的h5页面，需要处理各种不同类型。这里只是简单介绍一下，知道就可以呢。
+    ```
+    /**
+     * 这个方法中可以做拦截
+     * 主要的作用是处理各种通知和请求事件
+     * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+     * @param view                              view
+     * @param url                               链接
+     * @return                                  是否自己处理，true表示自己处理
+     */
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        //页面关闭后，直接返回，不要执行网络请求和js方法
+        boolean activityAlive = X5WebUtils.isActivityAlive(context);
+        if (!activityAlive){
+            return false;
+        }
+        if (TextUtils.isEmpty(url)) {
+            return false;
+        }
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        WebView.HitTestResult hitTestResult = null;
+        if (url.startsWith("http:") || url.startsWith("https:")){
+            hitTestResult = view.getHitTestResult();
+        }
+        if (hitTestResult == null) {
+            return false;
+        }
+        //HitTestResult 描述
+        //WebView.HitTestResult.UNKNOWN_TYPE 未知类型
+        //WebView.HitTestResult.PHONE_TYPE 电话类型
+        //WebView.HitTestResult.EMAIL_TYPE 电子邮件类型
+        //WebView.HitTestResult.GEO_TYPE 地图类型
+        //WebView.HitTestResult.SRC_ANCHOR_TYPE 超链接类型
+        //WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE 带有链接的图片类型
+        //WebView.HitTestResult.IMAGE_TYPE 单纯的图片类型
+        //WebView.HitTestResult.EDIT_TEXT_TYPE 选中的文字类型
+        if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+            return false;
+        }
+        return super.shouldOverrideUrlLoading(view, url);
+    }
+    ```
+
+
 
 
 

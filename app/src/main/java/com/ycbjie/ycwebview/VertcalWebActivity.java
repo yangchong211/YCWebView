@@ -126,6 +126,12 @@ public class VertcalWebActivity extends AppCompatActivity {
                 }
             });
         }
+//        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                return true;
+//            }
+//        });
     }
 
     /**
@@ -183,4 +189,7 @@ public class VertcalWebActivity extends AppCompatActivity {
 
         }
     };
+
+
+
 }
