@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_6_2).setOnClickListener(this);
         findViewById(R.id.tv_7_1).setOnClickListener(this);
         findViewById(R.id.tv_7_2).setOnClickListener(this);
+        findViewById(R.id.tv_7_3).setOnClickListener(this);
         findViewById(R.id.tv_8).setOnClickListener(this);
         findViewById(R.id.tv_9).setOnClickListener(this);
         findViewById(R.id.tv_10).setOnClickListener(this);
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_12).setOnClickListener(this);
         findViewById(R.id.tv_13).setOnClickListener(this);
         findViewById(R.id.tv_14).setOnClickListener(this);
+        findViewById(R.id.tv_15).setOnClickListener(this);
+        findViewById(R.id.tv_16).setOnClickListener(this);
     }
 
     @Override
@@ -69,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tv_7_2:
                 startActivity(new Intent(this,NativeActivity2.class));
                 break;
+            case R.id.tv_7_3:
+                startActivity(new Intent(this,NativeActivity3.class));
+                break;
             case R.id.tv_8:
                 startActivity(new Intent(this,EightActivity.class));
                 break;
@@ -89,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_14:
                 startActivity(new Intent(this, VertcalWebActivity.class));
+                break;
+            case R.id.tv_15:
+                startActivity(new Intent(this, WvNativeActivity2.class));
+                break;
+            case R.id.tv_16:
+                startActivity(new Intent(this, WvNativeActivity3.class));
                 break;
             default:
                 break;

@@ -177,10 +177,17 @@ public class WvWebView extends WebView {
     /**
      * set a listener for javascript closing the current activity.
      */
-    public void setJavascriptCloseWindowListener( JavascriptCloseWindowListener listener){
+    public void setJavascriptCloseWindowListener(JavascriptCloseWindowListener listener){
         javascriptCloseWindowListener=listener;
     }
 
+    /**
+     * js调native
+     * @param handlerName                               名称
+     * @param handler                                   消息
+     * @param <T>                                       T
+     * @param <R>                                       R
+     */
     public <T,R> void registerHandler(String handlerName, WVJBHandler<T,R> handler) {
         if (handlerName == null || handlerName.length() == 0 || handler == null) {
             return;
@@ -224,7 +231,7 @@ public class WvWebView extends WebView {
 
     private void dispatchMessage(WvMessage message) {
         String messageJson = messageToJsonObject(message).toString();
-        evaluateJavascript(String.format("WvWebViewJavascriptBridge._handleMessageFromJava(%s)", messageJson));
+        evaluateJavascript(String.format("WebViewJavascriptBridge._handleMessageFromJava(%s)", messageJson));
     }
 
     // handle the onResult message from javascript

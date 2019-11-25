@@ -12,6 +12,15 @@
         android:padding="10dp"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:textColor="@color/colorAccent"
+            android:background="@color/colorPrimary"
+            android:text="使用X5WebView或者BridgeWebView，借鉴JsBridge库"/>
 
         <TextView
             android:id="@+id/tv_1"
@@ -113,7 +122,19 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="7.2 原生native和h5交互案例2"/>
+            android:text="7.2 原生native和h5交互案例2，学习案例"/>
+
+        <TextView
+            android:id="@+id/tv_7_3"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="7.3 原生native和h5交互案例3，使用callHandler"/>
+
 
 
         <TextView
@@ -185,6 +206,38 @@
             android:textSize="12sp"
             android:background="@color/colorAccent"
             android:text="14.类似购物网站webView回顶部效果"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:textColor="@color/colorAccent"
+            android:background="@color/colorPrimary"
+            android:text="使用X5WvWebView，支持子线程处理消息，如果要使用，请先仔细阅读一下代码，实现思路和JsBridge不一样"/>
+
+
+        <TextView
+            android:id="@+id/tv_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="15 原生native和h5交互案例1"/>
+
+
+        <TextView
+            android:id="@+id/tv_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="16 原生native和h5交互案例2"/>
 
     </LinearLayout>
 

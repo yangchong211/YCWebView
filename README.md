@@ -475,6 +475,7 @@
     - [x5官方开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
     - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
     - [WebViewStudy开源库](https://github.com/youlookwhat/WebViewStudy)
+    - [DSBridge](https://github.com/wendux/DSBridge-Android)
 - 参考博客
     - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
     - [WebView详解，常见漏洞详解和安全源码上](https://juejin.im/post/58a037df86b599006b3fade4)
