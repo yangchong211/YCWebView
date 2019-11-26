@@ -22,7 +22,7 @@
 
 
 ### 01.前沿说明
-- 基于腾讯x5开源库，提高webView开发效率，大概要节约你百分之六十的时间成本。该案例支持处理js的交互逻辑且无耦合、同时暴露进度条加载进度、可以监听异常error状态、支持视频播放并且可以全频、支持加载word，xls，ppt，pdf，txt等文件文档、发短信、打电话、发邮件、打开文件操作上传图片、唤起原生App、x5库为最新版本，功能强大。
+- 基于腾讯x5开源库，提高webView开发效率，大概要节约你百分之六十的时间成本。该案例支持处理js的交互逻辑且无耦合、同时暴露进度条加载进度、可以监听异常error状态、支持视频播放并且可以全频、支持加载word，xls，ppt，pdf，txt等文件文档、发短信、打电话、发邮件、打开文件操作上传图片、唤起原生App、x5库为最新版本，功能强大。项目地址：[webView开源库](https://github.com/yangchong211/YCWebView)
 
 
 #### 1.1 案例展示效果
@@ -55,7 +55,7 @@
 - 支持加载word，xls，ppt，pdf，txt等文件文档，使用方法十分简单；
 - 支持设置仿微信加载H5页面进度条，完全无耦合，操作简单，极大提高用户体验；
 - 支持用户按照规范自定义WebViewClient和WebChromeClient，不影响js通信；
-
+- 汇集绝大多数问题，以及解决方案，是学习和深入理解webView的一个比较全面的案例；
 
 
 #### 1.3 相关类介绍说明
@@ -72,6 +72,9 @@
 - X5WebUtils            工具类，初始化腾讯x5浏览器webView，及调用该类init方法
 - X5WebView             可以使用这个类，方便统一初始化WebSettings的一些属性，如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
 - X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要集成此类，一定要继承该类，因为注入js监听是在该类中操作的
+- WebProgress           仿微信加载H5页面的WebView进度条
+
+
 
 
 #### [1.4 WebView基础知识点](https://github.com/yangchong211/YCWebView/blob/master/WebView.md)
@@ -177,6 +180,11 @@
         public void startProgress(int newProgress) {
             //该方法是是监听进度条进度变化的逻辑
             pb.setProgress(newProgress);
+        }
+        
+        @Override
+        public void showTitle(String title) {
+            //该方法是监听h5中title
         }
     };
     ```
@@ -442,6 +450,7 @@
 - 4.5.3 下载文件时的路径穿越问题
 - 4.5.4 WebView中http和https混合使用问题
 - 4.5.5 调用系统EMAIL发送邮件崩溃
+- 4.5.7 WebView访问部分网页崩溃问题
 - [更多问题反馈内容](https://github.com/yangchong211/YCWebView/blob/master/Question.md)
 
 

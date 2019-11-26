@@ -50,6 +50,7 @@
 - 4.5.3 下载文件时的路径穿越问题
 - 4.5.4 WebView中http和https混合使用问题
 - 4.5.5 调用系统EMAIL发送邮件崩溃
+- 4.5.7 WebView访问部分网页崩溃问题
 
 
 ### 4.0.0 WebView进化史介绍
@@ -977,6 +978,48 @@
 ### 4.5.5 调用系统EMAIL发送邮件崩溃
 - 崩溃日志：ActivityNotFoundException: No Activity found to handle Intent { act=android.intent.action.SENDTO dat=mailto:xxxxxxxxxxxx@xxx.xxx }
 - 在调用系统EMAIL发从邮件时，如果手机没有能接受SENDTO和mailto的应用，将会出现如下崩溃，特别是一些国行手机，这些手机里面没有安卓原生GMAIL。
+
+
+### 4.5.7 WebView组件访问部分网页崩溃问题
+- 在测试WebView组件时发现总是出现崩溃现像：提示：ERR_CLEARTEXT_NOT_PERMITTED
+- 当时以为是权限问题，查找自己的AndroidManifest文件发现已经申请INTERNET权限了。看了网上的一些大佬的文章才知道，原来由于 Android P （9.0）限制了明文流量的网络请求，非加密的流量请求都会被系统禁止掉，所以如果访问没有https协议的网站默认不不可以访问的。
+- 解决方案如下所示
+    - 1.只访问带有https协议的网站。
+    - 2.在AndroidManifest文件设置明文通信属性。
+    ```
+      ...
+      <!--权限-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+        <application
+           ...
+           <!--默认为false，即不允许未加密的网络流量通信-->
+            android:cleartextTrafficPermitted="true"
+          ...
+    ```
+    - 还有另一种操作，如下所示
+    ```
+    //在res文件夹下添加xml文件夹下添加network_security_config.xml文件
+    <?xml version="1.0" encoding="utf-8"?>
+    <network-security-config xmlns:android="http://schemas.android.com/apk/res/android">
+        <debug-overrides>
+            <trust-anchors>
+                <!-- Trust user added CAs while debuggable only -->
+                <certificates src="user" />
+            </trust-anchors>
+        </debug-overrides>
+        <base-config cleartextTrafficPermitted="true" />
+    </network-security-config>
+    
+    
+    //在AndroidManifest.xml文件中添加属性
+    //在application 中 添加android:networkSecurityConfig="@xml/network_security_config"
+    
+    <application
+        android:name=".base.BaseApplication"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/AppTheme">
+    ```
+
 
 
 
