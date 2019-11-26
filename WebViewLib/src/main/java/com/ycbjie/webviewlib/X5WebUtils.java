@@ -199,7 +199,7 @@ public final class X5WebUtils {
      * 注解限定符
      */
     @IntDef({ErrorMode.NO_NET,ErrorMode.STATE_404, ErrorMode.RECEIVED_ERROR, ErrorMode.SSL_ERROR,
-            ErrorMode.TIME_OUT})
+            ErrorMode.TIME_OUT,ErrorMode.STATE_500})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorType{}
 
@@ -218,6 +218,7 @@ public final class X5WebUtils {
         int RECEIVED_ERROR = 1003;
         int SSL_ERROR = 1004;
         int TIME_OUT = 1005;
+        int STATE_500 = 1006;
     }
 
 

@@ -333,11 +333,17 @@ public class X5WebViewClient extends WebViewClient {
         X5LogUtils.i("-------onReceivedHttpError-------"+ statusCode + "-------"+reasonPhrase);
         if (statusCode == 404) {
             //用javascript隐藏系统定义的404页面信息
-            String data = "Page NO FOUND！";
-            view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+            //String data = "Page NO FOUND！";
+            //view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\"");
+            if (webListener!=null){
+                webListener.showErrorView(X5WebUtils.ErrorMode.STATE_404);
+            }
         } else if (statusCode == 500){
             //避免出现默认的错误界面
-            view.loadUrl("about:blank");
+            //view.loadUrl("about:blank");
+            if (webListener!=null){
+                webListener.showErrorView(X5WebUtils.ErrorMode.STATE_500);
+            }
         } else {
             if (webListener!=null){
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);

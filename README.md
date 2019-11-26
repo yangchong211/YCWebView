@@ -100,7 +100,7 @@
 #### 2.1 如何引入
 - **如何引用，该x5的库已经更新到最新版本，引用最新1.2.0稳定版**
     ```
-    implementation 'cn.yc:WebViewLib:1.2.0'
+    implementation 'cn.yc:WebViewLib:1.2.2'
     ```
 
 #### 2.2 最简单使用
