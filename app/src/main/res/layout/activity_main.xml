@@ -158,6 +158,16 @@
             android:text="9.加载word，ppt，pdf等文档文件"/>
 
         <TextView
+            android:id="@+id/tv_9_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="9.2 使用scheme协议打开其他app"/>
+
+        <TextView
             android:id="@+id/tv_10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -206,6 +216,17 @@
             android:textSize="12sp"
             android:background="@color/colorAccent"
             android:text="14.类似购物网站webView回顶部效果"/>
+
+        <TextView
+            android:id="@+id/tv_14_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="14.2 截取WebView屏幕的整个可视区域和截取长图"/>
+
 
         <TextView
             android:layout_width="match_parent"

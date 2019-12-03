@@ -62,6 +62,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".EightActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".DeepLinkActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".FileDisplayActivity"/>
         <activity android:name=".ten.TenActivity"/>
         <activity android:name=".DownActivity"/>
@@ -71,6 +73,8 @@
         <activity android:name=".VertcalWebActivity"/>
         <activity android:name=".WvNativeActivity2"/>
         <activity android:name=".WvNativeActivity3"/>
+        <activity android:name=".WebViewActivity2"/>
+        <activity android:name=".ImageActivity"/>
     </application>
 
 </manifest>

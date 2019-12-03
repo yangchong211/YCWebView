@@ -476,6 +476,9 @@
 - 5.1.8 使用onJsPrompt实现js通信注意点
 - 5.1.9 Cookie同步场景和具体操作
 - 5.2.0 shouldOverrideUrlLoading处理多类型
+- 5.2.1 WebView独立进程解决方案
+- 5.2.2 截取WebView屏幕的整个可视区域
+- 5.2.3 截取WebView屏幕长图效果
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 

@@ -1,10 +1,14 @@
 package com.ycbjie.ycwebview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +18,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.BridgeHandler;
 import com.ycbjie.webviewlib.CallBackFunction;
 import com.ycbjie.webviewlib.DefaultHandler;
@@ -21,6 +27,12 @@ import com.ycbjie.webviewlib.InterWebListener;
 import com.ycbjie.webviewlib.WebProgress;
 import com.ycbjie.webviewlib.X5WebUtils;
 import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.X5WebViewClient;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <pre>
@@ -129,9 +141,6 @@ public class NativeActivity extends AppCompatActivity {
         //js交互方法
         initWebViewBridge();
     }
-
-
-
 
     private InterWebListener interWebListener = new InterWebListener() {
         @Override

@@ -30,11 +30,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_7_3).setOnClickListener(this);
         findViewById(R.id.tv_8).setOnClickListener(this);
         findViewById(R.id.tv_9).setOnClickListener(this);
+        findViewById(R.id.tv_9_2).setOnClickListener(this);
         findViewById(R.id.tv_10).setOnClickListener(this);
         findViewById(R.id.tv_11).setOnClickListener(this);
         findViewById(R.id.tv_12).setOnClickListener(this);
         findViewById(R.id.tv_13).setOnClickListener(this);
         findViewById(R.id.tv_14).setOnClickListener(this);
+        findViewById(R.id.tv_14_2).setOnClickListener(this);
         findViewById(R.id.tv_15).setOnClickListener(this);
         findViewById(R.id.tv_16).setOnClickListener(this);
     }
@@ -81,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tv_9:
                 startActivity(new Intent(this,FileDisplayActivity.class));
                 break;
+            case R.id.tv_9_2:
+                startActivity(new Intent(this,DeepLinkActivity.class));
+                break;
             case R.id.tv_10:
                 startActivity(new Intent(this, TenActivity.class));
                 break;
@@ -95,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_14:
                 startActivity(new Intent(this, VertcalWebActivity.class));
+                break;
+            case R.id.tv_14_2:
+                startActivity(new Intent(this, WebViewActivity2.class));
                 break;
             case R.id.tv_15:
                 startActivity(new Intent(this, WvNativeActivity2.class));

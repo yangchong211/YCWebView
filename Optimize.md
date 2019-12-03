@@ -19,6 +19,9 @@
 - 5.1.8 使用onJsPrompt实现js通信注意点
 - 5.1.9 Cookie同步场景和具体操作
 - 5.2.0 shouldOverrideUrlLoading处理多类型
+- 5.2.1 WebView独立进程解决方案
+- 5.2.2 截取WebView屏幕的整个可视区域
+- 5.2.3 截取WebView屏幕长图效果
 
 
 
@@ -671,6 +674,141 @@
         return super.shouldOverrideUrlLoading(view, url);
     }
     ```
+
+### 5.2.1 WebView独立进程解决方案
+- https://www.jianshu.com/p/b66c225c19e2
+
+
+
+### 5.2.2 截取WebView屏幕的整个可视区域
+- 有两种方法，第一种是截取activity的可见区域的视图；第二种是根据View的宽高去draw视图
+- 第一种是截取activity的可见区域的视图
+    ```
+    /**
+     * 截屏，截取activity的可见区域的视图
+     * @param activity
+     * @return
+     */
+    public static Bitmap activityShot(Activity activity) {
+        /*获取windows中最顶层的view*/
+        View view = activity.getWindow().getDecorView();
+        //允许当前窗口保存缓存信息
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        //获取状态栏高度
+        Rect rect = new Rect();
+        view.getWindowVisibleDisplayFrame(rect);
+        int statusBarHeight = rect.top;
+        WindowManager windowManager = activity.getWindowManager();
+        //获取屏幕宽和高
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(outMetrics);
+        int width = outMetrics.widthPixels;
+        int height = outMetrics.heightPixels;
+        //去掉状态栏
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache(), 0, statusBarHeight, width, height - statusBarHeight);
+        //销毁缓存信息
+        view.destroyDrawingCache();
+        view.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+    ```
+- 第二种是根据View的宽高去draw视图，这里提供截取RelativeLayout代码。其他的可以看项目demo。
+    ```
+    /**
+     * 截取RelativeLayout
+     **/
+    public static Bitmap getRelativeLayoutBitmap(RelativeLayout relativeLayout) {
+        int h = 0;
+        Bitmap bitmap;
+        for (int i = 0; i < relativeLayout.getChildCount(); i++) {
+            h += relativeLayout.getChildAt(i).getHeight();
+        }
+        // 创建对应大小的bitmap
+        bitmap = Bitmap.createBitmap(relativeLayout.getWidth(), h, Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bitmap);
+        relativeLayout.draw(canvas);
+        return bitmap;
+    }
+    ```
+
+
+### 5.2.3 截取WebView屏幕长图效果
+- 直接提供代码，如下所示：实际开发中建议用这种去截取长图，不仅仅使用webView，还适用LinearLayout，RelativeLayout等。
+    ```
+    /**
+     * 计算view的大小
+     */
+    public static Bitmap measureSize(Activity activity, View view) {
+        //将布局转化成view对象
+        View viewBitmap = view;
+        WindowManager manager = activity.getWindowManager();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        manager.getDefaultDisplay().getMetrics(outMetrics);
+        int width = outMetrics.widthPixels;
+        int height = outMetrics.heightPixels;
+        //然后View和其内部的子View都具有了实际大小，也就是完成了布局，相当与添加到了界面上。
+        //接着就可以创建位图并在上面绘制
+        return layoutView(viewBitmap, width, height);
+    }
+    
+    /**
+     * 填充布局内容
+     */
+    private static  Bitmap layoutView(final View viewBitmap, int width, int height) {
+        // 整个View的大小 参数是左上角 和右下角的坐标
+        viewBitmap.layout(0, 0, width, height);
+        int measuredWidth = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
+        int measuredHeight = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED);
+        viewBitmap.measure(measuredWidth, measuredHeight);
+        viewBitmap.layout(0, 0, viewBitmap.getMeasuredWidth(), viewBitmap.getMeasuredHeight());
+        viewBitmap.setDrawingCacheEnabled(true);
+        viewBitmap.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        viewBitmap.setDrawingCacheBackgroundColor(Color.WHITE);
+        // 把一个View转换成图片
+        Bitmap cachebmp = viewConversionBitmap(viewBitmap);
+        viewBitmap.destroyDrawingCache();
+        return cachebmp;
+    }
+    
+    /**
+     * view转bitmap
+     */
+    private static Bitmap viewConversionBitmap(View v) {
+        int w = v.getWidth();
+        int h = 0;
+        if (v instanceof LinearLayout){
+            LinearLayout linearLayout = (LinearLayout) v;
+            for (int i = 0; i < linearLayout.getChildCount(); i++) {
+                h += linearLayout.getChildAt(i).getHeight();
+            }
+        } else if (v instanceof RelativeLayout){
+            RelativeLayout relativeLayout = (RelativeLayout) v;
+            for (int i = 0; i < relativeLayout.getChildCount(); i++) {
+                h += relativeLayout.getChildAt(i).getHeight();
+            }
+        } else {
+            h = v.getHeight();
+        }
+        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmp);
+        //如果不设置canvas画布为白色，则生成透明
+        c.drawColor(Color.WHITE);
+        v.layout(0, 0, w, h);
+        v.draw(c);
+        return bmp;
+    }
+    ```
+
+
+
+
+
+
+
+
+
+
 
 
 

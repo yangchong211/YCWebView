@@ -309,6 +309,68 @@
 
 
 ### 07.如何使用DeepLink
+- 假设一个场景：
+    - 小明告诉小新，一鹿有车APP上有一个很有创意的抽奖活动，小新想要参与这个活动：
+        - 如果小新已经安装了APP，他需要找到且打开APP，然后找到相应的活动，共计2步；
+        - 如果小新没有安装APP，他需要在应用市场搜索一鹿有车APP、下载、打开APP且找到相应的活动，共计4步；
+- 什么是DeepLink
+    - Deep Link，又叫deep linking，中文翻译作深层链接。简单地从用户体验来讲，Deep Link，就是可以让你在手机的浏览器/Google Search上点击搜索的结果，便能直接跳转到已安装的应用中的某一个页面的技术。
+- 什么是Deferred DeepLink
+    - 相比DeepLink，它增加了判断APP是否被安装，用户匹配的2个功能；
+        - 1.当用户点击链接的时候判断APP是否安装，如果用户没有安装时，引导用户跳转到应用商店下载应用。
+        - 2.用户匹配功能，当用户点击链接时和用户启动APP时，分别将这两次用户Device Fingerprint（设备指纹信息）传到服务器进行模糊匹配，使用户下载且启动APP时，直接打开相应的指定页面。
+- 什么是AppLink
+    - AppLink相对复杂，需要App与Web协作完成系统验证，但可以保证直接唤起目标App，无需用户二次选择或确认
+- DeepLink和AppLink用到的核心技术
+    - URL SCHEMES。不论是IOS还是Android。
+    - 比如微信：URL Schemes：weixin://dl/moments（打开微信朋友圈）
+    - DeepLink与AppLink，本质上都是基于Intent框架，使App能够识别并处理来自系统或其他App的某种特殊URL，在原生App之间相互跳转，实现良好的用户体验
+- 如何实现DeepLink实践该方案
+    - 1.指定scheme跳转规则，比如暂时是这样设定的：yilu://link/?page=main
+    - 2.被唤起方，客户端需要配置清单文件activity。关于SchemeActivity注意查看下面代码：
+        ```
+        <!--用于DeepLink，html跳到此页面  scheme_Adr: 'yilu://link/?page=main',-->
+        <activity android:name=".activity.link.SchemeActivity"
+            android:screenOrientation="portrait">
+            <!--Android 接收外部跳转过滤器-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- 协议部分配置 ,要在web配置相同的-->
+                <!--yilu://link/?page=main-->
+                <data
+                    android:host="link"
+                    android:scheme="yilu" />
+            </intent-filter>
+        </activity>
+        
+        //解析数据
+        @Override
+        public void onCreate(Bundle savesInstanceState){
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.main);
+    
+            Intent intent=getIntent();
+            String action=intent.getAction();
+            Uri data=intent.getData();
+    
+            //解析data
+            String scheme=data.getScheme();
+            String host=data.getHost();
+            String path=data.getPath();
+            int port=data.getPort();
+            Set<String> paramKeySet=data.getQueryParameterNames();
+        }
+        ```
+    - 3.唤起方也需要操作
+    ```
+    Intent intent=new Intent();
+    intent.setData(Uri.parse("yilu://link/?page=main"));
+    startActivity(intent);
+    ```
+- 如何避免通过deep link打开多个应用实例
+    - http://stackoverflow.com/a/25997627
 - 具体可以看这篇文章：https://www.jianshu.com/p/127c80f62655
 
 
