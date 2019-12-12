@@ -221,7 +221,7 @@
 
 
 ### 4.0.9 视频/图片宽度超过屏幕
-- 视频播放宽度或者图片宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(false);
+- 视频播放宽度或者图片宽度比webView设置的宽度大，超过屏幕：这个时候可以设置ws.setLoadWithOverviewMode(true);
 - 另外一种让图片不超出屏幕范围的方法，可以用的是css
     ```
     <script type="text/javascript">
@@ -232,10 +232,11 @@
          }
     </script>
     ```
-- 通过webView的setting属性设置
+- 设置加载进来的页面自适应手机屏幕，通过webView的setting属性设置。
     ```
     // 网页内容的宽度是否可大于WebView控件的宽度
-    ws.setLoadWithOverviewMode(false);
+    settings.setUseWideViewPort(true); 
+    settings.setLoadWithOverviewMode(true); 
     ```
 
 
