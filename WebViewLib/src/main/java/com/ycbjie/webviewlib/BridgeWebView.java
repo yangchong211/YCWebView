@@ -16,7 +16,6 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
@@ -24,13 +23,9 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,8 +49,6 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	private Map<String, BridgeHandler> messageHandlers = new HashMap<>();
 	BridgeHandler defaultHandler = new DefaultHandler();
 	private List<Message> startupMessage = new ArrayList<>();
-	private X5WebViewClient x5WebViewClient;
-	private X5WebChromeClient x5WebChromeClient;
 	/**
 	 * loadUrl方法在19以上超过2097152个字符失效
 	 */
@@ -108,173 +101,6 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
-		x5WebViewClient = new MyX5WebViewClient(this,getContext());
-		this.setWebViewClient(x5WebViewClient);
-		x5WebChromeClient = new MyX5WebChromeClient(this,(Activity) getContext());
-		this.setWebChromeClient(x5WebChromeClient);
-	}
-
-	private class MyX5WebChromeClient extends X5WebChromeClient{
-
-//		private boolean isShowContent = false;
-
-		/**
-		 * 构造方法
-		 *
-		 * @param activity 上下文
-		 */
-		public MyX5WebChromeClient(BridgeWebView webView, Activity activity) {
-			super(webView, activity);
-		}
-
-		@Override
-		public void onProgressChanged(WebView view, int newProgress) {
-			super.onProgressChanged(view, newProgress);
-//			int max = 85;
-//			if (newProgress> max && !isShowContent){
-//				//在这个时候添加js注入方法，具体可以看readme文档
-//                BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
-//                if (BridgeWebView.this.getStartupMessage() != null) {
-//                    for (Message m : BridgeWebView.this.getStartupMessage()) {
-//						BridgeWebView.this.dispatchMessage(m);
-//                    }
-//					BridgeWebView.this.setStartupMessage(null);
-//                }
-//				isShowContent = true;
-//			}
-		}
-	}
-
-	private class MyX5WebViewClient extends X5WebViewClient{
-
-		/**
-		 * 构造方法
-		 *
-		 * @param webView 需要传进来webview
-		 * @param context 上下文
-		 */
-		public MyX5WebViewClient(BridgeWebView webView, Context context) {
-			super(webView, context);
-		}
-
-		/**
-		 * 这个方法中可以做拦截
-		 * 主要的作用是处理各种通知和请求事件
-		 * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
-		 * @param view                              view
-		 * @param url                               链接
-		 * @return                                  是否自己处理，true表示自己处理
-		 */
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			X5LogUtils.i("-------shouldOverrideUrlLoading----1---"+url);
-			//页面关闭后，直接返回，不要执行网络请求和js方法
-			boolean activityAlive = X5WebUtils.isActivityAlive(getContext());
-			if (!activityAlive){
-				return false;
-			}
-			if (TextUtils.isEmpty(url)) {
-				return false;
-			}
-			try {
-				url = URLDecoder.decode(url, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			// 如果是返回数据
-			if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
-				BridgeWebView.this.handlerReturnData(url);
-				return true;
-			} else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
-				BridgeWebView.this.flushMessageQueue();
-				return true;
-			} else {
-				if (this.onCustomShouldOverrideUrlLoading(url)){
-					return true;
-				} else {
-					return super.shouldOverrideUrlLoading(view, url);
-				}
-			}
-		}
-
-		protected boolean onCustomShouldOverrideUrlLoading(String url) {
-			return false;
-		}
-
-
-		/**
-		 * 增加shouldOverrideUrlLoading在api>=24时
-		 * 主要的作用是处理各种通知和请求事件
-		 * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
-		 * @param view                              view
-		 * @param request                           request
-		 * @return
-		 */
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-			X5LogUtils.i("-------shouldOverrideUrlLoading----2---"+request.getUrl().toString());
-			//页面关闭后，直接返回，不要执行网络请求和js方法
-			boolean activityAlive = X5WebUtils.isActivityAlive(getContext());
-			if (!activityAlive){
-				return false;
-			}
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-				String url = request.getUrl().toString();
-				if (TextUtils.isEmpty(url)) {
-					return false;
-				}
-				try {
-					url = URLDecoder.decode(url, "UTF-8");
-				} catch (UnsupportedEncodingException ex) {
-					ex.printStackTrace();
-				}
-				//如果是返回数据
-				if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
-					BridgeWebView.this.handlerReturnData(url);
-					return true;
-				} else if (url.startsWith(BridgeUtil.YY_OVERRIDE_SCHEMA)) {
-					BridgeWebView.this.flushMessageQueue();
-					return true;
-				} else {
-					if (this.onCustomShouldOverrideUrlLoading(url)){
-						return true;
-					} else {
-						return super.shouldOverrideUrlLoading(view, request);
-					}
-				}
-			}else {
-				return super.shouldOverrideUrlLoading(view, request);
-			}
-		}
-
-
-		/**
-		 * 当页面加载完成会调用该方法
-		 * @param view                              view
-		 * @param url                               url链接
-		 */
-		@Override
-		public void onPageFinished(WebView view, String url) {
-			super.onPageFinished(view, url);
-			//这个时候添加js注入方法
-			//WebViewJavascriptBridge.js
-			BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
-			if (BridgeWebView.this.getStartupMessage() != null) {
-				for (Message m : BridgeWebView.this.getStartupMessage()) {
-					//分发message 必须在主线程才分发成功
-					BridgeWebView.this.dispatchMessage(m);
-				}
-				BridgeWebView.this.setStartupMessage(null);
-			}
-		}
-	}
-
-    protected X5WebViewClient generateBridgeWebViewClient() {
-        return x5WebViewClient;
-    }
-
-	protected X5WebChromeClient generateBridgeWebChromeClient() {
-		return x5WebChromeClient;
 	}
 
     /**

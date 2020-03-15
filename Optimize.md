@@ -22,6 +22,8 @@
 - 5.2.1 WebView独立进程解决方案
 - 5.2.2 截取WebView屏幕的整个可视区域
 - 5.2.3 截取WebView屏幕长图效果
+- 5.2.4 Android P加载X5内核失败优化
+- 5.2.5 WebView流量轻量优化
 
 
 
@@ -801,10 +803,22 @@
     ```
 
 
+### 5.2.4 Android P加载X5内核失败优化
+- 关于Android 9：绝不多数手机是可以直接初始化成功的，但是到了Android 9，有人反馈部分手机初始化直接失败。
+- 具体原因呢是因为从Android 6.0开始引入了对Https的推荐支持，与以往不同，Android P的系统上面默认所有Http的请求都被阻止了。
+- 如何修改，代码如下所示。
+    ```
+    <application
+        ...
+        android:usesCleartextTraffic="true"
+        ...>
+        ...
+    </application>
+    ```
 
 
-
-
+### 5.2.5 WebView流量轻量优化
+- https://www.jianshu.com/p/39a9832847a6
 
 
 

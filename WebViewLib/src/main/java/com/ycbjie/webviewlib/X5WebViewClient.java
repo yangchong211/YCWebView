@@ -42,8 +42,7 @@ import java.net.URLDecoder;
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
  *     desc  : 自定义x5的WebViewClient
- *     revise: 如果要自定义WebViewClient必须要集成此类
- *             demo地址：https://github.com/yangchong211/YCWebView
+ *     revise: demo地址：https://github.com/yangchong211/YCWebView
  *
  *             作用：主要辅助 WebView 处理JavaScript 的对话框、网站 Logo、网站 title、load 进度等处理
  *             demo地址：https://github.com/yangchong211/YCWebView

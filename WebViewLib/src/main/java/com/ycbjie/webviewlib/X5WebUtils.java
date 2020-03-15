@@ -24,6 +24,7 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Picture;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -34,6 +35,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -340,5 +342,91 @@ public final class X5WebUtils {
         v.draw(c);
         return bmp;
     }
+
+
+
+    /**
+     * Android5.0以下版本
+     * 对WebView进行截屏，虽然使用过期方法，
+     * 但在当前Android版本中测试可行
+     * @param webView               WebView控件
+     * @return                      返回bitmap对象
+     */
+    public static Bitmap captureWebViewKitKat(WebView webView) {
+        Picture picture = webView.capturePicture();
+        int width = picture.getWidth();
+        int height = picture.getHeight();
+        if (width > 0 && height > 0) {
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            Canvas canvas = new Canvas(bitmap);
+            picture.draw(canvas);
+            return bitmap;
+        }
+        return null;
+    }
+
+
+    /**
+     * X5内核截取长图
+     * @param webView               x5WebView的控件
+     * @return                      返回bitmap对象
+     *
+     *        方法
+     *        1. 使用X5内核方法snapshotWholePage(Canvas, boolean, boolean)；在X5内核中提供了一个截取整个
+     *        WebView界面的方法snapshotWholePage(Canvas, boolean, boolean)，但是这个方法有个缺点，
+     *        就是不以屏幕上WebView的宽高截图，只是以WebView的contentWidth和contentHeight为宽高截图，
+     *        所以截出来的图片会不怎么清晰，但作为缩略图效果还是不错了。
+     *        2. 使用capturePicture()截取清晰长图；如果想要在X5内核下截到清晰的长图，不能使用
+     *        snapshotWholePage()，依然可以采用capturePicture()。X5内核下使用capturePicture()进行截图，
+     *        可以直接拿到WebView的清晰长图，但这是个Deprecated的方法，使用的时候要做好异常处理。
+     */
+    public static Bitmap captureX5WebViewUnsharp(com.tencent.smtt.sdk.WebView webView) {
+        if (webView == null) {
+            return null;
+        }
+        int width = webView.getContentWidth();
+        int height = webView.getContentHeight();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        webView.getX5WebViewExtension().snapshotWholePage(canvas, false, false);
+        return bitmap;
+    }
+
+
+    /**
+     * X5内核截取长图【暂时用不了】
+     * @param webView               x5WebView的控件
+     * @return                      返回bitmap对象
+     *
+     *        方法
+     *        1. 使用X5内核方法snapshotWholePage(Canvas, boolean, boolean)；在X5内核中提供了一个截取整个
+     *        WebView界面的方法snapshotWholePage(Canvas, boolean, boolean)，但是这个方法有个缺点，
+     *        就是不以屏幕上WebView的宽高截图，只是以WebView的contentWidth和contentHeight为宽高截图，
+     *        所以截出来的图片会不怎么清晰，但作为缩略图效果还是不错了。
+     *        2. 使用capturePicture()截取清晰长图；如果想要在X5内核下截到清晰的长图，不能使用
+     *        snapshotWholePage()，依然可以采用capturePicture()。X5内核下使用capturePicture()进行截图，
+     *        可以直接拿到WebView的清晰长图，但这是个Deprecated的方法，使用的时候要做好异常处理。
+     */
+    public static Bitmap captureX5Picture(com.tencent.smtt.sdk.WebView webView) {
+        if (webView == null) {
+            return null;
+        }
+        try {
+            Picture picture =  webView.capturePicture();
+            int width = picture.getWidth();
+            int height = picture.getHeight();
+            if (width > 0 && height > 0) {
+                Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                Canvas canvas = new Canvas(bitmap);
+                picture.draw(canvas);
+                return bitmap;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
 
 }

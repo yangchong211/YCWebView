@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -40,6 +41,8 @@ import static android.os.Build.VERSION_CODES.KITKAT;
 public class X5WebView extends BridgeWebView {
 
     private OnScrollChangeListener mOnScrollChangeListener;
+    private X5WebViewClient x5WebViewClient;
+    private X5WebChromeClient x5WebChromeClient;
 
     public void setOnScrollChangeListener(OnScrollChangeListener listener) {
         this.mOnScrollChangeListener = listener;
@@ -53,6 +56,10 @@ public class X5WebView extends BridgeWebView {
     public X5WebView(Context arg0, AttributeSet arg1) {
         super(arg0, arg1);
         initWebViewSettings();
+        x5WebViewClient = new MyX5WebViewClient(this,getContext());
+        this.setWebViewClient(x5WebViewClient);
+        x5WebChromeClient = new MyX5WebChromeClient(this,(Activity) getContext());
+        this.setWebChromeClient(x5WebChromeClient);
         //设置可以点击
         this.getView().setClickable(true);
     }
@@ -128,7 +135,7 @@ public class X5WebView extends BridgeWebView {
      * @return                          X5WebChromeClient对象
      */
     public X5WebChromeClient getX5WebChromeClient(){
-        return this.generateBridgeWebChromeClient();
+        return this.x5WebChromeClient;
     }
 
     /**
@@ -136,7 +143,7 @@ public class X5WebView extends BridgeWebView {
      * @return                          X5WebViewClient对象
      */
     public X5WebViewClient getX5WebViewClient(){
-        return this.generateBridgeWebViewClient();
+        return this.x5WebViewClient;
     }
 
     /**

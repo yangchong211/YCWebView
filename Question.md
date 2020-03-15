@@ -51,6 +51,7 @@
 - 4.5.4 WebView中http和https混合使用问题
 - 4.5.5 调用系统EMAIL发送邮件崩溃
 - 4.5.7 WebView访问部分网页崩溃问题
+- 4.5.8 WebView在fragment不可见停止播放视频
 
 
 ### 4.0.0 WebView进化史介绍
@@ -1022,6 +1023,7 @@
     ```
 
 
+### 4.5.8 WebView在fragment不可见停止播放视频
 
 
 ### 4.9.9 掘金问题反馈记录
