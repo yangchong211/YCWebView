@@ -41,7 +41,7 @@ import java.util.Map;
  * </pre>
  */
 @SuppressLint("SetJavaScriptEnabled")
-public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
+class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 
 	public static final String TO_LOAD_JS = "WebViewJavascriptBridge.js";
 	private long uniqueId = 0;
@@ -52,9 +52,8 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	/**
 	 * loadUrl方法在19以上超过2097152个字符失效
 	 */
-	private static final int URL_MAX_CHARACTER_NUM=2097152;
-
-
+	private static final int URL_MAX_CHARACTER_NUM = 2097152;
+	
 	/**
 	 * 获取消息list集合
 	 * @return							集合

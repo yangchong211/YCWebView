@@ -16,6 +16,7 @@ limitations under the License.
 package com.ycbjie.webviewlib;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -59,7 +60,7 @@ public class X5WebChromeClient extends WebChromeClient {
     private InterWebListener webListener;
     private VideoWebListener videoWebListener;
     private boolean isShowContent = false;
-    private Activity activity;
+    private Context context;
     private View progressVideo;
     private View customView;
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
@@ -93,10 +94,10 @@ public class X5WebChromeClient extends WebChromeClient {
 
     /**
      * 构造方法
-     * @param activity                          上下文
+     * @param context                          上下文
      */
-    public X5WebChromeClient(WebView webView , Activity activity) {
-        this.activity = activity;
+    public X5WebChromeClient(WebView webView , Context context) {
+        this.context = context;
         this.webView = webView;
     }
 
@@ -157,16 +158,40 @@ public class X5WebChromeClient extends WebChromeClient {
     /**
      * 处理prompt弹出框
      * @param webView                           view
-     * @param s                                 s
-     * @param s1                                s1
-     * @param s2                                s2
+     * @param url                               url链接
+     * @param message                           参数message:代表prompt（）的内容（不是url）
+     * @param defaultValue                      参数result:代表输入框的返回值
      * @param jsPromptResult                    jsPromptResult
      * @return
      */
     @Override
-    public boolean onJsPrompt(WebView webView, String s, String s1,
-                              String s2, JsPromptResult jsPromptResult) {
-        return super.onJsPrompt(webView, s, s1, s2, jsPromptResult);
+    public boolean onJsPrompt(WebView webView, String url, String message,
+                              String defaultValue, JsPromptResult jsPromptResult) {
+        //根据协议的参数，判断是否是所需要的url
+        //假定传入进来的 message = "js://openActivity?arg1=111&arg2=222"，代表需要打开本地页面，并且带入相应的参数
+        //同时也是约定好的需要拦截的
+        /*Uri uri = Uri.parse(message);
+        String scheme = uri.getScheme();
+        if ("js".equals(scheme)) {
+            if (uri.getAuthority().equals("openActivity")) {
+                HashMap<String, String> params = new HashMap<>();
+                Set<String> collection = uri.getQueryParameterNames();
+                for (String name : collection) {
+                    params.put(name, uri.getQueryParameter(name));
+                }
+                Intent intent = new Intent(webView.getContext(), MainActivity.class);
+                intent.putExtra("params", params);
+                webView.getContext().startActivity(intent);
+                //代表应用内部处理完成
+                jsPromptResult.confirm("success");
+            } else if("demo".equals(uri.getAuthority()));{
+                //代表应用内部处理完成
+                jsPromptResult.confirm("js调用了Android的方法成功啦");
+                return true;
+            }
+            return true;
+        }*/
+        return super.onJsPrompt(webView, url, message, defaultValue, jsPromptResult);
     }
 
     /**
@@ -191,8 +216,8 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     @Override
     public View getVideoLoadingProgressView() {
-        if (progressVideo == null && activity!=null) {
-            LayoutInflater inflater = LayoutInflater.from(activity);
+        if (progressVideo == null && context!=null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
             progressVideo = inflater.inflate(R.layout.view_web_video_progress, null);
         }
         return progressVideo;
@@ -207,17 +232,20 @@ public class X5WebChromeClient extends WebChromeClient {
     public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
         X5LogUtils.i("-------onShowCustomView-------");
         if (isShowCustomVideo){
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            videoWebListener.hindWebView();
-            // 如果一个视图已经存在，那么立刻终止并新建一个
-            if (customView != null) {
-                callback.onCustomViewHidden();
-                return;
+            if (context instanceof Activity){
+                Activity activity = (Activity) context;
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                videoWebListener.hindWebView();
+                // 如果一个视图已经存在，那么立刻终止并新建一个
+                if (customView != null) {
+                    callback.onCustomViewHidden();
+                    return;
+                }
+                fullViewAddView(view);
+                customView = view;
+                customViewCallback = callback;
+                videoWebListener.showVideoFullView();
             }
-            fullViewAddView(view);
-            customView = view;
-            customViewCallback = callback;
-            videoWebListener.showVideoFullView();
         }
     }
 
@@ -227,11 +255,14 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     private void fullViewAddView(View view) {
         //增强逻辑判断，尤其是getWindow()
-        if (activity!=null && activity.getWindow()!=null){
-            FrameLayout decor = (FrameLayout) activity.getWindow().getDecorView();
-            videoFullView = new FullscreenHolder(activity);
-            videoFullView.addView(view);
-            decor.addView(videoFullView);
+        if (context!=null && context instanceof Activity){
+            Activity activity = (Activity) context;
+            if (activity.getWindow()!=null){
+                FrameLayout decor = (FrameLayout) activity.getWindow().getDecorView();
+                videoFullView = new FullscreenHolder(activity);
+                videoFullView.addView(view);
+                decor.addView(videoFullView);
+            }
         }
     }
 
@@ -263,7 +294,8 @@ public class X5WebChromeClient extends WebChromeClient {
                 // 不是全屏播放状态
                 return;
             }
-            if (activity!=null){
+            if (context!=null && context instanceof Activity){
+                Activity activity = (Activity) context;
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
             customView.setVisibility(View.GONE);
@@ -294,7 +326,8 @@ public class X5WebChromeClient extends WebChromeClient {
      */
     public void hideCustomView() {
         this.onHideCustomView();
-        if (activity!=null){
+        if (context!=null && context instanceof Activity){
+            Activity activity = (Activity) context;
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
@@ -473,7 +506,8 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param uploadMsg                         msg
      */
     private void openFileChooserImpl(ValueCallback<Uri> uploadMsg) {
-        if (activity!=null){
+        if (context!=null && context instanceof Activity){
+            Activity activity = (Activity) context;
             mUploadMessage = uploadMsg;
             Intent i = new Intent(Intent.ACTION_GET_CONTENT);
             i.addCategory(Intent.CATEGORY_OPENABLE);
@@ -488,7 +522,8 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param uploadMsg                         msg
      */
     private void openFileChooserImplForAndroid5(ValueCallback<Uri[]> uploadMsg) {
-        if (activity!=null){
+        if (context!=null && context instanceof Activity){
+            Activity activity = (Activity) context;
             mUploadMessageForAndroid5 = uploadMsg;
             Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
             contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);

@@ -71,7 +71,7 @@
 - X5WebChromeClient     自定义x5的WebChromeClient，处理进度监听，title变化，以及上传图片，后期添加视频处理逻辑
 - X5WebUtils            工具类，初始化腾讯x5浏览器webView，及调用该类init方法
 - X5WebView             可以使用这个类，方便统一初始化WebSettings的一些属性，如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
-- X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要集成此类，一定要继承该类，因为注入js监听是在该类中操作的
+- X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要继承MyX5WebChromeClient，因为注入js监听是在该类中操作的
 - WebProgress           仿微信加载H5页面的WebView进度条
 
 

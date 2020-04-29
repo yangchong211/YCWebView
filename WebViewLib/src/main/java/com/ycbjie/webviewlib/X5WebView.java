@@ -22,6 +22,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.tencent.smtt.export.external.proxy.X5ProxyWebViewClient;
 import com.tencent.smtt.sdk.WebSettings;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
@@ -56,9 +57,13 @@ public class X5WebView extends BridgeWebView {
     public X5WebView(Context arg0, AttributeSet arg1) {
         super(arg0, arg1);
         initWebViewSettings();
-        x5WebViewClient = new MyX5WebViewClient(this,getContext());
-        this.setWebViewClient(x5WebViewClient);
-        x5WebChromeClient = new MyX5WebChromeClient(this,(Activity) getContext());
+        if (getCustomWebViewClient() == null){
+            x5WebViewClient = new MyX5WebViewClient(this,getContext());
+            this.setWebViewClient(x5WebViewClient);
+        } else {
+            this.setWebViewClient(getCustomWebViewClient());
+        }
+        x5WebChromeClient = new X5WebChromeClient(this,(Activity) getContext());
         this.setWebChromeClient(x5WebChromeClient);
         //设置可以点击
         this.getView().setClickable(true);
@@ -128,6 +133,14 @@ public class X5WebView extends BridgeWebView {
         setOpenLayerType(false);
         //默认不开启密码保存功能
         setSavePassword(false);
+    }
+
+    public X5WebViewClient getCustomWebViewClient(){
+        return null;
+    }
+
+    public X5WebChromeClient getCustomWebChromeClient(){
+        return null;
     }
 
     /**

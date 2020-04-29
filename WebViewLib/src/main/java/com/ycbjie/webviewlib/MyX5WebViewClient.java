@@ -30,7 +30,7 @@ import java.net.URLDecoder;
  *     @author yangchong
  *     blog  : https://github.com/yangchong211
  *     time  : 2019/9/10
- *     desc  : 主要把js的处理给分离到该类中
+ *     desc  : 特别重要：主要把js的处理给分离到该类中
  *     revise: 如果要自定义WebViewClient必须要集成此类
  *             demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
