@@ -112,8 +112,17 @@ public class WebProgress extends FrameLayout {
      * 第一次过来进度show，后面就是setProgress
      */
     private boolean isShow = false;
+    /**
+     * 用来记录不能继续开始
+     */
     public static final int UN_START = 0;
+    /**
+     * 用来记录已经开始，当开始执行加载动画后就切换到该状态
+     */
     public static final int STARTED = 1;
+    /**
+     * 用来记录已经结束
+     */
     public static final int FINISH = 2;
     /**
      * 百分比进度值
@@ -200,9 +209,14 @@ public class WebProgress extends FrameLayout {
      * @param endColor                          结束颜色
      */
     public void setColor(int startColor, int endColor) {
-        LinearGradient linearGradient = new LinearGradient(0, 0, mTargetWidth,
-                mTargetHeight, startColor, endColor, Shader.TileMode.CLAMP);
-        mPaint.setShader(linearGradient);
+        try {
+            LinearGradient linearGradient = new LinearGradient(0, 0, mTargetWidth,
+                    mTargetHeight, startColor, endColor, Shader.TileMode.CLAMP);
+            mPaint.setShader(linearGradient);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
