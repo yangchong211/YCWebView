@@ -30,7 +30,7 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="1.浏览普通的网页"/>
+            android:text="1. 自带webView浏览普通的网页"/>
 
         <TextView
             android:id="@+id/tv_2_1"

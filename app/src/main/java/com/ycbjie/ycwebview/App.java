@@ -11,6 +11,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         X5WebUtils.init(this);
-        X5LogUtils.setIsLog(false);
+        X5LogUtils.setIsLog(true);
     }
 }
