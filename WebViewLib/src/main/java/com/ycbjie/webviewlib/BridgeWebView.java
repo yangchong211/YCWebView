@@ -41,7 +41,7 @@ import java.util.Map;
  * </pre>
  */
 @SuppressLint("SetJavaScriptEnabled")
-class BridgeWebView extends WebView implements WebViewJavascriptBridge{
+class  BridgeWebView extends WebView implements WebViewJavascriptBridge{
 
 	public static final String TO_LOAD_JS = "WebViewJavascriptBridge.js";
 	private long uniqueId = 0;
@@ -82,6 +82,15 @@ class BridgeWebView extends WebView implements WebViewJavascriptBridge{
 	public BridgeWebView(Context context) {
 		super(context);
 		init();
+	}
+
+	@Override
+	public void loadUrl(String s) {
+		try {
+			super.loadUrl(s);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/**

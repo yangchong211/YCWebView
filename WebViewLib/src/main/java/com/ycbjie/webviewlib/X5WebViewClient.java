@@ -20,6 +20,8 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 
@@ -35,6 +37,7 @@ import com.tencent.smtt.sdk.WebViewClient;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Stack;
 
 /**
  * <pre>
@@ -57,6 +60,29 @@ public class X5WebViewClient extends WebViewClient {
      * 是否加载完毕
      */
     private boolean isLoadFinish = false;
+    /**
+     * 记录上次出现重定向的时间.
+     * 避免由于刷新造成循环重定向.
+     */
+    private long mLastRedirectTime = 0;
+    /**
+     * 默认重定向间隔.
+     * 避免由于刷新造成循环重定向.
+     */
+    private static final long DEFAULT_REDIRECT_INTERVAL = 3000;
+    /**
+     * URL栈
+     */
+    private final Stack<String> mUrlStack = new Stack<>();
+    /**
+     * 判断页面是否加载完成
+     */
+    private boolean mIsLoading = false;
+    /**
+     * 记录重定向前的链接
+     */
+    private String mUrlBeforeRedirect;
+    private static int ERR_TOO_MANY_REDIRECTS = -9;
 
     /**
      * 获取是否加载完毕
@@ -84,6 +110,72 @@ public class X5WebViewClient extends WebViewClient {
         this.webView = webView;
         //将js对象与java对象进行映射
         webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
+    }
+
+    /**
+     * 记录非重定向链接.
+     * 并且控制相同链接链接不入栈
+     *
+     * @param url 链接
+     */
+    private void recordUrl(String url) {
+        if (!TextUtils.isEmpty(url) && !url.equals(getUrl())) {
+            if (!TextUtils.isEmpty(mUrlBeforeRedirect)) {
+                mUrlStack.push(mUrlBeforeRedirect);
+                mUrlBeforeRedirect = null;
+            }
+        }
+    }
+
+    /**
+     * 获取最后停留页面的链接.
+     *
+     * @return url
+     */
+    @Nullable
+    public String getUrl() {
+        return mUrlStack.size() > 0 ? mUrlStack.peek() : null;
+    }
+
+    String popUrl() {
+        return mUrlStack.size() > 0 ? mUrlStack.pop() : null;
+    }
+
+    public boolean pageCanGoBack() {
+        return mUrlStack.size() >= 2;
+    }
+
+    public final boolean pageGoBack(@NonNull WebView webView) {
+        if (pageCanGoBack()) {
+            final String url = popBackUrl();
+            if (!TextUtils.isEmpty(url)) {
+                webView.loadUrl(url);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 将最后停留的页面url弹出.
+     * @return null 表示已经没有上一页了
+     */
+    @Nullable
+    public final String popBackUrl() {
+        if (mUrlStack.size() >= 2) {
+            //pop current page url
+            mUrlStack.pop();
+            return mUrlStack.pop();
+        }
+        return null;
+    }
+
+    private void resolveRedirect(WebView view) {
+        final long now = System.currentTimeMillis();
+        if (now - mLastRedirectTime > DEFAULT_REDIRECT_INTERVAL) {
+            mLastRedirectTime = System.currentTimeMillis();
+            view.reload();
+        }
     }
 
     /**
@@ -136,7 +228,8 @@ public class X5WebViewClient extends WebViewClient {
      * 主要的作用是处理各种通知和请求事件
      * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
      * @param view                              view
-     * @param request                           request
+     * @param request                           request，添加于API21，封装了一个Web资源的请求信息，
+     *                                          包含：请求地址，请求方法，请求头，是否主框架，是否用户点击，是否重定向
      * @return
      */
     @Override
@@ -179,19 +272,24 @@ public class X5WebViewClient extends WebViewClient {
     /**
      * 作用：开始载入页面调用的，我们可以设定一个loading的页面，告诉用户程序在等待网络响应。
      * @param webView                           view
-     * @param s                                 s
+     * @param url                               url
      * @param bitmap                            bitmap
      */
     @Override
-    public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
-        super.onPageStarted(webView, s, bitmap);
+    public void onPageStarted(WebView webView, String url, Bitmap bitmap) {
+        super.onPageStarted(webView, url, bitmap);
         //设定加载开始的操作
-        X5LogUtils.i("-------onPageStarted-------"+s);
+        X5LogUtils.i("-------onPageStarted-------"+url);
         if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
             //显示异常页面
             webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
         }
         isLoadFinish = false;
+        if (mIsLoading && mUrlStack.size() > 0) {
+            mUrlBeforeRedirect = mUrlStack.pop();
+        }
+        recordUrl(url);
+        mIsLoading = true;
     }
 
     /**
@@ -202,6 +300,9 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         X5LogUtils.i("-------onPageFinished-------"+url);
+        if (mIsLoading) {
+            mIsLoading = false;
+        }
         if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
             //隐藏进度条方法
             webListener.hindProgressBar();
@@ -242,6 +343,12 @@ public class X5WebViewClient extends WebViewClient {
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
         X5LogUtils.i("-------onReceivedError-------"+failingUrl);
+        if (Build.VERSION.SDK_INT < 23) {
+            if (errorCode == ERR_TOO_MANY_REDIRECTS) {
+                resolveRedirect(view);
+                return;
+            }
+        }
         if (webListener!=null){
             if (errorCode == ERROR_TIMEOUT){
                 //网络连接超时
@@ -285,13 +392,20 @@ public class X5WebViewClient extends WebViewClient {
      *          3.找不到页面www.ycdoubi.com
      *
      * @param view                              view
-     * @param request                           request
-     * @param error                             error
+     * @param request                           request，添加于API21，封装了一个Web资源的请求信息，
+     *                                          包含：请求地址，请求方法，请求头，是否主框架，是否用户点击，是否重定向
+     * @param error                             error，添加于API23，封装了一个Web资源的错误信息，包含错误码和描述
      */
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         X5LogUtils.i("-------onReceivedError-------"+error.getDescription().toString());
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (error != null && error.getErrorCode() == ERR_TOO_MANY_REDIRECTS) {
+                resolveRedirect(view);
+                return;
+            }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             X5LogUtils.d("服务器异常"+error.getDescription().toString());
         }
@@ -320,8 +434,10 @@ public class X5WebViewClient extends WebViewClient {
     /**
      * 通知主机应用程序在加载资源时从服务器接收到HTTP错误
      * @param view                              view
-     * @param request                           request
-     * @param errorResponse                     错误内容
+     * @param request                           request，添加于API21，封装了一个Web资源的请求信息，
+     *                                          包含：请求地址，请求方法，请求头，是否主框架，是否用户点击，是否重定向
+     * @param errorResponse                     errorResponse，封装了一个Web资源的响应信息，
+     *                                          包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      */
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request,
@@ -370,7 +486,7 @@ public class X5WebViewClient extends WebViewClient {
      *      我们需要忽略证书错误，需要调用WebViewClient类的onReceivedSslError方法，
      *      调用handler.proceed()来忽略该证书错误。
      * @param view                              view
-     * @param handler                           handler
+     * @param handler                           handler，表示一个处理SSL错误的请求，提供了方法操作(proceed/cancel)请求
      * @param error                             error
      */
     @Override
@@ -405,7 +521,14 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 这个回调添加于API23，仅用于主框架的导航
+     * 通知应用导航到之前页面时，其遗留的WebView内容将不再被绘制。
+     * 这个回调可以用来决定哪些WebView可见内容能被安全地回收，以确保不显示陈旧的内容
+     * 它最早被调用，以此保证WebView.onDraw不会绘制任何之前页面的内容，随后绘制背景色或需要加载的新内容。
+     * 当HTTP响应body已经开始加载并体现在DOM上将在随后的绘制中可见时，这个方法会被调用。
+     * 这个回调发生在文档加载的早期，因此它的资源(css,和图像)可能不可用。
+     * 如果需要更细粒度的视图更新，查看 postVisualStateCallback(long, WebView.VisualStateCallback).
+     * 请注意这上边的所有条件也支持 postVisualStateCallback(long ,WebView.VisualStateCallback)
      * @param webView                           view
      * @param s                                 s
      */
@@ -415,7 +538,11 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
+     * 此方法废弃于API21，调用于非UI线程，拦截资源请求并返回响应数据，返回null时WebView将继续加载资源
+     * 注意：API21以下的AJAX请求会走onLoadResource，无法通过此方法拦截
      *
+     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
      * @param s                                 s
      */
@@ -425,9 +552,13 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
+     * 此方法添加于API21，调用于非UI线程，拦截资源请求并返回数据，返回null时WebView将继续加载资源
      *
+     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
-     * @param webResourceRequest                request
+     * @param webResourceRequest                request，添加于API21，封装了一个Web资源的请求信息，
+     *                                          包含：请求地址，请求方法，请求头，是否主框架，是否用户点击，是否重定向
      * @return
      */
     @Override
@@ -436,9 +567,11 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
-     * @param webResourceRequest                request
+     * @param webResourceRequest                request，添加于API21，封装了一个Web资源的请求信息，
+     *                                          包含：请求地址，请求方法，请求头，是否主框架，是否用户点击，是否重定向
      * @param bundle                            bundle
      * @return
      */
@@ -459,7 +592,7 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 是否重新提交表单，默认不重发
      * @param webView                           view
      * @param message                           message
      * @param message1                          message1
@@ -470,7 +603,8 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     *  通知应用可以将当前的url存储在数据库中，意味着当前的访问url已经生效并被记录在内核当中。
+     *  此方法在网页加载过程中只会被调用一次，网页前进后退并不会回调这个函数。
      * @param webView                           view
      * @param s                                 s
      * @param b                                 b
@@ -481,9 +615,13 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 此方法添加于API21，在UI线程被调用
+     * 处理SSL客户端证书请求，必要的话可显示一个UI来提供KEY。
+     * 有三种响应方式：proceed()/cancel()/ignore()，默认行为是取消请求
+     * 如果调用proceed()或cancel()，Webview 将在内存中保存响应结果且对相同的"host:port"不会再次调用 onReceivedClientCertRequest
+     * 多数情况下，可通过KeyChain.choosePrivateKeyAlias启动一个Activity供用户选择合适的私钥
      * @param webView                           view
-     * @param clientCertRequest                 request
+     * @param clientCertRequest                 request，表示一个证书请求，提供了方法操作(proceed/cancel/ignore)请求
      */
     @Override
     public void onReceivedClientCertRequest(WebView webView, ClientCertRequest clientCertRequest) {
@@ -491,9 +629,9 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 处理HTTP认证请求，默认行为是取消请求
      * @param webView                           view
-     * @param httpAuthHandler                   handler
+     * @param httpAuthHandler                   handler，表示一个HTTP认证请求，提供了方法操作(proceed/cancel)请求
      * @param s                                 s
      * @param s1                                s1
      */
@@ -503,7 +641,8 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 给应用一个机会处理按键事件
+     * 如果返回true，WebView不处理该事件，否则WebView会一直处理，默认返回false
      * @param webView                           view
      * @param keyEvent                          event
      * @return
@@ -514,7 +653,9 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     *
+     * 处理未被WebView消费的按键事件
+     * WebView总是消费按键事件，除非是系统按键或shouldOverrideKeyEvent返回true
+     * 此方法在按键事件分派时被异步调用
      * @param webView                           view
      * @param keyEvent                          event
      * @return

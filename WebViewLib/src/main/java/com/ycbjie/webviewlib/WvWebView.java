@@ -381,7 +381,6 @@ public class WvWebView extends WebView {
         }
     }
 
-
     /**
      * 这个方法可以在任何线程中调用，如果在主线程中没有调用它，它将自动分配给主线程。通过handler实现不同线程
      * @param url                                   url
@@ -392,13 +391,6 @@ public class WvWebView extends WebView {
         mainThreadHandler.sendMessage(msg);
     }
 
-
-    /**
-     * This method can be called in any thread, and if it is not called in the main thread,
-     * it will be automatically distributed to the main thread.
-     * @param url
-     * @param additionalHttpHeaders
-     */
     @Override
     public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
         Message msg = mainThreadHandler.obtainMessage(LOAD_URL_WITH_HEADERS, new RequestInfo(url, additionalHttpHeaders));
@@ -412,7 +404,6 @@ public class WvWebView extends WebView {
     protected X5WebChromeClient generateBridgeWebChromeClient() {
         return mWebChromeClient;
     }
-
 
     private X5WebChromeClient mWebChromeClient = new X5WebChromeClient(this,(Activity) getContext()) {
 

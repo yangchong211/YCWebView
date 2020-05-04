@@ -15,12 +15,14 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
@@ -40,35 +42,109 @@ import java.util.Map;
 public class ScrollWebView extends X5WebView {
 
     private boolean mTouchByUser;
+    private OnScrollChangeListener mOnScrollChangeListener;
 
     public ScrollWebView(Context context) {
         super(context);
+        init();
     }
 
     public ScrollWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
-    public OnScrollWebListener getOnScrollWebListener() {
-        return onScrollWebListener;
+    @SuppressLint("ClickableViewAccessibility")
+    private void init(){
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    mTouchByUser = true;
+                    X5LogUtils.i("------------OnTouchListener = true--");
+                }
+                return false;
+            }
+        });
+        /*this.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                WebView.HitTestResult result = ((WebView)v).getHitTestResult();
+                if (null == result){
+                    return false;
+                }
+                int type = result.getType();
+                if (type == WebView.HitTestResult.UNKNOWN_TYPE){
+                    return false;
+                }
+                // 这里可以拦截很多类型，我们只处理图片类型就可以了
+                switch (type) {
+                    case WebView.HitTestResult.PHONE_TYPE: // 处理拨号
+                        break;
+                    case WebView.HitTestResult.EMAIL_TYPE: // 处理Email
+                        break;
+                    case WebView.HitTestResult.GEO_TYPE: // 地图类型
+                        break;
+                    case WebView.HitTestResult.SRC_ANCHOR_TYPE: // 超链接
+                        break;
+                    case WebView.HitTestResult.IMAGE_TYPE: // 处理长按图片的菜单项
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });*/
     }
 
-    private OnScrollWebListener onScrollWebListener;
-    public void setScrollWebListener(OnScrollWebListener onScrollWebListener) {
-        this.onScrollWebListener = onScrollWebListener;
+
+    public void setOnScrollChangeListener(OnScrollChangeListener listener) {
+        this.mOnScrollChangeListener = listener;
     }
 
-    public interface OnScrollWebListener {
-        void onScroll(int dx, int dy);
-    }
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
-        if (onScrollWebListener != null) {
-            onScrollWebListener.onScroll(l - oldl, t - oldt);
+        if (mOnScrollChangeListener!=null){
+            if (isBottom() && this.getX5WebViewClient().isLoadFinish()) {
+                //处于底端
+                mOnScrollChangeListener.onPageEnd(l, t, oldl, oldt);
+            } else if (isTop() && this.getX5WebViewClient().isLoadFinish()) {
+                //处于顶端
+                mOnScrollChangeListener.onPageTop(l, t, oldl, oldt);
+            } else {
+                mOnScrollChangeListener.onScrollChanged(l, t, oldl, oldt);
+            }
         }
     }
+
+    public interface OnScrollChangeListener {
+
+        void onPageEnd(int l, int t, int oldl, int oldt);
+
+        void onPageTop(int l, int t, int oldl, int oldt);
+
+        void onScrollChanged(int l, int t, int oldl, int oldt);
+
+    }
+
+    /**
+     * 判断是否在顶部
+     * @return                              true表示在顶部
+     */
+    public boolean isTop() {
+        return getScrollY() <= 0;
+    }
+
+    /**
+     * 判断是否在底部
+     * @return                              true表示在底部
+     */
+    public boolean isBottom() {
+        return getHeight() + getScrollY() >= getContentHeight() * getScale();
+    }
+
 
     @Override
     public final void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
@@ -107,6 +183,14 @@ public class ScrollWebView extends X5WebView {
         resetAllStateInternal(getUrl());
     }
 
+    /**
+     * 判断WebView是否存在滚动条
+     * @return                      WebView是否存在滚动条
+     */
+    public boolean existVerticalScrollbar () {
+        return computeVerticalScrollRange() > computeVerticalScrollExtent();
+    }
+
     public boolean isTouchByUser() {
         return mTouchByUser;
     }
@@ -131,6 +215,7 @@ public class ScrollWebView extends X5WebView {
             case MotionEvent.ACTION_DOWN:
                 //用户按下到下一个链接加载之前，置为true
                 mTouchByUser = true;
+                X5LogUtils.i("------onTouchEvent------");
                 break;
             default:
                 break;
@@ -171,4 +256,41 @@ public class ScrollWebView extends X5WebView {
             }
         });
     }
+
+    private long m_DownTime ;
+    public class CheckForClickTouchLister implements View.OnTouchListener {
+
+        private final static long MAX_TOUCH_DURATION = 100;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    m_DownTime = event.getEventTime();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(event.getEventTime() - m_DownTime <= MAX_TOUCH_DURATION) {
+                        //处理点击事件
+                        if (listener!=null){
+                            listener.OnClick(v);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+    }
+
+    public interface OnClickListener{
+        void OnClick(View view);
+    }
+
+    private OnClickListener listener;
+
+    public void setListener(OnClickListener listener) {
+        this.listener = listener;
+    }
+
 }

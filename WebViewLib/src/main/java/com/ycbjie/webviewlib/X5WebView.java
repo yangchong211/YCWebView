@@ -21,9 +21,13 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.tencent.smtt.export.external.proxy.X5ProxyWebViewClient;
+import com.tencent.smtt.sdk.WebBackForwardList;
+import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 
@@ -41,12 +45,14 @@ import static android.os.Build.VERSION_CODES.KITKAT;
  */
 public class X5WebView extends BridgeWebView {
 
-    private OnScrollChangeListener mOnScrollChangeListener;
     private X5WebViewClient x5WebViewClient;
     private X5WebChromeClient x5WebChromeClient;
+    private volatile boolean mInitialized;
 
-    public void setOnScrollChangeListener(OnScrollChangeListener listener) {
-        this.mOnScrollChangeListener = listener;
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mInitialized = false;
     }
 
     public X5WebView(Context arg0) {
@@ -63,10 +69,15 @@ public class X5WebView extends BridgeWebView {
         } else {
             this.setWebViewClient(getCustomWebViewClient());
         }
-        x5WebChromeClient = new X5WebChromeClient(this,(Activity) getContext());
-        this.setWebChromeClient(x5WebChromeClient);
+        if (getCustomWebViewClient() == null){
+            x5WebChromeClient = new X5WebChromeClient(this,(Activity) getContext());
+            this.setWebChromeClient(x5WebChromeClient);
+        } else {
+            this.setWebChromeClient(getCustomWebChromeClient());
+        }
         //设置可以点击
         this.getView().setClickable(true);
+        mInitialized = true;
     }
 
     /**
@@ -133,6 +144,7 @@ public class X5WebView extends BridgeWebView {
         setOpenLayerType(false);
         //默认不开启密码保存功能
         setSavePassword(false);
+        setRemoveJavascriptInterface();
     }
 
     public X5WebViewClient getCustomWebViewClient(){
@@ -148,7 +160,10 @@ public class X5WebView extends BridgeWebView {
      * @return                          X5WebChromeClient对象
      */
     public X5WebChromeClient getX5WebChromeClient(){
-        return this.x5WebChromeClient;
+        if (getCustomWebViewClient() == null){
+            return this.x5WebChromeClient;
+        }
+        return getCustomWebChromeClient();
     }
 
     /**
@@ -156,7 +171,10 @@ public class X5WebView extends BridgeWebView {
      * @return                          X5WebViewClient对象
      */
     public X5WebViewClient getX5WebViewClient(){
-        return this.x5WebViewClient;
+        if (getCustomWebViewClient() == null){
+            return this.x5WebViewClient;
+        }
+        return getCustomWebViewClient();
     }
 
     /**
@@ -172,6 +190,30 @@ public class X5WebView extends BridgeWebView {
      */
     public void reLoadView(){
         this.reload();
+    }
+
+    /**
+     * 是否设置地理位置(Geolocation)
+     *
+     * 注意需要添加以下权限，并且运行开启定位权限
+     * <uses-permission android:name="android.permission.INTERNET"/>
+     * <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+     * <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+     * @param isEnable                  布尔值
+     */
+    public void setGeolocationEnabled(boolean isEnable){
+        if (isEnable){
+            //启用数据库
+            this.getSettings().setDatabaseEnabled(true);
+            //启用地理定位，默认为true
+            this.getSettings().setGeolocationEnabled(true);
+            //设置定位的数据库路径
+            String dir = this.getContext().getDir("database", Context.MODE_PRIVATE).getPath();
+            //设置缓存定位路径
+            this.getSettings().setGeolocationDatabasePath(dir);
+        } else {
+            this.getSettings().setGeolocationEnabled(false);
+        }
     }
 
     /**
@@ -192,6 +234,68 @@ public class X5WebView extends BridgeWebView {
     }
 
     /**
+     * WebView返回上一页.
+     * 1.强制在{@link WebView}初始化的前内不能关闭所在的Activity,
+     * 否则在Android6.x的手机上频繁快速打开/关闭所在的Activity会造成chrome内核崩溃, 崩溃后除非kill进程否则一直是白屏.
+     * 2.在Android4.4及以下版本的webview会出现调用{@link #goBack()}失效的问题, 这边采用{@link #loadUrl(String)}自建URL栈来处理这个问题.
+     *
+     * @return True 表示处理返回成功
+     */
+    public final boolean pageGoBack() {
+        if (mInitialized) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                return getX5WebViewClient().pageGoBack(this);
+            } else {
+                if (!pageCanGoBack()) {
+                    return false;
+                } else if (X5WebUtils.shouldSkipUrl(getPreviousUrl())) {
+                    goBackOrForward(-2);
+                } else {
+                    goBack();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean validPreviousUrl() {
+            WebBackForwardList list = this.copyBackForwardList();
+            final int curIndex = list.getCurrentIndex();
+            final int preIndex = curIndex > 0 ? curIndex - 1 : -1;
+            if (preIndex >= 0) {
+                WebHistoryItem item = list.getItemAtIndex(preIndex);
+                return item != null && (!X5WebUtils.shouldSkipUrl(item.getUrl()) || preIndex != 0);
+            }
+        return false;
+    }
+
+    public String getPreviousUrl() {
+        WebBackForwardList list = this.copyBackForwardList();
+        final int curIndex = list.getCurrentIndex();
+        final int preIndex = curIndex > 0 ? curIndex - 1 : -1;
+        if (preIndex >= 0) {
+            WebHistoryItem item = list.getItemAtIndex(preIndex);
+            return item != null ? item.getUrl() : null;
+        }
+        return null;
+    }
+
+    /**
+     * 是否能返回上一页.
+     * 配合{@link #pageGoBack}使用.
+     *
+     * @return True 可以返回上一页
+     */
+    public final boolean pageCanGoBack() {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            return getX5WebViewClient().pageCanGoBack();
+        } else {
+            return validPreviousUrl() && canGoBack();
+        }
+    }
+
+    /**
      * WebView 默认开启密码保存功能，但是存在漏洞。
      * 如果该功能未关闭，在用户输入密码时，会弹出提示框，询问用户是否保存密码，如果选择”是”，
      * 密码会被明文保到 /data/data/com.package.name/databases/webview.db 中，这样就有被盗取密码的危险
@@ -205,45 +309,37 @@ public class X5WebView extends BridgeWebView {
         }
     }
 
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        if (mOnScrollChangeListener!=null){
-            if (isBottom() && this.getX5WebViewClient().isLoadFinish()) {
-                //处于底端
-                mOnScrollChangeListener.onPageEnd(l, t, oldl, oldt);
-            } else if (isTop() && this.getX5WebViewClient().isLoadFinish()) {
-                //处于顶端
-                mOnScrollChangeListener.onPageTop(l, t, oldl, oldt);
-            } else {
-                mOnScrollChangeListener.onScrollChanged(l, t, oldl, oldt);
+    /**
+     * 在4.2之前，js存在漏洞。不过现在4.2的手机很少了
+     */
+    private void setRemoveJavascriptInterface() {
+        this.removeJavascriptInterface("searchBoxJavaBridge_");
+        this.removeJavascriptInterface("accessibility");
+        this.removeJavascriptInterface("accessibilityTraversal");
+    }
+
+    /**
+     * 销毁时候调用该方法
+     */
+    public void destroy() {
+        try {
+            //有音频播放的web页面的销毁逻辑
+            //在关闭了Activity时，如果Webview的音乐或视频，还在播放。就必须销毁Webview
+            //但是注意：webview调用destory时,webview仍绑定在Activity上
+            //这是由于自定义webview构建时传入了该Activity的context对象
+            //因此需要先从父容器中移除webview,然后再销毁webview:
+            ViewGroup parent = (ViewGroup) getParent();
+            if (parent != null) {
+                parent.removeView(this);
             }
+            removeAllViews();
+            destroyDrawingCache();
+            clearCache(true);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            super.destroy();
         }
     }
 
-    public interface OnScrollChangeListener {
-
-        void onPageEnd(int l, int t, int oldl, int oldt);
-
-        void onPageTop(int l, int t, int oldl, int oldt);
-
-        void onScrollChanged(int l, int t, int oldl, int oldt);
-
-    }
-
-    /**
-     * 判断是否在顶部
-     * @return                              true表示在顶部
-     */
-    private boolean isTop() {
-        return getScrollY() <= 0;
-    }
-
-    /**
-     * 判断是否在底部
-     * @return                              true表示在底部
-     */
-    private boolean isBottom() {
-        return getHeight() + getScrollY() >= getContentHeight() * getScale();
-    }
 }

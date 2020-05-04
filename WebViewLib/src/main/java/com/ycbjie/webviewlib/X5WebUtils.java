@@ -28,9 +28,13 @@ import android.graphics.Picture;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -123,35 +127,6 @@ public final class X5WebUtils {
             return null;
         }
         return manager.getActiveNetworkInfo();
-    }
-
-    /**
-     * 同步cookie
-     * 建议调用webView.loadUrl(url)之前一句调用此方法就可以给WebView设置Cookie
-     * @param url                   地址
-     * @param cookieList            需要添加的Cookie值,以键值对的方式:key=value
-     */
-    public static void syncCookie(Context context , String url, ArrayList<String> cookieList) {
-        //初始化
-        CookieSyncManager.createInstance(context);
-        //获取对象
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
-        //移除
-        cookieManager.removeSessionCookie();
-        //添加cookie操作
-        if (cookieList != null && cookieList.size() > 0) {
-            for (String cookie : cookieList) {
-                cookieManager.setCookie(url, cookie);
-            }
-        }
-        String cookies = cookieManager.getCookie(url);
-        X5LogUtils.d("cookies-------"+cookies);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.flush();
-        } else {
-            CookieSyncManager.getInstance().sync();
-        }
     }
 
     /**
@@ -429,4 +404,30 @@ public final class X5WebUtils {
     }
 
 
+    /**
+     * 判断是否为重定向url
+     * @param url                   原始链接
+     * @return True                 为重定向链接
+     */
+    public static boolean shouldSkipUrl(@Nullable String url) {
+        if (TextUtils.isEmpty(url)) {
+            return true;
+        }
+        Uri uri = Uri.parse(url);
+        final String host = uri.getHost();
+        //skip redirect
+        if (!TextUtils.isEmpty(getKdtUnionUrl(uri))) {
+            return true;
+        }
+        //skip 'about:blank'
+        if (TextUtils.isEmpty(host)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Nullable
+    private static String getKdtUnionUrl(@NonNull Uri uri) {
+        return uri.isOpaque() ? null : uri.getQueryParameter("redirect_uri");
+    }
 }

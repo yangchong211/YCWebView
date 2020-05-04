@@ -46,8 +46,7 @@ import android.widget.FrameLayout;
  *             3.修改消失动画时长，使其消失时看到可以进度跑完
  *             4.修复当第一次进度返回 0 或超过 10，出现不显示进度条的问题
  *             5.能显示渐变色
- *             该自定义控件是 jingbin 所写，具体的demo链接如下所示
- *             Link to https://github.com/youlookwhat/WebProgress
+ *             参考案例：Link to https://github.com/youlookwhat/WebProgress
  * </pre>
  */
 public class WebProgress extends FrameLayout {

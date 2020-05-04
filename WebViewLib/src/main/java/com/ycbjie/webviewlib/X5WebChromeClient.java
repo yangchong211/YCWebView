@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,9 +28,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
+import com.tencent.smtt.export.external.interfaces.GeolocationPermissionsCallback;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
+import com.tencent.smtt.export.external.interfaces.PermissionRequest;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebStorage;
@@ -147,7 +150,7 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param webView                           view
      * @param s                                 s
      * @param s1                                s1
-     * @param jsResult                          jsResult
+     * @param jsResult                          jsResult，用于处理底层JS发起的请求，为客户端提供一些方法指明应进行的操作，比如确认或取消。
      * @return
      */
     @Override
@@ -203,15 +206,48 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param webView                           view
      * @param s                                 s
      * @param s1                                s1
-     * @param jsResult                          jsResult
+     * @param jsResult                          jsResult，用于处理底层JS发起的请求，为客户端提供一些方法指明应进行的操作，比如确认或取消。
      * @return
      */
     @Override
     public boolean onJsAlert(WebView webView, String s, String s1, JsResult jsResult) {
+        // 这里处理交互逻辑
+        // result.cancel(); 表示用户取消了操作(点击了取消按钮)
+        // result.confirm(); 表示用户确认了操作(点击了确认按钮)
+        // ...
+        // 返回true表示自已处理，返回false表示由系统处理
         return super.onJsAlert(webView, s, s1, jsResult);
     }
 
     /**
+     * 显示一个对话框让用户选择是否离开当前页面
+     * @param webView                           view
+     * @param s                                 s
+     * @param s1                                s1
+     * @param jsResult                          jsResult，用于处理底层JS发起的请求，为客户端提供一些方法指明应进行的操作，比如确认或取消。
+     * @return
+     */
+    @Override
+    public boolean onJsBeforeUnload(WebView webView, String s, String s1, JsResult jsResult) {
+        return super.onJsBeforeUnload(webView, s, s1, jsResult);
+    }
+
+    /**
+     * 指定源的网页内容在没有设置权限状态下尝试使用地理位置API。
+     * 从API24开始，此方法只为安全的源(https)调用，非安全的源会被自动拒绝
+     * @param origin                            origin
+     * @param geolocationPermissionsCallback    callback
+     */
+    @Override
+    public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissionsCallback geolocationPermissionsCallback) {
+        //boolean allow = true;   // 是否允许origin使用定位API
+        //boolean retain = false; // 内核是否记住这次制授权
+        //geolocationPermissionsCallback.invoke(origin, allow, retain);
+        super.onGeolocationPermissionsShowPrompt(origin, geolocationPermissionsCallback);
+    }
+
+    /**
+     * 当全屏的视频正在缓冲时，此方法返回一个占位视图(比如旋转的菊花)。
      * 视频加载时进程loading
      */
     @Override
@@ -224,10 +260,12 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
+     *  通知应用当前页进入了全屏模式，此时应用必须显示一个包含网页内容的自定义View
      * 播放网络视频时全屏会被调用的方法，播放视频切换为横屏
      * @param view                              view
      * @param callback                          callback
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
         X5LogUtils.i("-------onShowCustomView-------");
@@ -284,8 +322,10 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
+     * 通知应用当前页退出了全屏模式，此时应用必须隐藏之前显示的自定义View
      * 视频播放退出全屏会被调用的
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onHideCustomView() {
         X5LogUtils.i("-------onHideCustomView-------");
@@ -324,6 +364,7 @@ public class X5WebChromeClient extends WebChromeClient {
      * 逻辑是：先判断是否全频播放，如果是，则退出全频播放
      * 全屏时按返加键执行退出全屏方法
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     public void hideCustomView() {
         this.onHideCustomView();
         if (context!=null && context instanceof Activity){
@@ -362,6 +403,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
+     * 为'<input type="file" />'显示文件选择器，返回false使用默认处理
      * For Android > 5.0
      * @param webView                           webview
      * @param uploadMsg                         msg
@@ -377,7 +419,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 获得所有访问历史项目的列表，用于链接着色。
      * @param valueCallback                     callback
      */
     @Override
@@ -386,7 +428,8 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * <video /> 控件在未播放时，会展示为一张海报图，HTML中可通过它的'poster'属性来指定。
+     * 如果未指定'poster'属性，则通过此方法提供一个默认的海报图。
      * @return                                  bitmap
      */
     @Override
@@ -395,7 +438,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 接收JavaScript控制台消息
      * @param consoleMessage                    message
      * @return
      */
@@ -405,7 +448,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * js超时
      * @return                                  boolean
      */
     @Override
@@ -414,7 +457,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 当前一个调用 onGeolocationPermissionsShowPrompt() 取消时，隐藏相关的UI。
      */
     @Override
     public void onGeolocationPermissionsHidePrompt() {
@@ -425,7 +468,8 @@ public class X5WebChromeClient extends WebChromeClient {
      *
      * @param l                                 l
      * @param l1                                l1
-     * @param quotaUpdater                      quotaUpdater
+     * @param quotaUpdater                      quotaUpdater，WebStorage 用于管理WebView提供的JS存储API，
+     *                                          比如Application Cache API，Web SQL Database API，HTML5 Web Storage API
      */
     @Override
     public void onReachedMaxAppCacheSize(long l, long l1, WebStorage.QuotaUpdater quotaUpdater) {
@@ -439,7 +483,8 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param l                                 l
      * @param l1                                l1
      * @param l2                                l2
-     * @param quotaUpdater                      quotaUpdater
+     * @param quotaUpdater                      quotaUpdater，WebStorage 用于管理WebView提供的JS存储API，
+     *                                          比如Application Cache API，Web SQL Database API，HTML5 Web Storage API
      */
     @Override
     public void onExceededDatabaseQuota(String s, String s1, long l, long l1,
@@ -448,7 +493,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 接收图标(favicon)
      * @param webView                           view
      * @param bitmap                            bitmap
      */
@@ -458,7 +503,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * Android中处理Touch Icon的方案
      * @param webView                           view
      * @param s                                 s
      * @param b                                 b
@@ -469,7 +514,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 通知应用打开新窗口
      * @param webView                           view
      * @param b                                 b
      * @param b1                                b1
@@ -482,7 +527,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 请求获取取焦点
      * @param webView                           view
      */
     @Override
@@ -491,7 +536,7 @@ public class X5WebChromeClient extends WebChromeClient {
     }
 
     /**
-     *
+     * 通知应用关闭窗口
      * @param webView                           view
      */
     @Override
@@ -499,7 +544,23 @@ public class X5WebChromeClient extends WebChromeClient {
         super.onCloseWindow(webView);
     }
 
+    /**
+     * 通知应用网页内容申请访问指定资源的权限(该权限未被授权或拒绝)
+     * @param permissionRequest                 permissionRequest
+     */
+    @Override
+    public void onPermissionRequest(PermissionRequest permissionRequest) {
+        super.onPermissionRequest(permissionRequest);
+    }
 
+    /**
+     * 通知应用权限的申请被取消，隐藏相关的UI。
+     * @param permissionRequest                 permissionRequest
+     */
+    @Override
+    public void onPermissionRequestCanceled(PermissionRequest permissionRequest) {
+        super.onPermissionRequestCanceled(permissionRequest);
+    }
 
     /**
      * 打开文件夹

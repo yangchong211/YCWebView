@@ -36,6 +36,7 @@ public class X5WebViewActivity extends AppCompatActivity {
     private Toolbar mTitleToolBar;
     private X5WebChromeClient x5WebChromeClient;
     private X5WebViewClient x5WebViewClient;
+    private AndroidBug5497Workaround workaround;
 
 
     @Override
@@ -46,10 +47,9 @@ public class X5WebViewActivity extends AppCompatActivity {
                 x5WebChromeClient.hideCustomView();
                 return true;
                 //返回网页上一页
-            } else if (webView.canGoBack()) {
-                webView.goBack();
-                return true;
+            } else if (webView.pageCanGoBack()) {
                 //退出网页
+                return webView.pageGoBack();
             } else {
                 handleFinish();
             }
@@ -89,22 +89,12 @@ public class X5WebViewActivity extends AppCompatActivity {
             if (x5WebChromeClient!=null){
                 x5WebChromeClient.removeVideoView();
             }
-            //有音频播放的web页面的销毁逻辑
-            //在关闭了Activity时，如果Webview的音乐或视频，还在播放。就必须销毁Webview
-            //但是注意：webview调用destory时,webview仍绑定在Activity上
-            //这是由于自定义webview构建时传入了该Activity的context对象
-            //因此需要先从父容器中移除webview,然后再销毁webview:
-            if (webView != null) {
-                ViewGroup parent = (ViewGroup) webView.getParent();
-                if (parent != null) {
-                    parent.removeView(webView);
-                }
-                webView.removeAllViews();
-                webView.destroy();
-                webView = null;
-            }
+            webView.destroy();
         } catch (Exception e) {
             Log.e("X5WebViewActivity", e.getMessage());
+        }
+        if (workaround!=null){
+            workaround.onDestroy();
         }
         super.onDestroy();
     }
@@ -119,6 +109,7 @@ public class X5WebViewActivity extends AppCompatActivity {
         initWebView();
         // 处理 作为三方浏览器打开传过来的值
         getDataFromBrowser(getIntent());
+        AndroidBug5497Workaround workaround = new AndroidBug5497Workaround(this);
     }
 
     private void initFindViewById() {
