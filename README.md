@@ -10,6 +10,7 @@
     - 2.4 使用建议
     - 2.5 异常状态类型区分
     - 2.6 该库流程图
+    - 2.7 添加混淆
 - 03.js调用
     - 3.1 Java调用js方法
     - 3.2 js调用java方法
@@ -29,19 +30,19 @@
 - WebView启动过程大概分为以下几个阶段，这里借鉴美团的一张图片
     - ![image](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2017/9a2f8beb.png)
 - 项目案例效果展示图
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-0.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-1.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-2.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-3.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-4.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-5.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-6.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-7.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-8.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-9.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-10.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-11.jpg" width="500" hegiht="313" />
-    - <img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-12.jpg" width="500" hegiht="313" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-0.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-1.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-2.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-3.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-4.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-5.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-6.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-7.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-8.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-9.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-10.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-11.jpg" width="300" hegiht="180" />
+<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-12.jpg" width="300" hegiht="180" />
 
 
 
@@ -77,20 +78,39 @@
 
 
 
-#### [1.4 WebView基础知识点](https://github.com/yangchong211/YCWebView/blob/master/WebView.md)
-- 01.常用的基础介绍
-- 02.Android调用Js
-- 03.Js调用Android
-- 04.WebView.loadUrl(url)流程
-- 05.js的调用时机分析
-- 06.清除缓存数据方式有哪些
-- 07.如何使用DeepLink
-- 08.为什么WebView那么难搞
-- 09.如何处理加载错误
-- 10.应用被作为第三方浏览器打开
-- 11.理解WebView独立进程
-- 12.使用外部浏览器下载
-- 13.tel,sms等协议用法
+#### [1.4 WebView基础知识点](https://github.com/yangchong211/YCWebView/blob/master/read/WebView1.md)
+- [01.常用的基础使用介绍](https://github.com/yangchong211/YCWebView/blob/master/read/WebView1.md)
+- 02.Android调用Js方式
+- 03.Js调用Android方式
+- 04.清除缓存和缓存分析
+- 05.为什么WebView难搞
+- 06.如何处理加载错误
+- 07.触发加载网页的行为
+- 09.web进度条避免多次加载
+- 10.多次获取web标题title
+- [11.什么是302/303重定向](https://github.com/yangchong211/YCWebView/blob/master/read/WebView2.md)
+- 12.301/302业务场景白屏描述
+- 13.301/302业务白屏解决方案
+- 14.301/302回退栈问题描述
+- 15.301/302回退栈问题解决方案
+- 16.如何设置WebView触摸点击事件
+- 17.如何用代码判断是否重定向
+- 18.如何解决重定向回退栈问题
+- 19.shouldOverrideUrlLoading
+- [21.loadUrl(url)流程分析](https://github.com/yangchong211/YCWebView/blob/master/read/WebView3.md)
+- 22.js的调用时机分析
+- 23.如何使用DeepLink
+- 24.应用被作为三方浏览器打开
+- 25.理解WebView独立进程
+- 26.使用外部浏览器下载
+- 27.tel,sms等协议用法
+- 29.关于拦截处理注意要点
+- 30.FileChooser文件处理
+- [41.管理Cookies分析说明](https://github.com/yangchong211/YCWebView/blob/master/read/WebView4.md)
+- 42.WebView中长按处理逻辑
+- 43.8.0关于WebView新特性
+- 44.H5页面为何加载速度慢
+- 47.WebView多布局连贯滑动
 - [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
@@ -98,9 +118,9 @@
 
 ### 02.如何使用
 #### 2.1 如何引入
-- **如何引用，该x5的库已经更新到最新版本，引用最新1.2.0稳定版**
+- **如何引用，该x5的库已经更新到最新版本，引用最新4.3.0稳定版**
     ```
-    implementation 'cn.yc:WebViewLib:1.2.2'
+    implementation 'cn.yc:WebViewLib:1.2.4'
     ```
 
 #### 2.2 最简单使用
@@ -108,15 +128,7 @@
     ```
     X5WebUtils.init(this);
     ```
-- **最普通使用，需要自己做手动设置setting相关属性**
-    ```
-    <BridgeWebView
-        android:id="@+id/web_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarSize="3dp" />
-    ```
-- **也可以使用X5WebView，已经做了常见的setting属性设置**
+- **可以使用X5WebView，已经做了常见的setting属性设置**
     ```
     <X5WebView
         android:id="@+id/web_view"
@@ -135,25 +147,24 @@
 - **如何使用自己的WebViewClient和WebChromeClient**
     ```
     //主要是在X5WebViewClient和X5WebChromeClient已经做了很多常见的逻辑处理，如果不满足你使用，可以如下这样写
-    MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView, this);
+    YcX5WebViewClient webViewClient = new YcX5WebViewClient(webView, this);
     webView.setWebViewClient(webViewClient);
-    MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(this);
+    YcX5WebChromeClient webChromeClient = new YcX5WebChromeClient(webView,this);
     webView.setWebChromeClient(webChromeClient);
     
-    private class MyX5WebViewClient extends X5WebViewClient {
-        public MyX5WebViewClient(BridgeWebView webView, Context context) {
+    private class YcX5WebViewClient extends MyX5WebViewClient {
+        public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
         }
-        
+
         //重写你需要的方法即可
     }
-    
-    private class MyX5WebChromeClient extends X5WebChromeClient{
-        public MyX5WebChromeClient(Activity activity) {
-            super(activity);
+  
+    private class YcX5WebChromeClient extends X5WebChromeClient{
+        public YcX5WebChromeClient(X5WebView webView,Activity activity) {
+            super(webView,activity);
+            //重写你需要的方法即可
         }
-        
-        //重写你需要的方法即可
     }
     ```
 - **针对类似购物的商品详情页面的webView**
@@ -243,9 +254,9 @@
 - 设置cookie和清除cookie操作
     ```
     //同步cookie
-    X5WebUtils.syncCookie(this,"url",cookieList);
+    WebkitCookieUtils.syncCookie(this,url,cookieList);
     //清除cookie
-    X5WebUtils.removeCookie(this);
+    WebkitCookieUtils.remove(url);
     ```
 
 
@@ -273,14 +284,8 @@
     ```
     @Override
     protected void onDestroy() {
-        try {
-            if (webView != null) {
-                webView.stopLoading();
-                webView.destroy();
-                webView = null;
-            }
-        } catch (Exception e) {
-            Log.e("X5WebViewActivity", e.getMessage());
+        if (webView != null) {
+            webView.destroy();
         }
         super.onDestroy();
     }
@@ -328,6 +333,18 @@
     - 第三步操作：在shouldOverrideUrlLoading方法中拦截url，与网页约定好一个协议，匹配则执行相应操作，也就是利用WebViewClient接口回调方法拦截url
     - 第四步操作：如果是url.startsWith(BridgeUtil.YY_RETURN_DATA)则有数据返回；如果是BridgeUtil.YY_OVERRIDE_SCHEMA则刷新消息队列
     - 第五步操作：通过BridgeHandler对象，将data和callBackFunction返回交给开发者
+
+
+
+#### 2.7 添加混淆
+- 代码如下所示
+    ```
+    # 该包下所有的类和类成员不混淆
+    -keep class com.ycbjie.webviewlib.** {
+        *;
+    }
+    -dontwarn com.ycbjie.webviewlib.**
+    ```
 
 
 ### 03.js交互操作
@@ -470,7 +487,7 @@
 - 5.1.2 页面关闭后不要执行web中js
 - 5.1.3 WebView + HttpDns优化
 - 5.1.4 如何禁止WebView返回时刷新
-- 5.1.5 WebView处理404、500逻辑
+- 5.1.5 WebView处理404、300逻辑
 - 5.1.6 WebView判断断网和链接超时
 - 5.1.7 @JavascriptInterface注解方法注意点
 - 5.1.8 使用onJsPrompt实现js通信注意点
