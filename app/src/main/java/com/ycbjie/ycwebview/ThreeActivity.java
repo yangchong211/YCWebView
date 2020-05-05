@@ -7,15 +7,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.KeyEvent;
-
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.BridgeWebView;
+import com.ycbjie.webviewlib.MyX5WebViewClient;
 import com.ycbjie.webviewlib.X5WebView;
-import com.ycbjie.webviewlib.X5WebViewClient;
 
 public class ThreeActivity extends AppCompatActivity {
 
@@ -24,11 +21,10 @@ public class ThreeActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (webView.canGoBack()) {
-                webView.goBack();
-                return true;
+            if (webView.pageCanGoBack()) {
                 //退出网页
-            } else {
+                return webView.pageGoBack();
+            }else {
                 handleFinish();
             }
         }
@@ -65,12 +61,18 @@ public class ThreeActivity extends AppCompatActivity {
 
         String url = "file:///android_asset/callsms.html";
         webView.loadUrl(url);
-        MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView,this);
+        YcX5WebViewClient webViewClient = new YcX5WebViewClient(webView,this);
         webView.setWebViewClient(webViewClient);
     }
 
-    private class MyX5WebViewClient extends X5WebViewClient {
-        public MyX5WebViewClient(BridgeWebView webView, Context context) {
+    private class YcX5WebViewClient extends MyX5WebViewClient {
+        /**
+         * 构造方法
+         *
+         * @param webView 需要传进来webview
+         * @param context 上下文
+         */
+        public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
         }
 

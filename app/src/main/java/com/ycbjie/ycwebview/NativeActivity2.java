@@ -54,11 +54,6 @@ public class NativeActivity2 extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (mWebView != null) {
-            mWebView.clearHistory();
-            ViewGroup parent = (ViewGroup) mWebView.getParent();
-            if (parent != null) {
-                parent.removeView(mWebView);
-            }
             mWebView.destroy();
             //mWebView = null;
         }

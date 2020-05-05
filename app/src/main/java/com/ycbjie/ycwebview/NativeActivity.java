@@ -51,10 +51,12 @@ public class NativeActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (mWebView.canGoBack() && event.getKeyCode() ==
+        if (event.getKeyCode() ==
                 KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            mWebView.goBack();
-            return true;
+            if (mWebView.pageCanGoBack()) {
+                //退出网页
+                return mWebView.pageGoBack();
+            }
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -62,11 +64,6 @@ public class NativeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (mWebView != null) {
-            mWebView.clearHistory();
-            ViewGroup parent = (ViewGroup) mWebView.getParent();
-            if (parent != null) {
-                parent.removeView(mWebView);
-            }
             mWebView.destroy();
             //mWebView = null;
         }
@@ -193,12 +190,6 @@ public class NativeActivity extends AppCompatActivity {
     public void initWebViewBridge() {
         mWebView.setDefaultHandler(new DefaultHandler());
         //js调native
-        mWebView.registerHandler("toPhone", new BridgeHandler() {
-            @Override
-            public void handler(String data, CallBackFunction function) {
-
-            }
-        });
         mWebView.registerHandler("submitFromWeb", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
@@ -209,6 +200,7 @@ public class NativeActivity extends AppCompatActivity {
             }
         });
 
+        //Android调用js
         mWebView.callHandler("functionInJs", "小杨逗比", new CallBackFunction() {
             @Override
             public void onCallBack(String data) {

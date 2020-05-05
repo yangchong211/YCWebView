@@ -16,9 +16,8 @@ import android.view.View;
 
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.BridgeUtil;
-import com.ycbjie.webviewlib.BridgeWebView;
 import com.ycbjie.webviewlib.InterWebListener;
+import com.ycbjie.webviewlib.MyX5WebViewClient;
 import com.ycbjie.webviewlib.WebProgress;
 import com.ycbjie.webviewlib.X5WebChromeClient;
 import com.ycbjie.webviewlib.X5WebUtils;
@@ -36,10 +35,9 @@ public class EightActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (webView.canGoBack()) {
-                webView.goBack();
-                return true;
+            if (webView.pageCanGoBack()) {
                 //退出网页
+                return webView.pageGoBack();
             } else {
                 handleFinish();
             }
@@ -60,9 +58,7 @@ public class EightActivity extends AppCompatActivity {
     protected void onDestroy() {
         try {
             if (webView != null) {
-                webView.stopLoading();
                 webView.destroy();
-                webView = null;
             }
         } catch (Exception e) {
             Log.e("X5WebViewActivity", e.getMessage());
@@ -86,9 +82,9 @@ public class EightActivity extends AppCompatActivity {
                 return handleLongImage();
             }
         });
-        MyX5WebViewClient webViewClient = new MyX5WebViewClient(webView, this);
+        YcX5WebViewClient webViewClient = new YcX5WebViewClient(webView, this);
         webView.setWebViewClient(webViewClient);
-        MyX5WebChromeClient webChromeClient = new MyX5WebChromeClient(webView,this);
+        YcX5WebChromeClient webChromeClient = new YcX5WebChromeClient(webView,this);
         webView.setWebChromeClient(webChromeClient);
         webView.getX5WebChromeClient().setWebListener(interWebListener);
         webView.getX5WebViewClient().setWebListener(interWebListener);
@@ -135,8 +131,8 @@ public class EightActivity extends AppCompatActivity {
         }
     };
 
-    private class MyX5WebViewClient extends X5WebViewClient {
-        public MyX5WebViewClient(BridgeWebView webView, Context context) {
+    private class YcX5WebViewClient extends MyX5WebViewClient {
+        public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
         }
 
@@ -154,14 +150,8 @@ public class EightActivity extends AppCompatActivity {
     }
 
 
-    private class MyX5WebChromeClient extends X5WebChromeClient{
-
-        /**
-         * 构造方法
-         *
-         * @param activity 上下文
-         */
-        public MyX5WebChromeClient(BridgeWebView webView,Activity activity) {
+    private class YcX5WebChromeClient extends X5WebChromeClient{
+        public YcX5WebChromeClient(X5WebView webView,Activity activity) {
             super(webView,activity);
         }
     }

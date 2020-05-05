@@ -96,10 +96,21 @@ public class FirstActivity extends AppCompatActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             X5LogUtils.i("-------shouldOverrideUrlLoading-------"+url);
+            //判断重定向的方式一
+            WebView.HitTestResult hitTestResult = view.getHitTestResult();
+            if(hitTestResult == null) {
+                return false;
+            }
+            if(hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+                X5LogUtils.i("-------重定向-------");
+                return false;
+            }
+
             if (webView.isTouchByUser()){
                 X5LogUtils.i("-------点击事件-------");
             }
             view.loadUrl(url);
+            X5LogUtils.i("-----shouldOverrideUrlLoading------loadUrl-------");
 //            running++;
             return true;
             //return super.shouldOverrideUrlLoading(view, url);

@@ -21,10 +21,9 @@ public class SecondActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (webView.canGoBack()) {
-                webView.goBack();
-                return true;
+            if (webView.pageCanGoBack()) {
                 //退出网页
+                return webView.pageGoBack();
             } else {
                 handleFinish();
             }

@@ -27,6 +27,6 @@
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="java调用web操作"/>
+        android:text="Android调用js方法"/>
 
 </RelativeLayout>
