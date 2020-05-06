@@ -16,9 +16,7 @@
     - 加载网页是一个复杂的过程，在这个过程中，我们可能需要执行一些操作，包括：
     - 加载网页前，重置WebView状态以及与业务绑定的变量状态。WebView状态包括重定向状态(mTouchByUser)、前端控制的回退栈(mBackStep)等，业务状态包括进度条、当前页的分享内容、分享按钮的显示隐藏等。
     - 加载网页前，根据不同的域拼接本地客户端的参数，包括基本的机型信息、版本信息、登录信息以及埋点使用的Refer信息等，有时候涉及交易、财产等还需要做额外的配置。
-    - 开始执行页面加载操作时，会回调WebViewClient.onPageStarted(webview,url,favicon)。在此方法中，可以重置重定向保护的变量(mRedirectProtected)，当然也可以在页面加载前重置，由于历史遗留代码问题，此处尚未省去优化。
-    - 加载页面的过程中，WebView会回调几个方法。
-    - 页面加载结束后，WebView会回调几个方法。
+    - 开始执行页面加载操作时，会回调WebViewClient.onPageStarted(webView,url,favicon)。在此方法中，可以重置重定向保护的变量(mRedirectProtected)，当然也可以在页面加载前重置，由于历史遗留代码问题，此处尚未省去优化。
 - 加载页面的过程中回调哪些方法？
     - WebChromeClient.onReceivedTitle(webview, title)，用来设置标题。需要注意的是，在部分Android系统版本中可能会回调多次这个方法，而且有时候回调的title是一个url，客户端可以针对这种情况进行特殊处理，避免在标题栏显示不必要的链接。
     - WebChromeClient.onProgressChanged(webview, progress)，根据这个回调，可以控制进度条的进度（包括显示与隐藏）。一般情况下，想要达到100%的进度需要的时间较长（特别是首次加载），用户长时间等待进度条不消失必定会感到焦虑，影响体验。其实当progress达到80的时候，加载出来的页面已经基本可用了。事实上，国内厂商大部分都会提前隐藏进度条，让用户以为网页加载很快。

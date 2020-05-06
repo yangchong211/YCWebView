@@ -16,6 +16,7 @@
 - 4.6.2 为什么打包之后JS调用出现失败
 - 4.6.3 ViewPager里非首屏WebView点击事件不响应
 - 4.6.4 怎么知道WebView是否存在滚动条
+- 4.6.5 WebView被导航栏遮挡的问题
 
 
 
@@ -277,6 +278,15 @@
     ```
 - computeVerticalScrollRange得到的是可滑动的最大高度，computeVerticalScrollExtent得到的是滚动把手自身的高，当不存在滚动条时，两者的值是相等的。当有滚动条时前者一定是大于后者的。
 
+
+
+### 4.6.5 WebView被导航栏遮挡的问题
+- 解决部分手机虚拟导航栏遮挡住页面webView底部
+    ```
+    //透明导航栏
+    // getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+    ```
+- 为什么会出现这种情况
 
 
 ### 4.9.9 掘金问题反馈记录

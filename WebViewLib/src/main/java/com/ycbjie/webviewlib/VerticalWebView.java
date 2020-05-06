@@ -30,7 +30,7 @@ import android.webkit.WebView;
  *     revise: 当WebView在最顶部或者最底部的时候，不消费事件
  * </pre>
  */
-public class VerticalWebView extends X5WebView {
+public class VerticalWebView extends ScrollWebView {
 
     private float downX;
     private float downY;
@@ -74,22 +74,6 @@ public class VerticalWebView extends X5WebView {
                 break;
         }
         return super.dispatchTouchEvent(ev);
-    }
-
-    /**
-     * 判断是否在顶部
-     * @return                              true表示在顶部
-     */
-    private boolean isTop() {
-        return getScrollY() <= 0;
-    }
-
-    /**
-     * 判断是否在底部
-     * @return                              true表示在底部
-     */
-    private boolean isBottom() {
-        return getHeight() + getScrollY() >= getContentHeight() * getScale();
     }
 
     /**

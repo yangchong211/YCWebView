@@ -116,7 +116,7 @@ public class X5WebView extends BridgeWebView {
         // 使用localStorage则必须打开
         ws.setDomStorageEnabled(true);
         //防止中文乱码
-        ws.setDefaultTextEncodingName("UTF -8");
+        ws.setDefaultTextEncodingName("UTF-8");
         /*
          * 排版适应屏幕
          * 用WebView显示图片，可使用这个参数

@@ -6,26 +6,87 @@
 - 15.301/302回退栈问题解决方案
 - 16.如何设置WebView触摸点击事件
 - 17.如何用代码判断是否重定向
-- 18.如何解决重定向回退栈问题
 - 19.shouldOverrideUrlLoading
 
 
 
 ### 12.301/302业务场景白屏描述
-- https://iluhcm.com/2017/12/10/design-an-elegant-and-powerful-android-webview-part-one/
-
+- 业务场景问题
+    - 对于需要对url进行拦截以及在url中需要拼接特定参数的WebView来说，301和302发生的情景主要有以下几种：
+    - 首次进入，有重定向，然后直接加载H5页面，如http跳转https
+    - 首次进入，有重定向，然后跳转到native页面，如扫一扫短链，然后跳转到native
+    - 二次加载，有重定向，跳转到native页面
+    - 类似登录后跳转到某个页面的需求。如我的拼团，未登录状态下点击我的拼团跳转到登录页面，登录完成后再加载我的拼团页
+- 遇到问题分析
+    - 第一种情况属于正常情况，暂时没遇到什么坑。
+    - 第二种情况，会遇到WebView空白页问题，属于原始url不能拦截到native页面，但301/302后的url拦截到native页面的情况，当遇到这种情况时，需要把WebView对应的Activity结束，否则当用户从拦截后的页面返回上一个页面时，是一个WebView空白页。
+    - 第三种情况，也会遇到WebView空白页问题，原因在于加载的第一个页面发生了重定向到了第二个页面，第二个页面被客户端拦截跳转到native页面，那么WebView就停留在第一个页面的状态了，第一个页面显然是空白页。
+    - 第四种情况，会遇到无限加载登录页面的问题。
+- 为何会出现白屏
+    - webView自带的背景就是白色的
 
 
 ### 13.301/302回退栈问题描述
+- 无论是哪种重定向场景，都不可避免地会遇到回退栈的处理问题，如果处理不当，用户按返回键的时候不一定能回到重定向之前的那个页面。很多开发者在覆写WebViewClient.shouldOverrideUrlLoading()方法时，会简单地使用以下方式粗暴处理：
+    ```
+    WebView.setWebViewClient(new WebViewClient() {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+        ...
+    )
+    ```
+- 这种方法最致命的弱点就是如果不经过特殊处理，那么按返回键是没有效果的，还会停留在302之前的页面。现有的解决方案无非就几种：
+    - 手动管理回退栈，遇到重定向时回退两次。
+    - 通过HitTestResult判断是否是重定向，从而决定是否自己加载url。
+    - 通过设置标记位，在onPageStarted和onPageFinished分别标记变量避免重定向。
+- 这几种解决方案都不是完美的，都有缺陷。
 
 
 
 ### 15.301/302回退栈如何处理
-- https://iluhcm.com/2017/12/10/design-an-elegant-and-powerful-android-webview-part-one/
-
-
-
-
+- 在提供解决方案之前，我们需要了解一下shouldOverrideUrlLoading方法的返回值代表什么意思。
+    - 简单地说，就是返回true，那么url就已经由客户端处理了，WebView就不管了，如果返回false，那么当前的WebView实现就会去处理这个url。
+    - WebView能否知道某个url是不是301/302呢？当然知道，WebView能够拿到url的请求信息和响应信息，根据header里的code很轻松就可以实现，事实正是如此，交给WebView来处理重定向(return false)，这时候按返回键，是可以正常地回到重定向之前的那个页面的。（PS：从上面的章节可知，WebView在5.0以后是一个独立的apk，可以单独升级，新版本的WebView实现肯定处理了重定向问题）
+    - 但是，业务对url拦截有需求，肯定不能把所有的情况都交给系统WebView处理。为了解决url拦截问题，本文引入了另一种思想——通过用户的touch事件来判断重定向。下面通过代码来说明。
+- 核心代码如下所示，具体代码见本案例中的ScrollWebView类代码
+    ```
+    @Override
+    public void setWebViewClient(final WebViewClient client) {
+        super.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, url);
+                   if (handleByChild) {
+                    // 开放client接口给上层业务调用，如果返回true，表示业务已处理。
+                    return true;
+                   } else if (!isTouchByUser()) {
+                    // 如果业务没有处理，并且在加载过程中用户没有再次触摸屏幕，认为是301/302事件，直接交由系统处理。
+                    return super.shouldOverrideUrlLoading(view, url);
+                } else {
+                    //否则，属于二次加载某个链接的情况，为了解决拼接参数丢失问题，重新调用loadUrl方法添加固有参数。
+                    loadUrl(url);
+                    return true;
+                }
+            }
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, request);
+                if (handleByChild) {
+                    return true;
+                } else if (!isTouchByUser()) {
+                    return super.shouldOverrideUrlLoading(view, request);
+                } else {
+                    loadUrl(request.getUrl().toString());
+                    return true;
+                }
+            }
+        });
+    }
+    ```
 
 ### 16.如何设置WebView触摸点击事件
 - 如何在android中的webView上获得onclick事件
@@ -140,14 +201,6 @@
     }
     ```
 
-
-### 18.如何解决重定向回退栈问题
-- 重定向回退栈问题描述
-    - webView执行goBack为什么不能返回上一页面，而为什么有的网页可以返回上一个页面呢？这到底是什么原因导致的这个问题呢？
-    - 是因为web页面在被打开的时候是以url1打开，一部分网页是执行了重定向，那么它就会定向到另外一个url2地址上面去，导致你goback返回是返回了，当它从url3返回的时候其实并不是跳转到url2，而是直接返回到url1，而跳转到url1，又因为url1是打开后直接进行重定向的，那么就直接又跳转到url2了,所以会一直循环执行。所以你退不出去。
-    - 而另外一部分是可以退回上一个页面是因为这些页面没有重定向的操作。所以会直接退回到上一个面。
-- 解决方案
-    - https://www.kanzhun.com/jiaocheng/212017.html
 
 
 

@@ -201,10 +201,11 @@ public class X5WebViewClient extends WebViewClient {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        WebView.HitTestResult hitTestResult = null;
+        /*WebView.HitTestResult hitTestResult = null;
         if (url.startsWith("http:") || url.startsWith("https:")){
             hitTestResult = view.getHitTestResult();
-        }
+        }*/
+        WebView.HitTestResult hitTestResult = view.getHitTestResult();
         if (hitTestResult == null) {
             return false;
         }
@@ -247,10 +248,11 @@ public class X5WebViewClient extends WebViewClient {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        WebView.HitTestResult hitTestResult = null;
+        /*WebView.HitTestResult hitTestResult = null;
         if (url.startsWith("http:") || url.startsWith("https:")){
             hitTestResult = view.getHitTestResult();
-        }
+        }*/
+        WebView.HitTestResult hitTestResult = view.getHitTestResult();
         if (hitTestResult == null) {
             return false;
         }
@@ -541,7 +543,7 @@ public class X5WebViewClient extends WebViewClient {
      * 此方法废弃于API21，调用于非UI线程，拦截资源请求并返回响应数据，返回null时WebView将继续加载资源
      * 注意：API21以下的AJAX请求会走onLoadResource，无法通过此方法拦截
      *
-     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 其中 WebResourceRequest 封装了请求，WebResourceResponse 封装了响应
      * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
      * @param s                                 s
@@ -554,7 +556,7 @@ public class X5WebViewClient extends WebViewClient {
     /**
      * 此方法添加于API21，调用于非UI线程，拦截资源请求并返回数据，返回null时WebView将继续加载资源
      *
-     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 其中 WebResourceRequest 封装了请求，WebResourceResponse 封装了响应
      * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
      * @param webResourceRequest                request，添加于API21，封装了一个Web资源的请求信息，
@@ -567,7 +569,7 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     * 其中 WebResourceRequet 封装了请求，WebResourceResponse 封装了响应
+     * 其中 WebResourceRequest 封装了请求，WebResourceResponse 封装了响应
      * 封装了一个Web资源的响应信息，包含：响应数据流，编码，MIME类型，API21后添加了响应头，状态码与状态描述
      * @param webView                           view
      * @param webResourceRequest                request，添加于API21，封装了一个Web资源的请求信息，

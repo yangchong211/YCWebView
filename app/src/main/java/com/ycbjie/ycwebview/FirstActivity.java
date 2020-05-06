@@ -9,6 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -22,7 +28,9 @@ public class FirstActivity extends AppCompatActivity {
 
     private BaseWebView webView;
     private WebProgress progress;
-    private Toolbar bar;
+    private TextView tvTitle;
+    private ImageView ivRefresh;
+    private RotateAnimation rotate;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -54,6 +62,9 @@ public class FirstActivity extends AppCompatActivity {
                 webView.destroy();
                 webView = null;
             }
+            if (rotate!=null){
+                rotate.cancel();
+            }
         } catch (Exception e) {
             Log.e("X5WebViewActivity", e.getMessage());
         }
@@ -68,7 +79,10 @@ public class FirstActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web_view1);
         webView = findViewById(R.id.web_view);
         progress = findViewById(R.id.progress);
-        bar = findViewById(R.id.bar);
+        tvTitle = findViewById(R.id.tv_title);
+        ivRefresh = findViewById(R.id.iv_refresh);
+
+
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
@@ -76,6 +90,24 @@ public class FirstActivity extends AppCompatActivity {
         String url = "http://www.baidu.com";
         webView.loadUrl(url);
 
+        ivRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                webView.reload();
+                if (rotate != null) {
+                    ivRefresh.startAnimation(rotate);
+                }  else {
+                    rotate = new RotateAnimation(0, 3600,
+                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    rotate.setDuration(2000);
+                    rotate.setFillAfter(true);
+                    //减速- 动画插入器
+                    rotate.setInterpolator(new DecelerateInterpolator());
+                    ivRefresh.setAnimation(rotate);
+                    ivRefresh.startAnimation(rotate);
+                }
+            }
+        });
     }
 
 //    int running = 0;
@@ -157,7 +189,7 @@ public class FirstActivity extends AppCompatActivity {
         WebBackForwardList forwardList = view.copyBackForwardList();
         WebHistoryItem item = forwardList.getCurrentItem();
         if (item != null) {
-            bar.setTitle(item.getTitle());
+            tvTitle.setText(item.getTitle());
            // X5LogUtils.i("-------onReceivedTitle----getWebTitle---"+item.getTitle());
         }
     }
