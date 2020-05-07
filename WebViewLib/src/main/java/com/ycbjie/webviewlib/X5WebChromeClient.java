@@ -15,14 +15,18 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -70,6 +74,7 @@ public class X5WebChromeClient extends WebChromeClient {
     private FullscreenHolder videoFullView;
     private WebView webView;
     private boolean isShowCustomVideo = true;
+    public static final int REQUEST_LOCATION = 100;
 
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
@@ -244,6 +249,14 @@ public class X5WebChromeClient extends WebChromeClient {
         //boolean retain = false; // 内核是否记住这次制授权
         //geolocationPermissionsCallback.invoke(origin, allow, retain);
         super.onGeolocationPermissionsShowPrompt(origin, geolocationPermissionsCallback);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int code = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (code != PackageManager.PERMISSION_GRANTED && context instanceof Activity) {
+                // 还没有定位的授权，需要动态申请。
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
+            }
+        }
     }
 
     /**

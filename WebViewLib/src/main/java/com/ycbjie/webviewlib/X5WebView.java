@@ -23,11 +23,16 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.sdk.android.httpdns.HttpDns;
+import com.alibaba.sdk.android.httpdns.HttpDnsService;
 import com.tencent.smtt.export.external.proxy.X5ProxyWebViewClient;
 import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 
@@ -48,6 +53,7 @@ public class X5WebView extends BridgeWebView {
     private X5WebViewClient x5WebViewClient;
     private X5WebChromeClient x5WebChromeClient;
     private volatile boolean mInitialized;
+    private HttpDnsService httpDns;
 
     @Override
     protected void onDetachedFromWindow() {
@@ -78,6 +84,23 @@ public class X5WebView extends BridgeWebView {
         //设置可以点击
         this.getView().setClickable(true);
         mInitialized = true;
+        initSetHttpDns();
+        initListener();
+    }
+
+    private void initSetHttpDns() {
+        if (X5WebUtils.isHttpDns){
+            // 初始化http + dns
+            httpDns = HttpDns.getService(X5WebUtils.getApplication(), X5WebUtils.accountID);
+            // 预解析热点域名
+            httpDns.setPreResolveHosts(X5WebUtils.host);
+            // 允许过期IP以实现懒加载策略
+            httpDns.setExpiredIPEnabled(true);
+        }
+    }
+
+    public HttpDnsService getHttpDns() {
+        return httpDns;
     }
 
     /**
@@ -144,7 +167,28 @@ public class X5WebView extends BridgeWebView {
         setOpenLayerType(false);
         //默认不开启密码保存功能
         setSavePassword(false);
+        //移除高危风险js监听
         setRemoveJavascriptInterface();
+    }
+
+
+    private void initListener() {
+        this.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                // 这里不能像普通WebView一样将view强转为WebView然后获取HitTestResult，因为x5传来的view不是
+                // 标准的WebView
+                WebView.HitTestResult result = X5WebView.this.getHitTestResult();
+                if (result == null) {
+                    return false;
+                }
+                int type = result.getType();
+                if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) { // 图片
+                    return new SaveImageProcessor().showActionMenu(X5WebView.this);
+                }
+                return false;
+            }
+        });
     }
 
     public X5WebViewClient getCustomWebViewClient(){

@@ -39,13 +39,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.WebView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -62,6 +62,11 @@ import java.util.ArrayList;
  */
 public final class X5WebUtils {
 
+    private static Application application;
+    public static boolean isHttpDns = false;
+    public static String accountID = null;
+    public static ArrayList<String> host = null;
+
     /**
      * 不能直接new，否则抛个异常
      */
@@ -75,6 +80,7 @@ public final class X5WebUtils {
      */
     public static void init(Context context){
         if(context instanceof Application){
+            application = (Application) context;
             //搜集本地tbs内核信息并上报服务器，服务器返回结果决定使用哪个内核。
             QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
                 @Override
@@ -96,6 +102,25 @@ public final class X5WebUtils {
         }
     }
 
+    /**
+     * 初始化Http+Dns解析的属性
+     * @param httpDns                           是否使用
+     * @param account                           accountID
+     * @param hostUrl                           host
+     */
+    public static void setHttpDns(boolean httpDns , String account , ArrayList<String> hostUrl){
+        isHttpDns = httpDns;
+        accountID = account;
+        host = hostUrl;
+    }
+
+    /**
+     * 获取全局上下文
+     * @return                                  上下文
+     */
+    static Application getApplication() {
+        return application;
+    }
 
     /**
      * 判断网络是否连接
@@ -355,7 +380,7 @@ public final class X5WebUtils {
      *        snapshotWholePage()，依然可以采用capturePicture()。X5内核下使用capturePicture()进行截图，
      *        可以直接拿到WebView的清晰长图，但这是个Deprecated的方法，使用的时候要做好异常处理。
      */
-    public static Bitmap captureX5WebViewUnsharp(com.tencent.smtt.sdk.WebView webView) {
+    public static Bitmap captureX5WebViewUnsharp(WebView webView) {
         if (webView == null) {
             return null;
         }
@@ -382,7 +407,8 @@ public final class X5WebUtils {
      *        snapshotWholePage()，依然可以采用capturePicture()。X5内核下使用capturePicture()进行截图，
      *        可以直接拿到WebView的清晰长图，但这是个Deprecated的方法，使用的时候要做好异常处理。
      */
-    public static Bitmap captureX5Picture(com.tencent.smtt.sdk.WebView webView) {
+    @Deprecated
+    public static Bitmap captureX5Picture(WebView webView) {
         if (webView == null) {
             return null;
         }
@@ -402,7 +428,6 @@ public final class X5WebUtils {
         }
         return null;
     }
-
 
     /**
      * 判断是否为重定向url

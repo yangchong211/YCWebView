@@ -17,6 +17,7 @@ package com.ycbjie.webviewlib;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -205,6 +206,11 @@ public class X5WebViewClient extends WebViewClient {
         if (url.startsWith("http:") || url.startsWith("https:")){
             hitTestResult = view.getHitTestResult();
         }*/
+        final Uri uri = Uri.parse(url);
+        //scheme跳转支持
+        if (uri!=null && uri.getScheme()!=null && WebSchemeIntent.isSilentType(uri.getScheme())) {
+            return WebSchemeIntent.handleSilently(context, uri);
+        }
         WebView.HitTestResult hitTestResult = view.getHitTestResult();
         if (hitTestResult == null) {
             return false;
@@ -221,6 +227,9 @@ public class X5WebViewClient extends WebViewClient {
         if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
             return false;
         }
+
+        WebSchemeIntent.handleAlive(context, uri);
+
         return super.shouldOverrideUrlLoading(view, url);
     }
 
@@ -247,6 +256,11 @@ public class X5WebViewClient extends WebViewClient {
             url = URLDecoder.decode(url, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        }
+        final Uri uri = Uri.parse(url);
+        //scheme跳转支持
+        if (uri!=null && uri.getScheme()!=null && WebSchemeIntent.isSilentType(uri.getScheme())) {
+            return WebSchemeIntent.handleSilently(context, uri);
         }
         /*WebView.HitTestResult hitTestResult = null;
         if (url.startsWith("http:") || url.startsWith("https:")){

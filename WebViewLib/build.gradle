@@ -27,6 +27,9 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation ("com.aliyun.ams:alicloud-android-httpdns:1.1.7@aar") {
+        transitive true
+    }
     implementation files('libs/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
 }
 
