@@ -227,9 +227,10 @@ public class X5WebViewClient extends WebViewClient {
         if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
             return false;
         }
-
-        WebSchemeIntent.handleAlive(context, uri);
-
+        boolean handleAlive = WebSchemeIntent.handleAlive(context, uri);
+        if (handleAlive){
+            return true;
+        }
         return super.shouldOverrideUrlLoading(view, url);
     }
 
@@ -281,6 +282,10 @@ public class X5WebViewClient extends WebViewClient {
         //WebView.HitTestResult.EDIT_TEXT_TYPE 选中的文字类型
         if (hitTestResult.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
             return false;
+        }
+        boolean handleAlive = WebSchemeIntent.handleAlive(context, uri);
+        if (handleAlive){
+            return true;
         }
         return super.shouldOverrideUrlLoading(view, request);
     }

@@ -1,13 +1,17 @@
 package com.ycbjie.webviewlib;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 /**
@@ -51,9 +55,9 @@ public final class WebSchemeIntent {
      * <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
      */
     private static final String SCHEME_GEO = "geo";
-    private static final String MESSAGE_TEL = "网页请求打开应用";
-    private static final String MESSAGE_LABEL_OPEN = "打开";
     private static final String MESSAGE_UNKNOWN = "系统未安装相应应用";
+    public static final int REQUEST_PHONE = 101;
+    public static final int REQUEST_LOCATION = 100;
 
 
     private static boolean startWithActivity(Intent intent, Activity activity) throws WebViewException {
@@ -96,12 +100,44 @@ public final class WebSchemeIntent {
      * @return          true表示被处理
      */
     public static boolean handleAlive(@NonNull Context context, Uri uri) {
-        final String scheme = uri.getScheme();
-        if (TextUtils.isEmpty(scheme) || !isAliveType(scheme)) {
+        if (uri==null){
             return false;
         }
-        showUriDialog(context, uri, MESSAGE_TEL);
-        return true;
+        final String scheme = uri.getScheme();
+        if (scheme!=null && isAliveType(scheme)) {
+            if (scheme.contains(SCHEME_TEL)){
+                if(checkReadPermission(context, Manifest.permission.CALL_PHONE,REQUEST_PHONE)){
+                    //打电话，发信息，发邮件，自己处理
+                    startWithActivity(context,uri);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (scheme.contains(SCHEME_GEO)){
+                if(checkReadPermission(context,Manifest.permission.CALL_PHONE,REQUEST_LOCATION)){
+                    //定位
+                    startWithActivity(context,uri);
+                } else {
+                    return false;
+                }
+            } else {
+                startWithActivity(context,uri);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void startWithActivity(Context context, Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri);
+        if (!(context instanceof Activity)) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        }
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        }
     }
 
     /**
@@ -136,25 +172,23 @@ public final class WebSchemeIntent {
         return true;
     }
 
-    private static void showUriDialog(final Context context, final Uri uri, String msg) {
-        new AlertDialog.Builder(context)
-                .setMessage(msg)
-                .setPositiveButton(MESSAGE_LABEL_OPEN, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(uri);
-                        if (!(context instanceof Activity)) {
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-                        }
-                        if (intent.resolveActivity(context.getPackageManager()) != null) {
-                            context.startActivity(intent);
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    /**
+     * 判断是否有某项权限
+     * @param string_permission             权限
+     * @param request_code                  请求码
+     * @return
+     */
+    public static boolean checkReadPermission(Context context, String string_permission, int request_code) {
+        boolean flag = false;
+        int permission = ContextCompat.checkSelfPermission(context, string_permission);
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            //已有权限
+            flag = true;
+        } else {
+            //申请权限
+            ActivityCompat.requestPermissions((Activity) context, new String[]{string_permission}, request_code);
+        }
+        return flag;
     }
 
 }

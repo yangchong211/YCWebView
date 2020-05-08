@@ -1,6 +1,7 @@
 package com.ycbjie.webviewlib;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,15 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.storage.StorageManager;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.tencent.smtt.sdk.WebView;
@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class SaveImageProcessor {
 
@@ -43,22 +45,33 @@ public final class SaveImageProcessor {
      * app保存路径
      * 图片保存位置：x5Web/images   (包含画廊保存图片，list条目点击item按钮保存图片)
      */
-    private final static String APP_ROOT_SAVE_PATH = "x5Web";
+    private final static String APP_ROOT_SAVE_PATH = "WebX5";
     private static final String IMAGE_FILE_PATH = "images";
     private final static String PROPERTY = File.separator;
-
+    private Context mContext;
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            super.handleMessage(msg);
+            Bitmap bitmap = (Bitmap) msg.obj;
+            String imagePath = saveBitmap(bitmap);
+            insertMedia(mContext, imagePath);
+        }
+    };
 
     public boolean showActionMenu(final WebView webView) {
         final Context context = webView.getContext();
         if (context == null) {
             return false;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        mContext = context;
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(new CharSequence[] {"保存图片"}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (hasExtStoragePermission(context)){
-                    saveImage(context, webView);
+                if (hasExtStoragePermission(mContext)){
+                    saveImage(mContext, webView);
                 }
             }
         });
@@ -73,7 +86,7 @@ public final class SaveImageProcessor {
             Toast.makeText(context, "保存图片失败", Toast.LENGTH_SHORT).show();
             return;
         }
-        String imageUrl = hitTestResult.getExtra();
+        final String imageUrl = hitTestResult.getExtra();
         if (imageUrl == null) {
             Toast.makeText(context, "保存图片失败", Toast.LENGTH_SHORT).show();
         } else if (imageUrl.startsWith("data:")) {
@@ -98,11 +111,20 @@ public final class SaveImageProcessor {
                 e.printStackTrace();
             }
         } else {
-            Bitmap bitmap = returnBitMap(imageUrl);
-            String imagePath = saveBitmap(bitmap);
-            insertMedia(context, imagePath);
+            ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
+            singleThreadPool.execute(new Runnable() {
+                @SuppressLint("LongLogTag")
+                @Override
+                public void run() {
+                    Bitmap bitmap = returnBitMap(imageUrl);
+                    android.os.Message message = android.os.Message.obtain();
+                    message.obj = bitmap;
+                    handler.sendMessage(message);
+                }
+            });
         }
     }
+
 
     private File getImageDir(Context context) {
         String path = null;
@@ -348,7 +370,7 @@ public final class SaveImageProcessor {
     }
 
     private void insertMedia(Context context, String imagePath) {
-        if (imagePath==null || imagePath.length()==0){
+        if (imagePath==null || imagePath.length()==0 || context==null){
             return;
         }
         try {

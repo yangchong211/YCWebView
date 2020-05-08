@@ -85,7 +85,7 @@ public class X5WebView extends BridgeWebView {
         this.getView().setClickable(true);
         mInitialized = true;
         initSetHttpDns();
-        initListener();
+        //initListener();
     }
 
     private void initSetHttpDns() {
