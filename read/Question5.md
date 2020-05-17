@@ -1,243 +1,63 @@
-<!-- 杨充 -->
-<!-- 选择学校页面 -->
-<template>
-	<view>
-		<view class="container">
-			<view class="search-block">
-				<view class="search-ico-wapper"><image v-bind:src="image" class="search-ico"></image></view>
-				<input placeholder="搜索索学校名称" maxlength="10" class="search-text" confirm-type="search" @confirm="searchMe" />
-			</view>
-			<uni-indexed-list :options="list" :show-select="true" @click="bindClick" />
-		</view>
-	</view>
-</template>
+#### 问题汇总目录介绍
+- 4.6.6 WebView如何隐藏H5的部分内容
 
-<script>
-import uniIndexedList from '@/pages/widget/indexed-list/uni-indexed-list.vue';
-export default {
-	data() {
-		return {
-			title: 'Hello',
-			image: '../../static/icon/search.png',
-			list: [
-				{
-					letter: 'A',
-					data: ['阿克苏学校', '阿拉山口学校', '阿勒泰学校', '阿里昆莎学校', '安庆天柱山学校', '澳门国际学校']
-				},
-				{
-					letter: 'B',
-					data: ['保山学校', '包头学校', '北海福成学校', '北京南苑学校', '北京首都国际学校']
-				},
-				{
-					letter: 'C',
-					data: ['长白山学校', '长春龙嘉国际学校', '常德桃花源学校', '昌都邦达学校', '长沙黄花国际学校', '长治王村学校', '常州奔牛学校', '成都双流国际学校', '赤峰学校']
-				},
-				{
-					letter: 'D',
-					data: [
-						'大理学校',
-						'大连周水子国际学校',
-						'大庆萨尔图学校',
-						'大同东王庄学校',
-						'达州河市学校',
-						'丹东浪头学校',
-						'德宏芒市学校',
-						'迪庆香格里拉学校',
-						'东营学校',
-						'敦煌学校'
-					]
-				},
-				{
-					letter: 'E',
-					data: ['鄂尔多斯学校', '恩施许家坪学校', '二连浩特赛乌苏国际学校']
-				},
-				{
-					letter: 'F',
-					data: ['阜阳西关学校', '福州长乐国际学校']
-				},
-				{
-					letter: 'G',
-					data: ['赣州黄金学校', '格尔木学校', '固原六盘山学校', '广元盘龙学校', '广州白云国际学校', '桂林两江国际学校', '贵阳龙洞堡国际学校']
-				},
-				{
-					letter: 'H',
-					data: [
-						'哈尔滨太平国际学校',
-						'哈密学校',
-						'海口美兰国际学校',
-						'海拉尔东山国际学校',
-						'邯郸学校',
-						'汉中学校',
-						'杭州萧山国际学校',
-						'合肥骆岗国际学校',
-						'和田学校',
-						'黑河学校',
-						'呼和浩特白塔国际学校',
-						'淮安涟水学校',
-						'黄山屯溪国际学校'
-					]
-				},
-				{
-					letter: 'I',
-					data: []
-				},
-				{
-					letter: 'J',
-					data: [
-						'济南遥墙国际学校',
-						'济宁曲阜学校',
-						'鸡西兴凯湖学校',
-						'佳木斯东郊学校',
-						'嘉峪关学校',
-						'锦州小岭子学校',
-						'景德镇学校',
-						'井冈山学校',
-						'九江庐山学校',
-						'九寨黄龙学校'
-					]
-				},
-				{
-					letter: 'K',
-					data: ['喀什学校', '克拉玛依学校', '库车龟兹学校', '库尔勒学校', '昆明巫家坝国际学校']
-				},
-				{
-					letter: 'L',
-					data: [
-						'拉萨贡嘎学校',
-						'兰州中川学校',
-						'丽江三义学校',
-						'黎平学校',
-						'连云港白塔埠学校',
-						'临沧学校',
-						'临沂学校',
-						'林芝米林学校',
-						'柳州白莲学校',
-						'龙岩冠豸山学校',
-						'泸州蓝田学校',
-						'洛阳北郊学校'
-					]
-				},
-				{
-					letter: 'M',
-					data: ['满洲里西郊学校', '绵阳南郊学校', '漠河古莲学校', '牡丹江海浪学校']
-				},
-				{
-					letter: 'N',
-					data: ['南昌昌北国际学校', '南充高坪学校', '南京禄口国际学校', '南宁吴圩学校', '南通兴东学校', '南阳姜营学校', '宁波栎社国际学校']
-				},
-				{
-					letter: 'O',
-					data: []
-				},
-				{
-					letter: 'P',
-					data: ['普洱思茅学校']
-				},
-				{
-					letter: 'Q',
-					data: ['齐齐哈尔三家子学校', '秦皇岛山海关学校', '青岛流亭国际学校', '衢州学校', '泉州晋江学校']
-				},
-				{
-					letter: 'R',
-					data: ['日喀则和平学校']
-				},
-				{
-					letter: 'S',
-					data: [
-						'三亚凤凰国际学校',
-						'汕头外砂学校',
-						'上海虹桥国际学校',
-						'上海浦东国际学校',
-						'深圳宝安国际学校',
-						'沈阳桃仙国际学校',
-						'石家庄正定国际学校',
-						'苏南硕放国际学校'
-					]
-				},
-				{
-					letter: 'T',
-					data: ['塔城学校', '太原武宿国际学校', '台州路桥学校 (黄岩学校)', '唐山三女河学校', '腾冲驼峰学校', '天津滨海国际学校', '通辽学校', '铜仁凤凰学校']
-				},
-				{
-					letter: 'U',
-					data: []
-				},
-				{
-					letter: 'V',
-					data: []
-				},
-				{
-					letter: 'W',
-					data: [
-						'万州五桥学校',
-						'潍坊学校',
-						'威海大水泊学校',
-						'文山普者黑学校',
-						'温州永强国际学校',
-						'乌海学校',
-						'武汉天河国际学校',
-						'乌兰浩特学校',
-						'乌鲁木齐地窝堡国际学校',
-						'武夷山学校',
-						'梧州长洲岛学校'
-					]
-				},
-				{
-					letter: 'X',
-					data: [
-						'西安咸阳国际学校',
-						'西昌青山学校',
-						'锡林浩特学校',
-						'西宁曹家堡学校',
-						'西双版纳嘎洒学校',
-						'厦门高崎国际学校',
-						'香港国际学校',
-						'襄阳刘集学校',
-						'兴义学校',
-						'徐州观音学校'
-					]
-				},
-				{
-					letter: 'Y',
-					data: [
-						'延安二十里堡学校',
-						'盐城学校',
-						'延吉朝阳川学校',
-						'烟台莱山国际学校',
-						'宜宾菜坝学校',
-						'宜昌三峡学校',
-						'伊春林都学校',
-						'伊宁学校',
-						'义乌学校',
-						'银川河东学校',
-						'永州零陵学校',
-						'榆林榆阳学校',
-						'玉树巴塘学校',
-						'运城张孝学校'
-					]
-				},
-				{
-					letter: 'Z',
-					data: ['湛江学校', '昭通学校', '郑州新郑国际学校', '芷江学校', '重庆江北国际学校', '中卫香山学校', '舟山朱家尖学校', '珠海三灶学校']
-				}
-			]
-		};
-	},
-	onLoad() {},
-	methods: {
-		bindClick(e) {
-			console.log('点击item，返回数据' + JSON.stringify(e));
-		}
-	},
-	components: {
-		uniIndexedList
-	}
-};
-</script>
 
-<style lang="scss">
-@import url('select-school.css');
-page {
-	background: #ffffff;
-}
-</style>
+
+
+
+
+
+
+
+
+
+
+
+### 4.6.6 WebView如何隐藏H5的部分内容
+- 产品需求
+    - 要在App中打开xx的链接，并且要隐藏掉H5页面的某些内容，这个就需要在Java代码中操作WebView，让H5页面加载完成后能够隐藏掉某些内容。
+- 需要几个前提条件
+    - 页面加载完成
+    - 在Java代码中执行Js代码
+    - 利用Js代码找到页面中的底部栏并将其隐藏
+- 如何在h5中找隐藏元素
+    - 在H5页面中找到某个元素还是有很多方法的，比如getElementById()、getElementsByClassName()、getElementsByTagName()等，具体根据页面来选择
+    - 找到要隐藏的h5视图div，然后可以看到有id，或者class。这里用class举例子，比如div的class叫做'copyright'
+    - document.getElementsByClassName('copyright')[0].style.display='none'
+- 代码操作如下所示
+    ```
+    /**
+     * 可以等页面加载完成后，执行Js代码，找到底部栏并将其隐藏
+     * 如何找h5页面元素：
+     *      在H5页面中找到某个元素还是有很多方法的，比如getElementById()、getElementsByClassName()、getElementsByTagName()等，具体根据页面来选择
+     * 隐藏底部有赞的东西
+     *      这个主要找到copyright标签，然后反射拿到该方法，调用隐藏逻辑
+     * 步骤操作如下：
+     * 1.首先通过getElementByClassName方法找到'class'为'copyright'的所有元素，返回的是一个数组，
+     * 2.在这个页面中，只有底部栏的'class'为'copyright'，所以取数组中的第一个元素对应的就是底部栏元素
+     * 3.然后将底部栏的display属性设置为'none'，表示底部栏不显示，这样就可以将底部栏隐藏
+     *
+     * 可能存在问题：
+     * onPageFinished没有执行，导致这段代码没有走
+     */
+    private void hideBottom() {
+        try {
+            if (mWebView!=null) {
+                //定义javaScript方法
+                String javascript = "javascript:function hideBottom() { "
+                        + "document.getElementsByClassName('copyright')[0].style.display='none'"
+                        + "}";
+                //加载方法
+                mWebView.loadUrl(javascript);
+                //执行方法
+                mWebView.loadUrl("javascript:hideBottom();");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    ```
+
+
+
+
