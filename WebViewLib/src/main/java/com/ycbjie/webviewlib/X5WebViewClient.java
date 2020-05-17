@@ -110,14 +110,14 @@ public class X5WebViewClient extends WebViewClient {
         this.context = context;
         this.webView = webView;
         //将js对象与java对象进行映射
-        webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
+        //webView.addJavascriptInterface(new ImageJavascriptInterface(context), "imagelistener");
     }
 
     /**
      * 记录非重定向链接.
      * 并且控制相同链接链接不入栈
      *
-     * @param url 链接
+     * @param url                               链接
      */
     private void recordUrl(String url) {
         if (!TextUtils.isEmpty(url) && !url.equals(getUrl())) {
@@ -138,17 +138,33 @@ public class X5WebViewClient extends WebViewClient {
         return mUrlStack.size() > 0 ? mUrlStack.peek() : null;
     }
 
+    /**
+     * 出栈操作
+     * @return
+     */
     String popUrl() {
         return mUrlStack.size() > 0 ? mUrlStack.pop() : null;
     }
 
+    /**
+     * 是否可以回退操作
+     * @return                      如果栈中数量大于2，则表示可以回退操作
+     */
     public boolean pageCanGoBack() {
         return mUrlStack.size() >= 2;
     }
 
+    /**
+     * 回退操作
+     * @param webView                           webView
+     * @return
+     */
     public final boolean pageGoBack(@NonNull WebView webView) {
+        //判断是否可以回退操作
         if (pageCanGoBack()) {
+            //获取最后停留的页面url
             final String url = popBackUrl();
+            //如果不为空
             if (!TextUtils.isEmpty(url)) {
                 webView.loadUrl(url);
                 return true;
@@ -158,7 +174,7 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
-     * 将最后停留的页面url弹出.
+     * 获取最后停留的页面url
      * @return null 表示已经没有上一页了
      */
     @Nullable
@@ -171,8 +187,14 @@ public class X5WebViewClient extends WebViewClient {
         return null;
     }
 
+    /**
+     * 解决重定向
+     * @param view                              webView
+     */
     private void resolveRedirect(WebView view) {
+        //记录当前时间
         final long now = System.currentTimeMillis();
+        //mLastRedirectTime 记录上次出现重定向的时间
         if (now - mLastRedirectTime > DEFAULT_REDIRECT_INTERVAL) {
             mLastRedirectTime = System.currentTimeMillis();
             view.reload();
@@ -730,5 +752,6 @@ public class X5WebViewClient extends WebViewClient {
                 "}" +
                 "})()");
     }
+
 }
 

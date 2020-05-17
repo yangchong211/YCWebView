@@ -140,6 +140,7 @@ public class WebViewActivity2 extends AppCompatActivity {
             isLoadFinish = true;
             findViewById(R.id.btn_1).setVisibility(View.VISIBLE);
             findViewById(R.id.btn_2).setVisibility(View.VISIBLE);
+
         }
 
         @Override

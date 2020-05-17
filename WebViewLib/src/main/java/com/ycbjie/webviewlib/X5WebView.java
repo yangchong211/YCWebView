@@ -70,7 +70,7 @@ public class X5WebView extends BridgeWebView {
         super(arg0, arg1);
         initWebViewSettings();
         if (getCustomWebViewClient() == null){
-            x5WebViewClient = new MyX5WebViewClient(this,getContext());
+            x5WebViewClient = new MyX5WebViewClient(this , getContext());
             this.setWebViewClient(x5WebViewClient);
         } else {
             this.setWebViewClient(getCustomWebViewClient());
@@ -84,10 +84,15 @@ public class X5WebView extends BridgeWebView {
         //设置可以点击
         this.getView().setClickable(true);
         mInitialized = true;
+        //初始化https+dns域名解析功能，如果没有初始化，则默认不使用
         initSetHttpDns();
         //initListener();
     }
 
+    /**
+     * 初始化https+dns优化，目前已经集成阿里开源的httpdns库，已经非常稳定
+     * 具体更加详细内容，可以参考阿里httpdns官方文档
+     */
     private void initSetHttpDns() {
         if (X5WebUtils.isHttpDns){
             // 初始化http + dns
@@ -183,7 +188,8 @@ public class X5WebView extends BridgeWebView {
                     return false;
                 }
                 int type = result.getType();
-                if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) { // 图片
+                if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+                    // 图片
                     return new SaveImageProcessor().showActionMenu(X5WebView.this);
                 }
                 return false;
@@ -191,12 +197,34 @@ public class X5WebView extends BridgeWebView {
         });
     }
 
+    /**
+     * 开发者可以自己实现该方法
+     * @return
+     */
     public X5WebViewClient getCustomWebViewClient(){
         return null;
     }
 
+    /**
+     * 开发者可以自己实现该方法
+     * @return
+     */
     public X5WebChromeClient getCustomWebChromeClient(){
         return null;
+    }
+
+    /**
+     * 页面可见开启js交互
+     */
+    public void onResume() {
+        this.getSettings().setJavaScriptEnabled(true);
+    }
+
+    /**
+     * 页面不可见关闭js交互
+     */
+    protected void onStop() {
+        this.getSettings().setJavaScriptEnabled(false);
     }
 
     /**
@@ -385,5 +413,37 @@ public class X5WebView extends BridgeWebView {
             super.destroy();
         }
     }
+
+
+    /**
+     * 可以等页面加载完成后，执行Js代码，找到底部栏并将其隐藏
+     * 如何找h5页面元素：
+     *      在H5页面中找到某个元素还是有很多方法的，比如getElementById()、getElementsByClassName()、
+     *      getElementsByTagName()等，具体根据页面来选择
+     * 隐藏底h5的东西
+     *      这个主要找到需要隐藏内容标签，可以找div中的class，然后反射拿到该方法，调用隐藏逻辑
+     * 步骤操作如下：
+     * 1.首先通过getElementByClassName方法找到'class'为'xxx'的所有元素，返回的是一个数组，
+     * 2.在这个页面中，只有底部栏的'class'为'xxx'，所以取数组中的第一个元素对应的就是底部栏元素
+     * 3.然后将底部栏的display属性设置为'none'，表示底部栏不显示，这样就可以将底部栏隐藏
+     *
+     * 可能存在问题：
+     * onPageFinished没有执行，导致这段代码没有走
+     */
+    private void hideBottom(String className) {
+        try {
+            //定义javaScript方法
+            String javascript = "javascript:function hideBottom() { "
+                    + "document.getElementsByClassName('" +className+
+                    "')[0].style.display='none'}";
+            //加载方法
+            this.loadUrl(javascript);
+            //执行方法
+            this.loadUrl("javascript:hideBottom();");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

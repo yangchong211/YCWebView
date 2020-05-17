@@ -62,9 +62,21 @@ import java.util.ArrayList;
  */
 public final class X5WebUtils {
 
+    /**
+     * 全局上下文
+     */
     private static Application application;
+    /**
+     * 初始化，是否开启https+dns优化
+     */
     public static boolean isHttpDns = false;
+    /**
+     * accountID
+     */
     public static String accountID = null;
+    /**
+     * 需要使用https+dns优化的链接url的host集合
+     */
     public static ArrayList<String> host = null;
 
     /**
@@ -222,6 +234,7 @@ public final class X5WebUtils {
      * RECEIVED_ERROR               onReceivedError，请求网络出现error
      * SSL_ERROR                    在加载资源时通知主机应用程序发生SSL错误
      * TIME_OUT                     网络连接超时
+     * STATE_500                    服务器异常
      */
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorMode {

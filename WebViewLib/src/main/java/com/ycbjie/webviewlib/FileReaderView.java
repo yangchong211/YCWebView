@@ -67,7 +67,7 @@ public class FileReaderView extends FrameLayout implements TbsReaderView.ReaderC
                 e.printStackTrace();
             }
         } else {
-            Log.e("TAG", "文件路径无效！");
+            X5LogUtils.d("TAG"+ "文件路径无效！");
         }
     }
 

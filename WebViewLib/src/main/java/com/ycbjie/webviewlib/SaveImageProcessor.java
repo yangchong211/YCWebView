@@ -39,6 +39,14 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2019/9/10
+ *     desc  : 长按保存图片功能，因为请求图片涉及网络请求，后期这部分需要优化，暂时未用到
+ * </pre>
+ */
 public final class SaveImageProcessor {
 
     /**
@@ -156,7 +164,11 @@ public final class SaveImageProcessor {
                         context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
 
-
+    /**
+     * 网络请求图片，不建议使用该方法请求网络图片
+     * @param url
+     * @return
+     */
     private Bitmap returnBitMap(String url) {
         URL myFileUrl = null;
         Bitmap bitmap = null;

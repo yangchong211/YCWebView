@@ -78,8 +78,9 @@ public class WebTlsSniSocketFactory extends SSLSocketFactory {
     public Socket createSocket(Socket plainSocket, String host, int port, boolean autoClose)
             throws IOException {
         String peerHost = this.conn.getRequestProperty("Host");
-        if (peerHost == null)
+        if (peerHost == null){
             peerHost = host;
+        }
         X5LogUtils.i("customized createSocket. host: " + peerHost);
         InetAddress address = plainSocket.getInetAddress();
         if (autoClose) {
@@ -110,8 +111,9 @@ public class WebTlsSniSocketFactory extends SSLSocketFactory {
         }
         // verify hostname and certificate
         SSLSession session = ssl.getSession();
-        if (!hostnameVerifier.verify(peerHost, session))
+        if (!hostnameVerifier.verify(peerHost, session)){
             throw new SSLPeerUnverifiedException("Cannot verify hostname: " + peerHost);
+        }
         X5LogUtils.i("Established " + session.getProtocol() + " connection with " +
                 session.getPeerHost() + " using " + session.getCipherSuite());
         return ssl;
