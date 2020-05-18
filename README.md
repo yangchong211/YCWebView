@@ -120,7 +120,11 @@
 #### 2.1 如何引入
 - **如何引用，该x5的库已经更新到最新版本，引用最新4.3.0稳定版**
     ```
+    //普通版本
     implementation 'cn.yc:WebViewLib:1.2.4'
+
+    //添加阿里https+dns解析版本
+    implementation 'cn.yc:WebViewLib:1.2.7'
     ```
 
 #### 2.2 最简单使用

@@ -22,7 +22,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //官方库
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'cn.yc:WebViewLib:1.2.4'
+    implementation 'cn.yc:WebViewLib:1.2.7'
     implementation 'cn.yc:YCSlideLib:1.1.2'
 //    implementation project(':WebViewLib')
 }
