@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GitHub-YCWebView.iml" filepath="$PROJECT_DIR$/GitHub-YCWebView.iml" group="YCWebView" />
+      <module fileurl="file://$PROJECT_DIR$/WebLib/WebLib.iml" filepath="$PROJECT_DIR$/WebLib/WebLib.iml" group="YCWebView/WebLib" />
       <module fileurl="file://$PROJECT_DIR$/WebViewLib/WebViewLib.iml" filepath="$PROJECT_DIR$/WebViewLib/WebViewLib.iml" group="YCWebView/WebViewLib" />
       <module fileurl="file://$PROJECT_DIR$/YCWebView.iml" filepath="$PROJECT_DIR$/YCWebView.iml" group="YCWebView" />
       <module fileurl="file://$PROJECT_DIR$/WebViewLib/YCWebView-WebViewLib.iml" filepath="$PROJECT_DIR$/WebViewLib/YCWebView-WebViewLib.iml" group="YCWebView/WebViewLib" />
