@@ -72,7 +72,7 @@ public final class WebSchemeIntent {
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             return target.startActivityIfNeeded(intent, -1);
         } catch (ActivityNotFoundException e) {
-            throw new WebViewException(MESSAGE_UNKNOWN);
+            throw new WebViewException(3,MESSAGE_UNKNOWN);
         }
     }
 
@@ -81,7 +81,7 @@ public final class WebSchemeIntent {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
             context.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            throw new WebViewException(MESSAGE_UNKNOWN);
+            throw new WebViewException(3,MESSAGE_UNKNOWN);
         }
     }
 

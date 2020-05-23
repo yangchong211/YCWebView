@@ -32,7 +32,7 @@ import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
-import com.ycbjie.webviewlib.client.MyX5WebViewClient;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.helper.SaveImageProcessor;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
@@ -71,7 +71,7 @@ public class X5WebView extends BridgeWebView {
         super(arg0, arg1);
         initWebViewSettings();
         if (getCustomWebViewClient() == null){
-            x5WebViewClient = new MyX5WebViewClient(this , getContext());
+            x5WebViewClient = new JsX5WebViewClient(this , getContext());
             this.setWebViewClient(x5WebViewClient);
         } else {
             this.setWebViewClient(getCustomWebViewClient());

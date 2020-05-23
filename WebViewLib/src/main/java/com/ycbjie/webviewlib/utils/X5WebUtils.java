@@ -46,6 +46,7 @@ import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.tools.WebViewException;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -82,15 +83,15 @@ public final class X5WebUtils {
     /**
      * 不能直接new，否则抛个异常
      */
-    private X5WebUtils() {
-        throw new UnsupportedOperationException("u can't instantiate me...");
+    private X5WebUtils() throws WebViewException {
+        throw new WebViewException(1,"u can't instantiate me...");
     }
 
     /**
      * 初始化腾讯x5浏览器webView，建议在application初始化
      * @param context                       上下文
      */
-    public static void init(Context context){
+    public static void init(Context context) throws WebViewException {
         if(context instanceof Application){
             application = (Application) context;
             //搜集本地tbs内核信息并上报服务器，服务器返回结果决定使用哪个内核。
@@ -110,7 +111,7 @@ public final class X5WebUtils {
             //x5内核初始化接口
             QbSdk.initX5Environment(context,  cb);
         }else {
-            throw new UnsupportedOperationException("context must be application...");
+            throw new WebViewException(2,"context must be application...");
         }
     }
 

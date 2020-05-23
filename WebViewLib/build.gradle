@@ -27,6 +27,9 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    //okhttp库
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //阿里https+dns开源库
     implementation ("com.aliyun.ams:alicloud-android-httpdns:1.1.7@aar") {
         transitive true
     }

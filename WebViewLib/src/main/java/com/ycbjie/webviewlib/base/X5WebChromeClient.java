@@ -16,38 +16,29 @@ limitations under the License.
 package com.ycbjie.webviewlib.base;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.GeolocationPermissionsCallback;
-import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.export.external.interfaces.PermissionRequest;
 import com.tencent.smtt.sdk.ValueCallback;
-import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebStorage;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.R;
-import com.ycbjie.webviewlib.utils.X5LogUtils;
-import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.inter.VideoWebListener;
-import com.ycbjie.webviewlib.widget.FullscreenHolder;
-
+import com.ycbjie.webviewlib.utils.X5LogUtils;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.video.VideoChromeClient;
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -62,7 +53,7 @@ import static android.app.Activity.RESULT_OK;
  *             作用：WebViewClient主要辅助WebView执行处理各种响应请求事件的
  * </pre>
  */
-public class X5WebChromeClient extends WebChromeClient {
+public class X5WebChromeClient extends VideoChromeClient {
 
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mUploadMessageForAndroid5;
@@ -72,15 +63,9 @@ public class X5WebChromeClient extends WebChromeClient {
     public static int FILE_CHOOSER_RESULT_CODE = 1;
     public static int FILE_CHOOSER_RESULT_CODE_5 = 2;
     private InterWebListener webListener;
-    private VideoWebListener videoWebListener;
     private boolean isShowContent = false;
     private Context context;
-    private View progressVideo;
-    private View customView;
-    private IX5WebChromeClient.CustomViewCallback customViewCallback;
-    private FullscreenHolder videoFullView;
     private WebView webView;
-    private boolean isShowCustomVideo = true;
     public static final int REQUEST_LOCATION = 100;
 
     /**
@@ -96,15 +81,15 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param videoWebListener                  listener
      */
     public void setVideoWebListener(VideoWebListener videoWebListener){
-        this.videoWebListener = videoWebListener;
+        setVideoListener(videoWebListener);
     }
 
     /**
-     * 设置是否使用
+     * 设置是否使用自定义视频视图，建议使用
      * @param showCustomVideo                   是否使用自定义视频视图
      */
     public void setShowCustomVideo(boolean showCustomVideo) {
-        isShowCustomVideo = showCustomVideo;
+        setCustomVideo(showCustomVideo);
     }
 
     /**
@@ -112,6 +97,7 @@ public class X5WebChromeClient extends WebChromeClient {
      * @param context                          上下文
      */
     public X5WebChromeClient(WebView webView , Context context) {
+        super(context, webView);
         this.context = context;
         this.webView = webView;
     }
@@ -263,133 +249,6 @@ public class X5WebChromeClient extends WebChromeClient {
                 ActivityCompat.requestPermissions((Activity) context,
                         new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
             }
-        }
-    }
-
-    /**
-     * 当全屏的视频正在缓冲时，此方法返回一个占位视图(比如旋转的菊花)。
-     * 视频加载时进程loading
-     */
-    @Override
-    public View getVideoLoadingProgressView() {
-        if (progressVideo == null && context!=null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            progressVideo = inflater.inflate(R.layout.view_web_video_progress, null);
-        }
-        return progressVideo;
-    }
-
-    /**
-     *  通知应用当前页进入了全屏模式，此时应用必须显示一个包含网页内容的自定义View
-     * 播放网络视频时全屏会被调用的方法，播放视频切换为横屏
-     * @param view                              view
-     * @param callback                          callback
-     */
-    @SuppressLint("SourceLockedOrientationActivity")
-    @Override
-    public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
-        X5LogUtils.i("-------onShowCustomView-------");
-        if (isShowCustomVideo){
-            if (context instanceof Activity){
-                Activity activity = (Activity) context;
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                videoWebListener.hindWebView();
-                // 如果一个视图已经存在，那么立刻终止并新建一个
-                if (customView != null) {
-                    callback.onCustomViewHidden();
-                    return;
-                }
-                fullViewAddView(view);
-                customView = view;
-                customViewCallback = callback;
-                videoWebListener.showVideoFullView();
-            }
-        }
-    }
-
-    /**
-     * 添加view到decorView容齐中
-     * @param view                              view
-     */
-    private void fullViewAddView(View view) {
-        //增强逻辑判断，尤其是getWindow()
-        if (context!=null && context instanceof Activity){
-            Activity activity = (Activity) context;
-            if (activity.getWindow()!=null){
-                FrameLayout decor = (FrameLayout) activity.getWindow().getDecorView();
-                videoFullView = new FullscreenHolder(activity);
-                videoFullView.addView(view);
-                decor.addView(videoFullView);
-            }
-        }
-    }
-
-    /**
-     * 获取视频控件view
-     * @return                                  view
-     */
-    private FrameLayout getVideoFullView() {
-        return videoFullView;
-    }
-
-    /**
-     * 销毁的时候需要移除一下视频view
-     */
-    public void removeVideoView(){
-        if (videoFullView!=null){
-            videoFullView.removeAllViews();
-        }
-    }
-
-    /**
-     * 通知应用当前页退出了全屏模式，此时应用必须隐藏之前显示的自定义View
-     * 视频播放退出全屏会被调用的
-     */
-    @SuppressLint("SourceLockedOrientationActivity")
-    @Override
-    public void onHideCustomView() {
-        X5LogUtils.i("-------onHideCustomView-------");
-        if (isShowCustomVideo){
-            if (customView == null) {
-                // 不是全屏播放状态
-                return;
-            }
-            if (context!=null && context instanceof Activity){
-                Activity activity = (Activity) context;
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-            customView.setVisibility(View.GONE);
-            if (getVideoFullView() != null) {
-                getVideoFullView().removeView(customView);
-            }
-            customView = null;
-            if (videoWebListener!=null){
-                videoWebListener.hindVideoFullView();
-            }
-            customViewCallback.onCustomViewHidden();
-            if (videoWebListener!=null){
-                videoWebListener.showWebView();
-            }
-        }
-    }
-
-    /**
-     * 判断是否是全屏
-     */
-    public boolean inCustomView() {
-        return (customView != null);
-    }
-
-    /**
-     * 逻辑是：先判断是否全频播放，如果是，则退出全频播放
-     * 全屏时按返加键执行退出全屏方法
-     */
-    @SuppressLint("SourceLockedOrientationActivity")
-    public void hideCustomView() {
-        this.onHideCustomView();
-        if (context!=null && context instanceof Activity){
-            Activity activity = (Activity) context;
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
 

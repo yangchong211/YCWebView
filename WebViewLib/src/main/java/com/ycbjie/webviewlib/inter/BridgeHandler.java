@@ -16,6 +16,8 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib.inter;
 
+import com.ycbjie.webviewlib.inter.CallBackFunction;
+
 /**
  * <pre>
  *     @author yangchong

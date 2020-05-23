@@ -15,7 +15,7 @@
         android:textSize="18sp"
         android:gravity="center"/>
 
-    <com.ycbjie.webviewlib.widget.FileReaderView
+    <com.ycbjie.webviewlib.FileReaderView
         android:id="@+id/documentReaderView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

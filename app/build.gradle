@@ -24,5 +24,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'cn.yc:WebViewLib:1.2.7'
     implementation 'cn.yc:YCSlideLib:1.1.2'
-//    implementation project(':WebViewLib')
+    //okhttp库
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation project(':WebViewLib')
 }

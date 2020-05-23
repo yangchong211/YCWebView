@@ -26,11 +26,11 @@ import android.util.AttributeSet;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.inter.CallBackFunction;
 import com.ycbjie.webviewlib.bridge.DefaultHandler;
-import com.ycbjie.webviewlib.bean.Message;
+import com.ycbjie.webviewlib.bridge.Message;
 import com.ycbjie.webviewlib.inter.WebViewJavascriptBridge;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.inter.BridgeHandler;
-import com.ycbjie.webviewlib.utils.BridgeUtil;
+import com.ycbjie.webviewlib.bridge.BridgeUtil;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -48,8 +48,7 @@ import java.util.Map;
  * </pre>
  */
 @SuppressLint("SetJavaScriptEnabled")
-public
-class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
+public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 
 	public static final String TO_LOAD_JS = "WebViewJavascriptBridge.js";
 	private long uniqueId = 0;
