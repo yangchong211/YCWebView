@@ -22,9 +22,10 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //官方库
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'cn.yc:WebViewLib:1.2.7'
+    implementation 'cn.yc:WebViewLib:1.2.7.3'
     implementation 'cn.yc:YCSlideLib:1.1.2'
     //okhttp库
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation project(':WebViewLib')
+    //implementation project(':WebViewLib')
+    //implementation files('lib/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
 }

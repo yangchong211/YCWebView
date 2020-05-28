@@ -4,8 +4,21 @@ import android.text.TextUtils;
 
 import java.util.HashSet;
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 缓存配置，定义为final不可修改
+ *     revise:
+ * </pre>
+ */
+public final class CacheExtensionConfig {
 
-public class CacheExtensionConfig {
+    //单独webview实例的
+    private HashSet<String> statics = new HashSet(STATIC);
+    private HashSet<String> no_cache = new HashSet(NO_CACH);
+
     //全局默认的
     private static HashSet STATIC = new HashSet() {
         {
@@ -46,9 +59,7 @@ public class CacheExtensionConfig {
         }
     };
 
-    //单独webview实例的
-    private HashSet<String> statics = new HashSet(STATIC);
-    private HashSet<String> no_cache = new HashSet(NO_CACH);
+
 
     public static void addGlobalExtension(String extension) {
         add(STATIC, extension);
@@ -73,6 +84,11 @@ public class CacheExtensionConfig {
         set.remove(extension.replace(".", "").toLowerCase().trim());
     }
 
+    /**
+     * 是否是音视频内容，需要过滤
+     * @param extension                             extension
+     * @return
+     */
     public boolean isMedia(String extension) {
         if (TextUtils.isEmpty(extension)) {
             return false;
@@ -83,6 +99,11 @@ public class CacheExtensionConfig {
         return no_cache.contains(extension.toLowerCase().trim());
     }
 
+    /**
+     * 是否可以缓存
+     * @param extension                             extension
+     * @return
+     */
     public boolean canCache(String extension) {
         if (TextUtils.isEmpty(extension)) {
             return false;

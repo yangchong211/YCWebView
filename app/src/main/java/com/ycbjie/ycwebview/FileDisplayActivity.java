@@ -9,7 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.ycbjie.webviewlib.FileReaderView;
+
+import com.ycbjie.webviewlib.widget.FileReaderView;
 
 import java.io.File;
 import java.io.FileOutputStream;

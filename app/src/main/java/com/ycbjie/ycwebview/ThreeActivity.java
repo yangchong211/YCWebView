@@ -11,8 +11,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.MyX5WebViewClient;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
+import com.ycbjie.webviewlib.view.X5WebView;
 
 public class ThreeActivity extends AppCompatActivity {
 
@@ -65,7 +65,7 @@ public class ThreeActivity extends AppCompatActivity {
         webView.setWebViewClient(webViewClient);
     }
 
-    private class YcX5WebViewClient extends MyX5WebViewClient {
+    private class YcX5WebViewClient extends JsX5WebViewClient {
         /**
          * 构造方法
          *

@@ -13,11 +13,12 @@ import android.webkit.JavascriptInterface;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.WvWebView;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WvWebView;
+
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.widget.WebProgress;
+import com.ycbjie.webviewlib.wv.WvWebView;
+import com.ycbjie.webviewlib.wv.X5WvWebView;
 
 import org.json.JSONObject;
 

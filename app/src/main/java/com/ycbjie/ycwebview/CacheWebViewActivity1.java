@@ -11,13 +11,13 @@ import android.view.KeyEvent;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.MyX5WebViewClient;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
-import com.ycbjie.ycwebview.cache.WebResponseAdapter;
-import com.ycbjie.ycwebview.cache.WebViewCacheDelegate;
+import com.ycbjie.webviewlib.cache.WebResponseAdapter;
+import com.ycbjie.webviewlib.cache.WebViewCacheDelegate;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 /**
  * <pre>
@@ -143,7 +143,7 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
         }
     };
 
-    private class YcX5WebViewClient extends MyX5WebViewClient {
+    private class YcX5WebViewClient extends JsX5WebViewClient {
         public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
         }

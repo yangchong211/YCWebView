@@ -11,16 +11,31 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 资源处理loader
+ *     revise:
+ * </pre>
+ */
 public class WebAssetsLoader {
 
     private static volatile WebAssetsLoader assetsLoader;
     private Context mContext;
+    /**
+     * 资源内存缓存集合
+     */
     private CopyOnWriteArraySet<String> mAssetResSet;
     private String mDir="";
     /**
      * 是否清理
      */
     private boolean mCleared = false;
+    /**
+     * 是否是后缀方法
+     */
     private boolean mIsSuffixMod = false;
 
     public static WebAssetsLoader getInstance() {
@@ -72,7 +87,7 @@ public class WebAssetsLoader {
             if (TextUtils.isEmpty(mDir)){
                 return getAssetFileStream(uPath);
             }else{
-                return getAssetFileStream(mDir+File.separator+uPath);
+                return getAssetFileStream(mDir + File.separator + uPath);
             }
         }
         if (mAssetResSet!=null){
@@ -81,13 +96,14 @@ public class WebAssetsLoader {
                     if (TextUtils.isEmpty(mDir)){
                         return getAssetFileStream(p);
                     }else{
-                        return getAssetFileStream(mDir+File.separator+p);
+                        return getAssetFileStream(mDir + File.separator + p);
                     }
                 }
             }
         }
         return null;
     }
+
     public WebAssetsLoader setDir(final String dir){
         mDir = dir;
         return this;
@@ -127,7 +143,6 @@ public class WebAssetsLoader {
     }
 
     private WebAssetsLoader initResourceNoneRecursion(String dir){
-
         try {
             LinkedList<String> list = new LinkedList<String>();
             String[] resData = mContext.getAssets().list(dir);
@@ -175,6 +190,7 @@ public class WebAssetsLoader {
 
     public InputStream getAssetFileStream(String path) {
         try {
+            //读取assets路径下的文件
             return mContext.getAssets().open(path);
         } catch (IOException e) {
             e.printStackTrace();

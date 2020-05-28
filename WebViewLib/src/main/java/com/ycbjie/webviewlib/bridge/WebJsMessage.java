@@ -33,7 +33,7 @@ import org.json.JSONTokener;
  *     revise: demo地址：https://github.com/yangchong211/YCWebView
  * </pre>
  */
-public class Message {
+public class WebJsMessage {
 
     /**
      * callbackId
@@ -119,8 +119,8 @@ public class Message {
         return null;
     }
 	
-	public static Message toObject(String jsonStr) {
-        Message m =  new Message();
+	public static WebJsMessage toObject(String jsonStr) {
+        WebJsMessage m =  new WebJsMessage();
         try {
             JSONObject jsonObject = new JSONObject(jsonStr);
             m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR):null);
@@ -135,12 +135,12 @@ public class Message {
         return m;
 	}
 	
-	public static List<Message> toArrayList(String jsonStr){
-        List<Message> list = new ArrayList<>();
+	public static List<WebJsMessage> toArrayList(String jsonStr){
+        List<WebJsMessage> list = new ArrayList<>();
         try {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for(int i = 0; i < jsonArray.length(); i++){
-                Message m = new Message();
+                WebJsMessage m = new WebJsMessage();
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 m.setHandlerName(jsonObject.has(HANDLER_NAME_STR) ? jsonObject.getString(HANDLER_NAME_STR):null);
                 m.setCallbackId(jsonObject.has(CALLBACK_ID_STR) ? jsonObject.getString(CALLBACK_ID_STR):null);

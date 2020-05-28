@@ -46,8 +46,12 @@ import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.cache.WebCacheType;
+import com.ycbjie.webviewlib.cache.WebViewCacheDelegate;
+import com.ycbjie.webviewlib.cache.WebViewCacheWrapper;
 import com.ycbjie.webviewlib.tools.WebViewException;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -91,7 +95,7 @@ public final class X5WebUtils {
      * 初始化腾讯x5浏览器webView，建议在application初始化
      * @param context                       上下文
      */
-    public static void init(Context context) throws WebViewException {
+    public static void init(Context context){
         if(context instanceof Application){
             application = (Application) context;
             //搜集本地tbs内核信息并上报服务器，服务器返回结果决定使用哪个内核。
@@ -111,8 +115,23 @@ public final class X5WebUtils {
             //x5内核初始化接口
             QbSdk.initX5Environment(context,  cb);
         }else {
-            throw new WebViewException(2,"context must be application...");
+            throw new UnsupportedOperationException("context must be application...");
         }
+    }
+
+    public static void initCache(Application application){
+        WebViewCacheWrapper.Builder builder = new WebViewCacheWrapper.Builder(application);
+        //设置缓存路径，默认getCacheDir，名称CacheWebViewCache
+        builder.setCachePath(new File(application.getCacheDir(),"CacheWebViewCache"))
+                //设置缓存大小，默认100M
+                .setCacheSize(1024*1024*100)
+                //设置http请求链接超时，默认20秒
+                .setConnectTimeoutSecond(20)
+                //设置http请求链接读取超时，默认20秒
+                .setReadTimeoutSecond(20)
+                //设置缓存为正常模式，默认模式为强制缓存静态资源
+                .setCacheType(WebCacheType.NORMAL);
+        WebViewCacheDelegate.getInstance().init(builder);
     }
 
     /**

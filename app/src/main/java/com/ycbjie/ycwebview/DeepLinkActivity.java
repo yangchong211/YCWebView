@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
-import com.ycbjie.webviewlib.X5WebViewClient;
+import com.ycbjie.webviewlib.base.X5WebViewClient;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

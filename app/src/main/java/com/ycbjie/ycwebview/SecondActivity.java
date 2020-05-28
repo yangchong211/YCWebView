@@ -7,11 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.ProgressWebView;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
+
 
 public class SecondActivity extends AppCompatActivity {
 

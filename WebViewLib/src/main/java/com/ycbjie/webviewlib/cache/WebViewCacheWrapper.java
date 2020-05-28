@@ -9,8 +9,8 @@ import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.URLUtil;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.X5LogUtils;
-import com.ycbjie.webviewlib.X5WebUtils;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-//实现类
+
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 拦截资源的接口的实现类
+ *     revise:
+ * </pre>
+ */
 public class WebViewCacheWrapper implements WebViewRequestClient {
 
     private File mCacheFile;
@@ -43,7 +52,13 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
     private CacheExtensionConfig mCacheExtensionConfig;
     private Context mContext;
     private WebCacheType mCacheType;
+    /**
+     * 资源文件
+     */
     private String mAssetsDir;
+    /**
+     * 是否是信任的host
+     */
     private boolean mTrustAllHostname;
     private SSLSocketFactory mSSLSocketFactory;
     private X509TrustManager mX509TrustManager;
@@ -89,7 +104,11 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         WebAssetsLoader.getInstance().init(mContext).setDir(mAssetsDir).isAssetsSuffixMod(mIsSuffixMod);
     }
 
+    /**
+     * 创建okhttp，主要是用它进行缓存
+     */
     private void initHttpClient() {
+        //设置缓存的位置，还有缓存的大小，默认是100M
         final Cache cache = new Cache(mCacheFile, mCacheSize);
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .cache(cache)
@@ -126,9 +145,11 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
             headers.put("Origin", mOrigin);
         }
         if (!TextUtils.isEmpty(mReferer)) {
+            //先前网页的地址，当前请求网页紧随其后,即来路
             headers.put("Referer", mReferer);
         }
         if (!TextUtils.isEmpty(mUserAgent)) {
+            //User-Agent的内容包含发出请求的用户信息
             headers.put("User-Agent", mUserAgent);
         }
         return headers;
@@ -139,6 +160,12 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         return interceptRequest(url, buildHeaders());
     }
 
+    /**
+     * 检查url，是否是http开发的
+     * 如果不是以http开发，没有资源拦截，以及不是缓存的类型，或者是资源媒体，就直接返回false，表示这些不可缓存
+     * @param url                                       url链接
+     * @return
+     */
     private boolean checkUrl(String url) {
         if (TextUtils.isEmpty(url)) {
             return false;
@@ -163,7 +190,6 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         if (!mCacheExtensionConfig.canCache(extension)) {
             return false;
         }
-
         return true;
     }
 
@@ -209,11 +235,13 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         mUserAgent = webView.getSettings().getUserAgentString();
     }
 
+    /**
+     * 清除缓存，删除缓存文件，然后清除内存缓存
+     */
     @Override
     public void clearCache() {
         WebFileUtils.deleteDirs(mCacheFile.getAbsolutePath(), false);
         WebAssetsLoader.getInstance().clear();
-
     }
 
     @Override
@@ -241,8 +269,12 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         return mCacheFile;
     }
 
+    /**
+     * 添加header头
+     * @param reqBuilder                            builder
+     * @param headers                               headers
+     */
     public void addHeader(Request.Builder reqBuilder, Map<String, String> headers) {
-
         if (headers == null) {
             return;
         }
@@ -251,8 +283,14 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         }
     }
 
+    /**
+     * 拦截处理的核心逻辑
+     * @param url                                       链接url
+     * @param headers                                   header头信息
+     * @return
+     */
     private WebResourceResponse interceptRequest(String url, Map<String, String> headers) {
-
+        //标准缓存，不用该方案
         if (mCacheType == WebCacheType.NORMAL) {
             return null;
         }
@@ -277,14 +315,22 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
             }
             addHeader(reqBuilder, headers);
             if (!X5WebUtils.isConnected(mContext)) {
+                //设置缓存策略
+                //仅使用缓存的缓存控制请求指令，即使缓存的响应已经过时。
+                //如果响应在缓存中不可用或需要服务器验证，调用将失败，并带有{@code 504 unsatisrequest}。
                 reqBuilder.cacheControl(CacheControl.FORCE_CACHE);
             }
             Request request = reqBuilder.build();
+            //直接交给OkHttpClient去做网络请求
             Response response = mHttpClient.newCall(request).execute();
+            //返回从缓存接收到的原始响应。如果此响应没有使用缓存，则为null。
+            //对于有条件的get请求，缓存响应和网络响应可能都是非空的。不应该读取返回的响应的正文。
             Response cacheRes = response.cacheResponse();
             if (cacheRes != null) {
+                //应用缓存
                 X5LogUtils.d("WebViewCacheWrapper---interceptRequest2--" +String.format("from cache: %s", url));
             } else {
+                //没有缓存
                 X5LogUtils.d("WebViewCacheWrapper---interceptRequest3--" +String.format("from server: %s", url));
             }
             String mimeType = MimeTypeMapUtils.getMimeTypeFromUrl(url);
@@ -292,6 +338,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
             if (response.body() != null) {
                 webResourceResponse = new WebResourceResponse(mimeType, "", response.body().byteStream());
             }
+            //没有联网，或者504，直接返回为空
             if (response.code() == 504 && !X5WebUtils.isConnected(mContext)){
                 return null;
             }
@@ -302,12 +349,14 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 }
                 try {
                     if (webResourceResponse != null) {
+                        //设置状态代码和原因短语
                         webResourceResponse.setStatusCodeAndReasonPhrase(response.code(), message);
                     }
                 } catch (Exception e) {
                     return null;
                 }
                 if (webResourceResponse != null) {
+                    //设置响应头
                     webResourceResponse.setResponseHeaders(multimapToSingle(response.headers().toMultimap()));
                 }
             }
@@ -424,11 +473,20 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
 
     }
 
+    /**
+     * 判断url是否有效
+     * @param url                                   url地址
+     * @return
+     */
     boolean isValidUrl(String url) {
         return URLUtil.isValidUrl(url);
     }
 
-
+    /**
+     * 获取起源url地址
+     * @param referer                               当前地址url
+     * @return
+     */
     private String getOriginUrl(String referer) {
         String ou = referer;
         if (TextUtils.isEmpty(ou)) {
@@ -438,6 +496,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
             URL url = new URL(ou);
             int port = url.getPort();
             ou = url.getProtocol() + "://" + url.getHost() + (port == -1 ? "" : ":" + port);
+            X5LogUtils.i("WebViewCacheWrapper---getOriginUrl--" +ou);
         } catch (Exception e) {
             e.printStackTrace();
         }

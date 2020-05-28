@@ -30,9 +30,11 @@ dependencies {
     //okhttp库
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     //阿里https+dns开源库
-    implementation ("com.aliyun.ams:alicloud-android-httpdns:1.1.7@aar") {
+    implementation('com.aliyun.ams:alicloud-android-httpdns:1.1.7@aar') {
         transitive true
     }
+    //x5库
+    //implementation 'com.tencent.tbs.tbssdk:sdk:latest.release'
     implementation files('libs/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
 }
 
@@ -52,7 +54,7 @@ group = "cn.yc"
 //发布到JCenter上的项目名字，必须填写
 def libName = "WebViewLib"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.2.7"
+version = "1.2.7.3"
 
 //生成源文件
 task sourcesJar(type: Jar) {

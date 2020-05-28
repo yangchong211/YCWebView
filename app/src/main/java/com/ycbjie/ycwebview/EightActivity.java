@@ -16,13 +16,12 @@ import android.view.View;
 
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.MyX5WebViewClient;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebChromeClient;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
-import com.ycbjie.webviewlib.X5WebViewClient;
+import com.ycbjie.webviewlib.base.X5WebChromeClient;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -131,7 +130,7 @@ public class EightActivity extends AppCompatActivity {
         }
     };
 
-    private class YcX5WebViewClient extends MyX5WebViewClient {
+    private class YcX5WebViewClient extends JsX5WebViewClient {
         public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
         }
@@ -150,7 +149,7 @@ public class EightActivity extends AppCompatActivity {
     }
 
 
-    private class YcX5WebChromeClient extends X5WebChromeClient{
+    private class YcX5WebChromeClient extends X5WebChromeClient {
         public YcX5WebChromeClient(X5WebView webView,Activity activity) {
             super(webView,activity);
         }

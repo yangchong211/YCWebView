@@ -29,7 +29,7 @@ import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
-import com.ycbjie.webviewlib.bridge.Message;
+import com.ycbjie.webviewlib.bridge.WebJsMessage;
 import com.ycbjie.webviewlib.bridge.BridgeUtil;
 import com.ycbjie.webviewlib.view.BridgeWebView;
 
@@ -175,7 +175,7 @@ public class JsX5WebViewClient extends X5WebViewClient {
         //WebViewJavascriptBridge.js
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
         if (mWebView.getStartupMessage() != null) {
-            for (Message m : mWebView.getStartupMessage()) {
+            for (WebJsMessage m : mWebView.getStartupMessage()) {
                 //分发message 必须在主线程才分发成功
                 mWebView.dispatchMessage(m);
             }

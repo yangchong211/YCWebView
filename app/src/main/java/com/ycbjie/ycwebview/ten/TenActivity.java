@@ -13,7 +13,7 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import com.ycbjie.slide.SlideLayout;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.ycwebview.R;
 
 public class TenActivity extends AppCompatActivity {

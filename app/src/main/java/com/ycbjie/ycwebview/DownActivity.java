@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.tencent.smtt.sdk.DownloadListener;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 /**
  * <pre>

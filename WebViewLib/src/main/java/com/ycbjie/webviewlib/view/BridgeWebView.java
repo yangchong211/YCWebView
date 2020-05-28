@@ -18,7 +18,9 @@ package com.ycbjie.webviewlib.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -26,7 +28,7 @@ import android.util.AttributeSet;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.inter.CallBackFunction;
 import com.ycbjie.webviewlib.bridge.DefaultHandler;
-import com.ycbjie.webviewlib.bridge.Message;
+import com.ycbjie.webviewlib.bridge.WebJsMessage;
 import com.ycbjie.webviewlib.inter.WebViewJavascriptBridge;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.inter.BridgeHandler;
@@ -55,24 +57,53 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 	private Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
 	private Map<String, BridgeHandler> messageHandlers = new HashMap<>();
 	BridgeHandler defaultHandler = new DefaultHandler();
-	private List<Message> startupMessage = new ArrayList<>();
+	private List<WebJsMessage> startupMessage = new ArrayList<>();
 	/**
 	 * loadUrl方法在19以上超过2097152个字符失效
 	 */
 	private static final int URL_MAX_CHARACTER_NUM = 2097152;
+	private static final int DISPATCH_MESSAGE = 520;
+	private static final int POST_URL = 521;
+	@SuppressLint("HandlerLeak")
+	private Handler handler = new Handler(){
+		@Override
+		public void handleMessage(android.os.Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what){
+				case DISPATCH_MESSAGE:
+					String javascriptCommand = (String) msg.obj;
+					X5LogUtils.d("分发message--------------"+javascriptCommand);
+					//this.loadUrl(javascriptCommand);
+					//开始执行js中_handleMessageFromNative方法
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+							javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
+						evaluateJavascript(javascriptCommand,null);
+					}else {
+						loadUrl(javascriptCommand);
+					}
+					break;
+				case POST_URL:
+					String url = (String) msg.obj;
+					loadUrl(url);
+					break;
+				default:
+					break;
+			}
+		}
+	};
 	
 	/**
 	 * 获取消息list集合
 	 * @return							集合
 	 */
-	public List<Message> getStartupMessage() {
+	public List<WebJsMessage> getStartupMessage() {
 		return startupMessage;
 	}
 
 	/**
 	 * 设置消息，注意目前在onProgressChanged方法中调用
 	 */
-	public void setStartupMessage(List<Message> startupMessage) {
+	public void setStartupMessage(List<WebJsMessage> startupMessage) {
 		this.startupMessage = startupMessage;
 	}
 
@@ -97,6 +128,21 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 			super.loadUrl(s);
 		}catch (Exception e){
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 子线程发送消息
+	 * @param url						url
+	 */
+	public void postUrl(String url){
+		if (Thread.currentThread() == Looper.getMainLooper().getThread()){
+			loadUrl(url);
+		} else {
+			Message message = handler.obtainMessage();
+			message.what = DISPATCH_MESSAGE;
+			message.obj = url;
+			handler.sendMessage(message);
 		}
 	}
 
@@ -152,7 +198,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
      */
 	private void doSend(String handlerName, String data, CallBackFunction responseCallback) {
 		//创建message对象，主要是将js的方法名称，传递的数据，封装到对象中
-		Message m = new Message();
+		WebJsMessage m = new WebJsMessage();
 		//判断是否有data数据
 		if (!TextUtils.isEmpty(data)) {
 			m.setData(data);
@@ -181,7 +227,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
      * list<message> != null 添加到消息集合否则分发消息
      * @param m Message
      */
-	private void queueMessage(Message m) {
+	private void queueMessage(WebJsMessage m) {
 		if (startupMessage != null) {
 			startupMessage.add(m);
 		} else {
@@ -193,7 +239,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
      * 分发message 必须在主线程才分发成功
      * @param m Message
      */
-	public void dispatchMessage(Message m) {
+	public void dispatchMessage(WebJsMessage m) {
         String messageJson = m.toJson();
         //增加非空判断的逻辑
         if (messageJson!=null){
@@ -207,8 +253,12 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 			//转化格式为javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');
 			String javascriptCommand = String.format(
 					BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
+			Message message = handler.obtainMessage();
+			message.what = DISPATCH_MESSAGE;
+			message.obj = javascriptCommand;
+			handler.sendMessage(message);
 			// 必须要找主线程才会将数据传递出去 --- 划重点
-			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+			/*if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 				X5LogUtils.d("分发message--------------"+javascriptCommand);
 				//this.loadUrl(javascriptCommand);
 				//开始执行js中_handleMessageFromNative方法
@@ -218,7 +268,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 				}else {
 					this.loadUrl(javascriptCommand);
 				}
-			}
+			}*/
 		}
     }
 
@@ -231,9 +281,9 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 				@Override
 				public void onCallBack(String data) {
 					// deserializeMessage 反序列化消息
-					List<Message> list = null;
+					List<WebJsMessage> list = null;
 					try {
-						list = Message.toArrayList(data);
+						list = WebJsMessage.toArrayList(data);
 					} catch (Exception e) {
                         e.printStackTrace();
 						return;
@@ -242,7 +292,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 						return;
 					}
 					for (int i = 0; i < list.size(); i++) {
-						Message m = list.get(i);
+						WebJsMessage m = list.get(i);
 						String responseId = m.getResponseId();
 						// 是否是response  CallBackFunction
 						if (!TextUtils.isEmpty(responseId)) {
@@ -258,7 +308,7 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 								responseFunction = new CallBackFunction() {
 									@Override
 									public void onCallBack(String data) {
-										Message responseMsg = new Message();
+										WebJsMessage responseMsg = new WebJsMessage();
 										responseMsg.setResponseId(callbackId);
 										responseMsg.setResponseData(data);
 										queueMessage(responseMsg);

@@ -11,7 +11,16 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
-//委派类
+
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 拦截资源的接口的委派类
+ *     revise:
+ * </pre>
+ */
 public class WebViewCacheDelegate implements WebViewRequestClient {
 
     private static volatile WebViewCacheDelegate webViewCacheInterceptorInst;

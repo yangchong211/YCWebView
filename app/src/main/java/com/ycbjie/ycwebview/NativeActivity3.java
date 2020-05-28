@@ -13,14 +13,12 @@ import android.webkit.JavascriptInterface;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.ycbjie.webviewlib.BridgeHandler;
-import com.ycbjie.webviewlib.CallBackFunction;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.WvWebView;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
-import com.ycbjie.webviewlib.X5WvWebView;
+import com.ycbjie.webviewlib.inter.BridgeHandler;
+import com.ycbjie.webviewlib.inter.CallBackFunction;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 import org.json.JSONObject;
 
@@ -121,7 +119,7 @@ public class NativeActivity3 extends AppCompatActivity {
                 });
             }
         });
-        mWebView.loadUrl("file:///android_asset/exampleApp.html");
+        mWebView.loadUrl("");
     }
 
 
@@ -181,7 +179,7 @@ public class NativeActivity3 extends AppCompatActivity {
         mWebView.registerHandler("toSeller", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
-
+                function.onCallBack(data);
             }
         });
         mWebView.registerHandler("testJavaCallback", new BridgeHandler() {

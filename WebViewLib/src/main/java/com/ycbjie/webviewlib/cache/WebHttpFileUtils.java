@@ -14,6 +14,15 @@ import okio.Okio;
 import okio.Source;
 
 
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 获取http缓存的流对象
+ *     revise: 通过file转化成io流
+ * </pre>
+ */
 public class WebHttpFileUtils {
 
     private static final int ENTRY_METADATA = 0;

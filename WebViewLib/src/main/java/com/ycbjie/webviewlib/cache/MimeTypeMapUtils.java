@@ -3,7 +3,15 @@ package com.ycbjie.webviewlib.cache;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-
+/**
+ * <pre>
+ *     @author yangchong
+ *     blog  : https://github.com/yangchong211
+ *     time  : 2020/5/17
+ *     desc  : 根据url获取文件的拓展信息工具类
+ *     revise:
+ * </pre>
+ */
 public class MimeTypeMapUtils {
 
     /**
