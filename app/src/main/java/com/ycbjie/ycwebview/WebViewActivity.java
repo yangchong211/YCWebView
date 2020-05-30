@@ -96,7 +96,7 @@ public class WebViewActivity extends AppCompatActivity {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
 
-        mWebView.loadUrl("https://github.com/yangchong211/LifeHelper");
+        mWebView.loadUrl("https://github.com/yangchong211/YCLiveDataBus");
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
     }
