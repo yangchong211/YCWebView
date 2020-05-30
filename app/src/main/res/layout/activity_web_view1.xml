@@ -39,7 +39,7 @@
             android:layout_height="match_parent"/>
 
         <!--仿微信横向进度条-->
-        <com.ycbjie.webviewlib.WebProgress
+        <com.ycbjie.webviewlib.widget.WebProgress
             android:id="@+id/progress"
             android:layout_width="match_parent"
             android:layout_height="3dp"/>

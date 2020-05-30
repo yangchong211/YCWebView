@@ -187,6 +187,21 @@
 - https://my.oschina.net/zhibuji/blog/100580
 
 
+### 4.0.8 关于js注入时机修改
+- **onPageFinished()或者onPageStarted()方法中注入js代码**
+    - 做过WebView开发，并且需要和js交互，大部分都会认为js在WebViewClient.onPageFinished()方法中注入最合适，此时dom树已经构建完成，页面已经完全展现出来。但如果做过页面加载速度的测试，会发现WebViewClient.onPageFinished()方法通常需要等待很久才会回调（首次加载通常超过3s），这是因为WebView需要加载完一个网页里主文档和所有的资源才会回调这个方法。
+    - 能不能在WebViewClient.onPageStarted()中注入呢？答案是不确定。经过测试，有些机型可以，有些机型不行。在WebViewClient.onPageStarted()中注入还有一个致命的问题——这个方法可能会回调多次，会造成js代码的多次注入。
+    - 从7.0开始，WebView加载js方式发生了一些小改变，**官方建议把js注入的时机放在页面开始加载之后**。
+- **WebViewClient.onProgressChanged()方法中注入js代码**
+    - WebViewClient.onProgressChanged()这个方法在dom树渲染的过程中会回调多次，每次都会告诉我们当前加载的进度。
+        - 在这个方法中，可以给WebView自定义进度条，类似微信加载网页时的那种进度条
+        - 如果在此方法中注入js代码，则需要避免重复注入，需要增强逻辑。可以定义一个boolean值变量控制注入时机
+    - 那么有人会问，加载到多少才需要处理js注入逻辑呢？
+        - 正是因为这个原因，页面的进度加载到80%的时候，实际上dom树已经渲染得差不多了，表明WebView已经解析了<html>标签，这时候注入一定是成功的。在WebViewClient.onProgressChanged()实现js注入有几个需要注意的地方：
+        - 1 上文提到的多次注入控制，使用了boolean值变量控制
+        - 2 重新加载一个URL之前，需要重置boolean值变量，让重新加载后的页面再次注入js
+        - 3 如果做过本地js，css等缓存，则先判断本地是否存在，若存在则加载本地，否则加载网络js
+        - 4 注入的进度阈值可以自由定制，理论上10%-100%都是合理的，不过建议使用了75%到90%之间可以。
 
 
 ### 4.0.9 视频/图片宽度超过屏幕

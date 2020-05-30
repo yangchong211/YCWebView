@@ -12,8 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.ycbjie.webviewlib.X5WebChromeClient;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.base.X5WebChromeClient;
+import com.ycbjie.webviewlib.view.X5WebView;
 
 public class SixActivity2 extends AppCompatActivity {
 

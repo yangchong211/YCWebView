@@ -17,14 +17,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.ycbjie.webviewlib.BridgeHandler;
-import com.ycbjie.webviewlib.CallBackFunction;
-import com.ycbjie.webviewlib.DefaultHandler;
-import com.ycbjie.webviewlib.ImageJavascriptInterface;
-import com.ycbjie.webviewlib.InterWebListener;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5WebUtils;
-import com.ycbjie.webviewlib.X5WebView;
+import com.ycbjie.webviewlib.bridge.DefaultHandler;
+import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
+import com.ycbjie.webviewlib.view.X5WebView;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 /**
  * <pre>

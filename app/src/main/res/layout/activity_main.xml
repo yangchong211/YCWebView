@@ -53,6 +53,26 @@
             android:text="2.2 带加载进度条的网页"/>
 
         <TextView
+            android:id="@+id/tv_2_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="2.3 A添加缓存拦截的功能，请求一个网站"/>
+
+        <TextView
+            android:id="@+id/tv_2_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="2.4 B不添加缓存的功能，请求一个网站"/>
+
+        <TextView
             android:id="@+id/tv_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,7 +153,7 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="7.3 原生native和h5交互案例3，使用callHandler"/>
+            android:text="7.3 原生native和h5交互案例3"/>
 
 
 

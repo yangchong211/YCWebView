@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.ycbjie.webviewlib.X5WebView
+        <com.ycbjie.webviewlib.view.X5WebView
             android:id="@+id/wb_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

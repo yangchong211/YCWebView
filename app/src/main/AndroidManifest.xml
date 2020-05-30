@@ -64,8 +64,13 @@
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".DeepLinkActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".CacheWebViewActivity1"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".CacheWebViewActivity2"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".FileDisplayActivity"/>
-        <activity android:name=".ten.TenActivity"/>
+        <activity android:name=".TenActivity"/>
         <activity android:name=".DownActivity"/>
         <activity android:name=".NativeActivity2"/>
         <activity android:name=".NativeActivity3"/>

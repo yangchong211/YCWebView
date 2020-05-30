@@ -13,16 +13,16 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.RotateAnimation;
+import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
+import android.webkit.WebHistoryItem;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tencent.smtt.sdk.WebBackForwardList;
-import com.tencent.smtt.sdk.WebChromeClient;
-import com.tencent.smtt.sdk.WebHistoryItem;
-import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewClient;
-import com.ycbjie.webviewlib.WebProgress;
-import com.ycbjie.webviewlib.X5LogUtils;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
+import com.ycbjie.webviewlib.widget.WebProgress;
 
 public class FirstActivity extends AppCompatActivity {
 

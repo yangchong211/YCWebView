@@ -4,6 +4,7 @@
 - 03.分析WebViewJavascriptBridge.js
 - 04.页面Html注册”functionInJs”方法
 - 05.“functionInJs”执行结果回传Java
+- 06.该库交互流程图
 
 
 ### 01.WebView加载html页面
@@ -245,3 +246,29 @@
     }
     ```
 - 到此，JsBridge使用了MessageQueue后，分析起来有点绕。但原理是不变的，Js调用Java是通过WebViewClient.shouldOverrideUrlLoading()。当然，ava调用Js是通过WebView.loadUrl(“javascript:xxxx”)。
+
+
+
+### 06.该库交互流程图
+- java调用js的流程图
+    - 第一步操作：mWebView.callHandler("functionInJs", "小杨逗比", new CallBackFunction() {//这里面是回调});
+    - 第二步操作：将handlerName，data，responseCallback，封装到Message对象中，然后开始分发数据，最后webView执行_handleMessageFromNative；
+    - 第三步操作：去WebViewJavascriptBridge.js类中找到_handleMessageFromNative方法，js根据"functionInJs"找到对应的js方法并且执行；
+    - 第四步操作：js把运行结果保存到message对象中，然后添加到js消息队列中；
+    - 第五步操作：在_dispatchMessageFromNative方法中，可以看到，js向native发送 "消息队列中有消息" 的通知；
+    - 第六步操作：webView执行js的_fetchQueue（WebViewJavascriptBridge.js类）方法；
+    - 第七步操作：js把消息队列中的所有消息都一起回传给webView；
+    - 第八步操作：webView收到所有的消息，一个一个串行处理，注意其中包括 "functionInJs"方法运行的结果的消息；
+- js调用Android的流程图
+    - 第一步操作：mWebView.registerHandler("toPhone", new BridgeHandler() { //回调});
+    - 第二步操作：调用messageHandlers.put(handlerName, handler)，将名称和BridgeHandler对象放到map集合中
+    - 第三步操作：在shouldOverrideUrlLoading方法中拦截url，与网页约定好一个协议，匹配则执行相应操作，也就是利用WebViewClient接口回调方法拦截url
+    - 第四步操作：如果是url.startsWith(BridgeUtil.YY_RETURN_DATA)则有数据返回；如果是BridgeUtil.YY_OVERRIDE_SCHEMA则刷新消息队列
+    - 第五步操作：通过BridgeHandler对象，将data和callBackFunction返回交给开发者
+
+
+
+
+
+
+
