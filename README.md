@@ -1,24 +1,10 @@
 #### 目录介绍
-- 01.前沿说明
-    - 1.1 案例展示效果
-    - 1.2 该库功能和优势
-    - 1.3 相关类介绍说明
-- 02.如何使用
-    - 2.1 如何引入
-    - 2.2 最简单使用
-    - 2.3 常用api
-    - 2.4 使用建议
-    - 2.5 异常状态类型区分
-    - 2.6 该库流程图
-    - 2.7 添加混淆
-- 03.js调用
-    - 3.1 Java调用js方法
-    - 3.2 js调用java方法
-    - 3.3 js的调用时机分析
-    - 3.4 js交互原理分析
-- 04.问题反馈
+- 01.该库具有的功能
+- 02.该库如何使用
+- 03.js调用原理
+- 04.问题反馈总结
 - 05.webView优化
-- 06.关于参考
+- 06.WebView知识点
 - 07.其他说明介绍
 
 
@@ -29,21 +15,6 @@
 #### 1.1 案例展示效果
 - WebView启动过程大概分为以下几个阶段，这里借鉴美团的一张图片
     - ![image](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2017/9a2f8beb.png)
-- 项目案例效果展示图
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-0.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-1.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-2.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-3.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-4.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-5.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-6.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-7.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-8.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-9.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-10.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-11.jpg" width="300" hegiht="180" />
-<img src="https://github.com/yangchong211/YCWebView/blob/master/image/QQ20190923-12.jpg" width="300" hegiht="180" />
-
 
 
 #### 1.2 该库功能和优势
@@ -57,369 +28,37 @@
 - 支持设置仿微信加载H5页面进度条，完全无耦合，操作简单，极大提高用户体验；
 - 支持用户按照规范自定义WebViewClient和WebChromeClient，不影响js通信；
 - 汇集绝大多数问题，以及解决方案，是学习和深入理解webView的一个比较全面的案例；
-
-
-#### 1.3 相关类介绍说明
-- BridgeHandler         接口，主要处理消息回调逻辑
-- BridgeUtil            工具类，静态常量，以及获取js消息的一些方法，final修饰
-- BridgeWebView         自定义WebView类，主要处理与js之间的消息
-- CallBackFunction      js回调
-- DefaultHandler        默认的BridgeHandler
-- InterWebListener      接口，web的接口回调，包括常见状态页面切换【状态页面切换】，进度条变化【显示和进度监听】等
-- Message               自定义消息Message实体类
-- ProgressWebView       自定义带进度条的webView
-- WebViewJavascriptBridge       js桥接接口
-- X5WebChromeClient     自定义x5的WebChromeClient，处理进度监听，title变化，以及上传图片，后期添加视频处理逻辑
-- X5WebUtils            工具类，初始化腾讯x5浏览器webView，及调用该类init方法
-- X5WebView             可以使用这个类，方便统一初始化WebSettings的一些属性，如果不用这里的，想单独初始化setting属性，也可以直接使用BridgeWebView
-- X5WebViewClient       自定义x5的WebViewClient，如果要自定义WebViewClient必须要继承MyX5WebChromeClient，因为注入js监听是在该类中操作的
-- WebProgress           仿微信加载H5页面的WebView进度条
+- 除了webView自带缓存外，还添加了资源拦截缓存，交给OkHttp去做，支持设置超时，设置缓存空间大小；
+- 统一处理web页面打电话，发短信，定位，邮件，开启支付宝，微信等scheme拦截处理；
+- 充分运用了面向对象的设计思想，将视频全屏播放，scheme拦截，web进度条，拦截缓存抽成独立的部分，你也可以拿来即用，完全解耦；
+- 添加了阿里的https+dns优化方案，按照配置初始化填入accountID和host即可使用；
 
 
 
-
-#### [1.4 WebView基础知识点](https://github.com/yangchong211/YCWebView/blob/master/read/WebView1.md)
-- [01.常用的基础使用介绍](https://github.com/yangchong211/YCWebView/blob/master/read/WebView1.md)
-- 02.Android调用Js方式
-- 03.Js调用Android方式
-- 04.清除缓存和缓存分析
-- 05.为什么WebView难搞
-- 06.如何处理加载错误
-- 07.触发加载网页的行为
-- 09.web进度条避免多次加载
-- 10.多次获取web标题title
-- [11.什么是302/303重定向](https://github.com/yangchong211/YCWebView/blob/master/read/WebView2.md)
-- 12.301/302业务场景白屏描述
-- 13.301/302业务白屏解决方案
-- 14.301/302回退栈问题描述
-- 15.301/302回退栈问题解决方案
-- 16.如何设置WebView触摸点击事件
-- 17.如何用代码判断是否重定向
-- 18.如何解决重定向回退栈问题
-- 19.shouldOverrideUrlLoading
-- [21.loadUrl(url)流程分析](https://github.com/yangchong211/YCWebView/blob/master/read/WebView3.md)
-- 22.js的调用时机分析
-- 23.如何使用DeepLink
-- 24.应用被作为三方浏览器打开
-- 25.理解WebView独立进程
-- 26.使用外部浏览器下载
-- 27.tel,sms等协议用法
-- 29.关于拦截处理注意要点
-- 30.FileChooser文件处理
-- [41.管理Cookies分析说明](https://github.com/yangchong211/YCWebView/blob/master/read/WebView4.md)
-- 42.WebView中长按处理逻辑
-- 43.8.0关于WebView新特性
-- 44.H5页面为何加载速度慢
-- 47.WebView多布局连贯滑动
-- [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
+### [02.该库如何使用](https://github.com/yangchong211/YCWebView/wiki/02.%E8%AF%A5%E5%BA%93%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8)
+- 2.1 如何引入该库
+- 2.2 最简单使用
+- 2.3 常用api说明
+- 2.4 使用建议
+- 2.5 关于web页面异常状态区分类型
+- 2.6 如何使用拦截缓存
+- 2.7 使用Https+Dns
+- 2.8 js交互操作处理
+- 2.9 关于添加混淆
 
 
 
-
-### 02.如何使用
-#### 2.1 如何引入
-- **如何引用，该x5的库已经更新到最新版本，引用最新4.3.0稳定版**
-    ```
-    //普通版本
-    implementation 'cn.yc:WebViewLib:1.2.4'
-
-    //添加阿里https+dns解析版本
-    implementation 'cn.yc:WebViewLib:1.2.7'
-    ```
-
-#### 2.2 最简单使用
-- **项目初始化**
-    ```
-    X5WebUtils.init(this);
-    ```
-- **可以使用X5WebView，已经做了常见的setting属性设置**
-    ```
-    <X5WebView
-        android:id="@+id/web_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarSize="3dp" />
-    ```
-- **如果想有带进度的，可以使用ProgressWebView**
-    ```
-    <可以使用ProgressWebView
-        android:id="@+id/web_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarSize="3dp" />
-    ```
-- **如何使用自己的WebViewClient和WebChromeClient**
-    ```
-    //主要是在X5WebViewClient和X5WebChromeClient已经做了很多常见的逻辑处理，如果不满足你使用，可以如下这样写
-    YcX5WebViewClient webViewClient = new YcX5WebViewClient(webView, this);
-    webView.setWebViewClient(webViewClient);
-    YcX5WebChromeClient webChromeClient = new YcX5WebChromeClient(webView,this);
-    webView.setWebChromeClient(webChromeClient);
-    
-    private class YcX5WebViewClient extends MyX5WebViewClient {
-        public YcX5WebViewClient(X5WebView webView, Context context) {
-            super(webView, context);
-        }
-
-        //重写你需要的方法即可
-    }
-  
-    private class YcX5WebChromeClient extends X5WebChromeClient{
-        public YcX5WebChromeClient(X5WebView webView,Activity activity) {
-            super(webView,activity);
-            //重写你需要的方法即可
-        }
-    }
-    ```
-- **针对类似购物的商品详情页面的webView**
-    - 当WebView在最顶部或者最底部的时候，不消费事件，则可以使用VerticalWebView
-
-
-
-#### 2.3 常用api
-- **关于web的接口回调，包括常见状态页面切换，进度条变化等监听处理**
-    ```
-    mWebView.getX5WebChromeClient().setWebListener(interWebListener);
-    private InterWebListener interWebListener = new InterWebListener() {
-        @Override
-        public void hindProgressBar() {
-            pb.setVisibility(View.GONE);
-        }
-    
-        @Override
-        public void showErrorView(@X5WebUtils.ErrorType int type) {
-            //设置自定义异常错误页面
-        }
-    
-        @Override
-        public void startProgress(int newProgress) {
-            //该方法是是监听进度条进度变化的逻辑
-            pb.setProgress(newProgress);
-        }
-        
-        @Override
-        public void showTitle(String title) {
-            //该方法是监听h5中title
-        }
-    };
-    ```
-- **关于视频播放的时候，web的接口回调，主要是视频相关回调，比如全频，取消全频，隐藏和现实webView**
-    ```
-    x5WebChromeClient = x5WebView.getX5WebChromeClient();
-    x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
-        @Override
-        public void showVideoFullView() {
-            //视频全频播放时监听
-        }
-    
-        @Override
-        public void hindVideoFullView() {
-            //隐藏全频播放，也就是正常播放视频
-        }
-    
-        @Override
-        public void showWebView() {
-            //显示webView
-        }
-    
-        @Override
-        public void hindWebView() {
-            //隐藏webView
-        }
-    });
-    ```
-- **其他api说明**
-    ```
-    //X5WebView中
-    //设置是否开启密码保存功能，不建议开启，默认已经做了处理，存在盗取密码的危险
-    mWebView.setSavePassword(false);
-    //是否开启软硬件加速
-    mWebView.setOpenLayerType(false);
-    //获取x5WebChromeClient对象
-    x5WebChromeClient = mWebView.getX5WebChromeClient();
-    //获取x5WebViewClient对象
-    x5WebViewClient = mWebView.getX5WebViewClient();
-    ```
-- **关于如何使用仿微信加载H5页面进度条**
-    - 前端页面时受到网路环境，页面内容大小的影响有时候会让用户等待很久。显示一个加载进度条可以说很大程度上提升用户的体验。
-    ```
-    private WebProgress pb;
-    //显示进度条
-    pb.show();
-    //设置进度条过度颜色
-    pb.setColor(Color.BLUE,Color.RED);
-    //设置单色进度条
-    pb.setColor(Color.BLUE);
-    //为单独处理WebView进度条
-    pb.setWebProgress(newProgress);
-    //进度完成后消失
-    pb.hide();
-    ```
-- 设置cookie和清除cookie操作
-    ```
-    //同步cookie
-    WebkitCookieUtils.syncCookie(this,url,cookieList);
-    //清除cookie
-    WebkitCookieUtils.remove(url);
-    ```
-
-
-#### 2.4 使用建议
-- **优化一下相关的操作**
-    - 关于设置js支持的属性
-    ```
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(true);
-        }
-    }
-    
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(false);
-        }
-    }
-    ```
-    - 关于destroy销毁逻辑
-    ```
-    @Override
-    protected void onDestroy() {
-        if (webView != null) {
-            webView.destroy();
-        }
-        super.onDestroy();
-    }
-    ```
-
-
-#### 2.5 关于web页面异常状态区分类型
-- 对于web加载异常，分为多种状态，比如常见的有，没有网络；404加载异常；onReceivedError，请求网络出现error；在加载资源时通知主机应用程序发生SSL错误
-    ```
-    @Override
-    public void showErrorView(@X5WebUtils.ErrorType int type) {
-        switch (type){
-            //没有网络
-            case X5WebUtils.ErrorMode.NO_NET:
-                break;
-            //404，网页无法打开
-            case X5WebUtils.ErrorMode.STATE_404:
-                break;
-            //onReceivedError，请求网络出现error
-            case X5WebUtils.ErrorMode.RECEIVED_ERROR:
-                break;
-            //在加载资源时通知主机应用程序发生SSL错误
-            case X5WebUtils.ErrorMode.SSL_ERROR:
-                break;
-            default:
-                break;
-        }
-    }
-    ```
-
-
-#### 2.6 该库流程图
-- java调用js的流程图
-    - 第一步操作：mWebView.callHandler("functionInJs", "小杨逗比", new CallBackFunction() {//这里面是回调});
-    - 第二步操作：将handlerName，data，responseCallback，封装到Message对象中，然后开始分发数据，最后webView执行_handleMessageFromNative；
-    - 第三步操作：去WebViewJavascriptBridge.js类中找到_handleMessageFromNative方法，js根据"functionInJs"找到对应的js方法并且执行；
-    - 第四步操作：js把运行结果保存到message对象中，然后添加到js消息队列中；
-    - 第五步操作：在_dispatchMessageFromNative方法中，可以看到，js向native发送 "消息队列中有消息" 的通知；
-    - 第六步操作：webView执行js的_fetchQueue（WebViewJavascriptBridge.js类）方法；
-    - 第七步操作：js把消息队列中的所有消息都一起回传给webView；
-    - 第八步操作：webView收到所有的消息，一个一个串行处理，注意其中包括 "functionInJs"方法运行的结果的消息；
-- js调用Android的流程图
-    - 第一步操作：mWebView.registerHandler("toPhone", new BridgeHandler() { //回调});
-    - 第二步操作：调用messageHandlers.put(handlerName, handler)，将名称和BridgeHandler对象放到map集合中
-    - 第三步操作：在shouldOverrideUrlLoading方法中拦截url，与网页约定好一个协议，匹配则执行相应操作，也就是利用WebViewClient接口回调方法拦截url
-    - 第四步操作：如果是url.startsWith(BridgeUtil.YY_RETURN_DATA)则有数据返回；如果是BridgeUtil.YY_OVERRIDE_SCHEMA则刷新消息队列
-    - 第五步操作：通过BridgeHandler对象，将data和callBackFunction返回交给开发者
-
-
-
-#### 2.7 添加混淆
-- 代码如下所示
-    ```
-    # 该包下所有的类和类成员不混淆
-    -keep class com.ycbjie.webviewlib.** {
-        *;
-    }
-    -dontwarn com.ycbjie.webviewlib.**
-    ```
-
-
-### 03.js交互操作
-#### 3.1 Java调用js的使用方法
-- 代码如下所示，下面updateAttentionStatus代表js这边的方法名称
-    - webView.callHandler(“updateAttentionStatus”, …, new CallBackFunction());这是Java层主动调用Js的”updateAttentionStatus”方法。
-    ```
-    mWebView.callHandler("updateAttentionStatus", attention, new CallBackFunction() {
-        @Override
-        public void onCallBack(String data) {
-    
-        }
-    });
-    ```
-
-
-
-#### 3.2 js调用java的使用方法
-- **代码如下所示，下面中的toPhone代表的是Android这边提供给js的方法名称**
-    - webView.registerHandler(“toPhone”, …);这是Java层注册了一个叫”toPhone”的接口方法，目的是提供给Js来调用。这个”toPhone”的接口方法的回调就是BridgeHandler.handler()。
-    ```
-    mWebView.registerHandler("toPhone", new BridgeHandler() {
-        @Override
-        public void handler(String data, CallBackFunction function) {
-            try {
-                JSONObject jsonData = new JSONObject(data);
-                String phone = jsonData.optString("phone");
-                //todo 打电话
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    });
-    ```
-- **如何回调数据给web那边**
-    ```
-    //注意，这里回传数据目前只是支持String字符串类型
-    function.onCallBack("回调数据");
-    ```
-
-
-
-#### 3.3 js的调用时机分析
-- **onPageFinished()或者onPageStarted()方法中注入js代码**
-    - 做过WebView开发，并且需要和js交互，大部分都会认为js在WebViewClient.onPageFinished()方法中注入最合适，此时dom树已经构建完成，页面已经完全展现出来。但如果做过页面加载速度的测试，会发现WebViewClient.onPageFinished()方法通常需要等待很久才会回调（首次加载通常超过3s），这是因为WebView需要加载完一个网页里主文档和所有的资源才会回调这个方法。
-    - 能不能在WebViewClient.onPageStarted()中注入呢？答案是不确定。经过测试，有些机型可以，有些机型不行。在WebViewClient.onPageStarted()中注入还有一个致命的问题——这个方法可能会回调多次，会造成js代码的多次注入。
-    - 从7.0开始，WebView加载js方式发生了一些小改变，**官方建议把js注入的时机放在页面开始加载之后**。
-- **WebViewClient.onProgressChanged()方法中注入js代码**
-    - WebViewClient.onProgressChanged()这个方法在dom树渲染的过程中会回调多次，每次都会告诉我们当前加载的进度。
-        - 在这个方法中，可以给WebView自定义进度条，类似微信加载网页时的那种进度条
-        - 如果在此方法中注入js代码，则需要避免重复注入，需要增强逻辑。可以定义一个boolean值变量控制注入时机
-    - 那么有人会问，加载到多少才需要处理js注入逻辑呢？
-        - 正是因为这个原因，页面的进度加载到80%的时候，实际上dom树已经渲染得差不多了，表明WebView已经解析了<html>标签，这时候注入一定是成功的。在WebViewClient.onProgressChanged()实现js注入有几个需要注意的地方：
-        - 1 上文提到的多次注入控制，使用了boolean值变量控制
-        - 2 重新加载一个URL之前，需要重置boolean值变量，让重新加载后的页面再次注入js
-        - 3 如果做过本地js，css等缓存，则先判断本地是否存在，若存在则加载本地，否则加载网络js
-        - 4 注入的进度阈值可以自由定制，理论上10%-100%都是合理的，不过建议使用了75%到90%之间可以。
-
-
-
-#### [3.4 js交互原理分析](https://github.com/yangchong211/YCWebView/blob/master/read/Method.md)
+### [03.js调用原理](https://github.com/yangchong211/YCWebView/wiki/03.Js%E4%BA%A4%E4%BA%92%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90)
 - 01.WebView加载html页面
 - 02.加载WebViewJavascriptBridge.js
 - 03.分析WebViewJavascriptBridge.js
 - 04.页面Html注册”functionInJs”方法
 - 05.“functionInJs”执行结果回传Java
-- [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
+- 06.该库交互流程图
 
 
 
-### 04.问题反馈
+### 04.问题反馈总结
 - [4.0.0 WebView进化史介绍](https://github.com/yangchong211/YCWebView/blob/master/read/Question1.md)
 - 4.0.1 提前初始化WebView必要性
 - 4.0.2 x5加载office资源
@@ -502,17 +141,44 @@
 - [更多webView优化内容](https://github.com/yangchong211/YCWebView/blob/master/Optimize.md)
 
 
-### 06.关于参考
-- 感谢开源库
-    - [x5官方开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
-    - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
-    - [WebViewStudy开源库](https://github.com/youlookwhat/WebViewStudy)
-    - [DSBridge](https://github.com/wendux/DSBridge-Android)
-- 参考博客
-    - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
-    - [WebView详解，常见漏洞详解和安全源码上](https://juejin.im/post/58a037df86b599006b3fade4)
-    - [WebView详解，常见漏洞详解和安全源码下](https://blog.csdn.net/self_study/article/details/55046348)
-    - [如何设计一个优雅健壮的Android WebView](https://juejin.im/post/5a94f9d15188257a63113a74)
+
+### 06.WebView知识点
+- [01.常用的基础使用介绍](https://github.com/yangchong211/YCWebView/blob/master/read/WebView1.md)
+- 02.Android调用Js方式
+- 03.Js调用Android方式
+- 04.清除缓存和缓存分析
+- 05.为什么WebView难搞
+- 06.如何处理加载错误
+- 07.触发加载网页的行为
+- 09.web进度条避免多次加载
+- 10.多次获取web标题title
+- [11.什么是302/303重定向](https://github.com/yangchong211/YCWebView/blob/master/read/WebView2.md)
+- 12.301/302业务场景白屏描述
+- 13.301/302业务白屏解决方案
+- 14.301/302回退栈问题描述
+- 15.301/302回退栈问题解决方案
+- 16.如何设置WebView触摸点击事件
+- 17.如何用代码判断是否重定向
+- 18.如何解决重定向回退栈问题
+- 19.shouldOverrideUrlLoading
+- [21.loadUrl(url)流程分析](https://github.com/yangchong211/YCWebView/blob/master/read/WebView3.md)
+- 22.js的调用时机分析
+- 23.如何使用DeepLink
+- 24.应用被作为三方浏览器打开
+- 25.理解WebView独立进程
+- 26.使用外部浏览器下载
+- 27.tel,sms等协议用法
+- 29.关于拦截处理注意要点
+- 30.FileChooser文件处理
+- [41.管理Cookies分析说明](https://github.com/yangchong211/YCWebView/blob/master/read/WebView4.md)
+- 42.WebView中长按处理逻辑
+- 43.8.0关于WebView新特性
+- 44.H5页面为何加载速度慢
+- 47.WebView多布局连贯滑动
+- [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
+
+
+
 
 
 ### 07.其他说明介绍
@@ -533,6 +199,16 @@
 - 博客笔记大汇总【15年10月到至今】，包括Java基础及深入知识点，Android技术博客，Python学习笔记等等，还包括平时开发中遇到的bug汇总，当然也在工作之余收集了大量的面试题，长期更新维护并且修正，持续完善……开源的文件是markdown格式的！同时也开源了生活博客，从12年起，积累共计47篇[近100万字]，转载请注明出处，谢谢！
 - 链接地址：https://github.com/yangchong211/YCBlogs
 - 如果觉得好，可以star一下，谢谢！当然也欢迎提出建议，万事起于忽微，量变引起质变！
+- 感谢开源库
+    - [x5官方开发文档](https://x5.tencent.com/tbs/guide/sdkInit.html)
+    - [JsBridge开源库](https://github.com/lzyzsd/JsBridge)
+    - [WebViewStudy开源库](https://github.com/youlookwhat/WebViewStudy)
+    - [DSBridge](https://github.com/wendux/DSBridge-Android)
+- 参考博客
+    - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
+    - [WebView详解，常见漏洞详解和安全源码上](https://juejin.im/post/58a037df86b599006b3fade4)
+    - [WebView详解，常见漏洞详解和安全源码下](https://blog.csdn.net/self_study/article/details/55046348)
+    - [如何设计一个优雅健壮的Android WebView](https://juejin.im/post/5a94f9d15188257a63113a74)
 
 
 

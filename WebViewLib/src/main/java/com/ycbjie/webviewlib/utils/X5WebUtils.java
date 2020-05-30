@@ -120,6 +120,9 @@ public final class X5WebUtils {
     }
 
     public static void initCache(Application application){
+        //1.创建委托对象
+        WebViewCacheDelegate webViewCacheDelegate = WebViewCacheDelegate.getInstance();
+        //2.创建调用处理器对象，实现类
         WebViewCacheWrapper.Builder builder = new WebViewCacheWrapper.Builder(application);
         //设置缓存路径，默认getCacheDir，名称CacheWebViewCache
         builder.setCachePath(new File(application.getCacheDir(),"CacheWebViewCache"))
@@ -131,7 +134,7 @@ public final class X5WebUtils {
                 .setReadTimeoutSecond(20)
                 //设置缓存为正常模式，默认模式为强制缓存静态资源
                 .setCacheType(WebCacheType.NORMAL);
-        WebViewCacheDelegate.getInstance().init(builder);
+        webViewCacheDelegate.init(builder);
     }
 
     /**

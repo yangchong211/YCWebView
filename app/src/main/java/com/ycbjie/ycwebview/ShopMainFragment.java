@@ -1,4 +1,4 @@
-package com.ycbjie.ycwebview.ten;
+package com.ycbjie.ycwebview;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

@@ -50,6 +50,15 @@ public class WebViewCacheDelegate implements WebViewRequestClient {
         if (mInterceptor==null){
             return null;
         }
+        //比如，这里增加过滤
+        /*boolean isHttpsDns = true;
+        if (isHttpsDns){
+            //https + dns 拦截优化
+            return mInterceptor.interceptRequest(request);
+        } else {
+            // 缓存拦截优化
+            return mInterceptor.interceptRequest(request);
+        }*/
         return mInterceptor.interceptRequest(request);
     }
 

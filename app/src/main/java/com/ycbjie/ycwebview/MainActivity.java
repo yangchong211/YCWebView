@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.ycbjie.ycwebview.ten.TenActivity;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
