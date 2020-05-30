@@ -23,7 +23,7 @@ import com.ycbjie.webviewlib.widget.WebProgress;
 public class CacheWebViewActivity2 extends AppCompatActivity {
 
     //public static String url =  "https://www.jianshu.com/u/b7b2c6ed9284";
-    public static String url =  "https://h5.youzan.com/v2/feature/e24rDsqa2r";
+    public static String url =  "https://h5.youzan.com/v2/showcase/homepage?alias=lUWblj8NNI";
     private X5WebView mWebView;
     private WebProgress progress;
 

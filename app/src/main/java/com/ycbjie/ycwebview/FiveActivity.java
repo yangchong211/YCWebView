@@ -69,7 +69,7 @@ public class FiveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
-        String movieUrl = "http://www.v.baidu.com/movie";
+        String movieUrl = "https://www.iqiyi.com/";
         webView.loadUrl(movieUrl);
         progress = findViewById(R.id.progress);
         progress.show();
