@@ -62,7 +62,12 @@ public final class WebSchemeIntent {
     private static final String MESSAGE_UNKNOWN = "系统未安装相应应用";
     public static final int REQUEST_PHONE = 101;
 
-
+    /**
+     * 开启activity
+     * @param intent                            intent
+     * @param activity                          上下文
+     * @throws WebViewException                 异常，如果找不到，就会抛出异常，开发者也可以自己try-catch
+     */
     private static boolean startWithActivity(Intent intent, Activity activity) throws WebViewException {
         Activity target = activity.getParent();
         if (target == null) {
@@ -76,6 +81,12 @@ public final class WebSchemeIntent {
         }
     }
 
+    /**
+     * 开启activity
+     * @param intent                            intent
+     * @param context                           上下文
+     * @throws WebViewException                 异常，如果找不到，就会抛出异常，开发者也可以自己try-catch
+     */
     private static void startWithAppContext(Intent intent, Context context) throws WebViewException {
         try {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
@@ -85,11 +96,21 @@ public final class WebSchemeIntent {
         }
     }
 
+    /**
+     * 是否是短信，电话，邮件，地图定位
+     * @param scheme                            scheme
+     * @return
+     */
     public static boolean isAliveType(@NonNull String scheme) {
         return SCHEME_SMS.equalsIgnoreCase(scheme) || SCHEME_TEL.equalsIgnoreCase(scheme)
                 || SCHEME_MAIL.equalsIgnoreCase(scheme) || SCHEME_GEO.equalsIgnoreCase(scheme);
     }
 
+    /**
+     * 是否是支付相关，这里主要有阿里支付，微信支付等拦截处理
+     * @param scheme                           scheme
+     * @return
+     */
     public static boolean isSilentType(@NonNull String scheme) {
         return SCHEME_WX_PAY.equalsIgnoreCase(scheme)
                 || SCHEME_ALI_PAY.equalsIgnoreCase(scheme) || SCHEME_QQ_IM.equalsIgnoreCase(scheme);
@@ -98,9 +119,9 @@ public final class WebSchemeIntent {
     /**
      * 处理会打断的默认scheme
      *
-     * @param context   上下文
-     * @param uri       链接
-     * @return          true表示被处理
+     * @param context                           上下文
+     * @param uri                               链接
+     * @return                                  true表示被处理
      */
     public static boolean handleAlive(@NonNull Context context, Uri uri) {
         final String scheme = uri.getScheme();
@@ -114,9 +135,9 @@ public final class WebSchemeIntent {
     /**
      * 静默处理内部页面支持的scheme.
      *
-     * @param context 上下文
-     * @param uri     链接
-     * @return true表示被处理
+     * @param context                           上下文
+     * @param uri                               链接
+     * @return                                  true表示被处理
      */
     public static boolean handleSilently(@NonNull Context context, Uri uri) {
         final String scheme = uri.getScheme();
@@ -165,19 +186,27 @@ public final class WebSchemeIntent {
     }
 
     /**
-     * 开启activity
+     * 开启activity，这里需要手动try-catch一下
+     * 在调用系统EMAIL发从邮件时，如果手机没有能接受SENDTO和mailto的应用，将会出现如下崩溃，
+     * ActivityNotFoundException: No Activity found to handle Intent {
+     * act=android.intent.action.SENDTO dat=mailto:xxxxxxxxxxxx@xxx.xxx }
+     * 特别是一些国行手机，这些手机里面没有安卓原生GMAIL。
      * @param context                           context上下文
      * @param uri                               uri
      */
     private static void startWithActivity(Context context, Uri uri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(uri);
-        if (!(context instanceof Activity)) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-        }
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(uri);
+            if (!(context instanceof Activity)) {
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            }
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }
+        } catch (ActivityNotFoundException e){
+            e.printStackTrace();
         }
     }
 

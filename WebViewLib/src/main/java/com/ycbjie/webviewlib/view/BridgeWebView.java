@@ -25,7 +25,9 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.base.RequestInfo;
 import com.ycbjie.webviewlib.inter.CallBackFunction;
 import com.ycbjie.webviewlib.bridge.DefaultHandler;
 import com.ycbjie.webviewlib.bridge.WebJsMessage;
@@ -33,6 +35,7 @@ import com.ycbjie.webviewlib.inter.WebViewJavascriptBridge;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.inter.BridgeHandler;
 import com.ycbjie.webviewlib.bridge.BridgeUtil;
+import com.ycbjie.webviewlib.wv.WvWebView;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -62,29 +65,28 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 	 * loadUrl方法在19以上超过2097152个字符失效
 	 */
 	private static final int URL_MAX_CHARACTER_NUM = 2097152;
-	private static final int DISPATCH_MESSAGE = 520;
-	private static final int POST_URL = 521;
+	private static final int EXEC_SCRIPT = 1;
+	private static final int LOAD_URL = 2;
+	private static final int LOAD_URL_WITH_HEADERS = 3;
+	private static final int HANDLE_MESSAGE = 4;
+
 	@SuppressLint("HandlerLeak")
 	private Handler handler = new Handler(){
 		@Override
 		public void handleMessage(android.os.Message msg) {
 			super.handleMessage(msg);
 			switch (msg.what){
-				case DISPATCH_MESSAGE:
+				case EXEC_SCRIPT:
 					String javascriptCommand = (String) msg.obj;
-					X5LogUtils.d("分发message--------------"+javascriptCommand);
-					//this.loadUrl(javascriptCommand);
-					//开始执行js中_handleMessageFromNative方法
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
-							javascriptCommand.length()>=URL_MAX_CHARACTER_NUM) {
-						evaluateJavascript(javascriptCommand,null);
-					}else {
-						loadUrl(javascriptCommand);
-					}
+					evaluateJavascriptUrl(javascriptCommand);
 					break;
-				case POST_URL:
+				case LOAD_URL:
 					String url = (String) msg.obj;
 					loadUrl(url);
+					break;
+				case LOAD_URL_WITH_HEADERS:
+					RequestInfo info = (RequestInfo) msg.obj;
+					BridgeWebView.super.loadUrl(info.url, info.headers);
 					break;
 				default:
 					break;
@@ -122,16 +124,35 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 		init();
 	}
 
+	/**
+	 * 开发者调用
+	 * 主线程发送消息
+	 * @param url						url
+	 */
 	@Override
-	public void loadUrl(String s) {
+	public void loadUrl(String url) {
 		try {
-			super.loadUrl(s);
+			super.loadUrl(url);
+			//Message msg = handler.obtainMessage(LOAD_URL, url);
+			//handler.sendMessage(msg);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 
 	/**
+	 * 开发者调用
+	 * 主线程发送消息
+	 * @param url						url
+	 */
+	@Override
+	public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
+		Message msg = handler.obtainMessage(LOAD_URL_WITH_HEADERS, new RequestInfo(url, additionalHttpHeaders));
+		handler.sendMessage(msg);
+	}
+
+	/**
+	 * 开发者调用
 	 * 子线程发送消息
 	 * @param url						url
 	 */
@@ -140,9 +161,52 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 			loadUrl(url);
 		} else {
 			Message message = handler.obtainMessage();
-			message.what = DISPATCH_MESSAGE;
+			message.what = LOAD_URL;
 			message.obj = url;
 			handler.sendMessage(message);
+		}
+	}
+
+	/**
+	 * 开发者调用
+	 * Android调用js方法
+	 * @param script					方法
+	 */
+	public void evaluateJavascript(final String script) {
+		if (Looper.getMainLooper() == Looper.myLooper()) {
+			evaluateJavascriptUrl(script);
+		} else {
+			Message msg = handler.obtainMessage(EXEC_SCRIPT, script);
+			handler.sendMessage(msg);
+		}
+	}
+
+	/**
+	 * Android调用js方法
+	 * @param script					方法
+	 */
+	private void evaluateJavascriptUrl(String script) {
+		X5LogUtils.d("分发message--------------"+script);
+		//this.loadUrl(javascriptCommand);
+		//开始执行js中_handleMessageFromNative方法
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			BridgeWebView.super.evaluateJavascript(script, new ValueCallback<String>(){
+				@Override
+				public void onReceiveValue(String s) {
+					X5LogUtils.i("---evaluateJavascript-1--"+s);
+				}
+			});
+		} else {
+			if (script.length()>=URL_MAX_CHARACTER_NUM){
+				BridgeWebView.super.evaluateJavascript(script, new ValueCallback<String>(){
+					@Override
+					public void onReceiveValue(String s) {
+						X5LogUtils.i("---evaluateJavascript-2--"+s);
+					}
+				});
+			} else {
+				loadUrl(script);
+			}
 		}
 	}
 
@@ -251,10 +315,9 @@ public class  BridgeWebView extends WebView implements WebViewJavascriptBridge {
 			messageJson = messageJson.replaceAll("%7D", URLEncoder.encode("%7D"));
 			messageJson = messageJson.replaceAll("%22", URLEncoder.encode("%22"));
 			//转化格式为javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');
-			String javascriptCommand = String.format(
-					BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
+			String javascriptCommand = String.format(BridgeUtil.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
 			Message message = handler.obtainMessage();
-			message.what = DISPATCH_MESSAGE;
+			message.what = EXEC_SCRIPT;
 			message.obj = javascriptCommand;
 			handler.sendMessage(message);
 			// 必须要找主线程才会将数据传递出去 --- 划重点

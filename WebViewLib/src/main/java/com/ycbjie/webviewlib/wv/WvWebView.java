@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.base.RequestInfo;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 
@@ -98,15 +99,6 @@ public class WvWebView extends WebView {
                         break;
                 }
             }
-        }
-    }
-
-    private class RequestInfo {
-        String url;
-        Map<String, String> headers;
-        RequestInfo(String url, Map<String, String> additionalHttpHeaders) {
-            this.url = url;
-            this.headers = additionalHttpHeaders;
         }
     }
 
