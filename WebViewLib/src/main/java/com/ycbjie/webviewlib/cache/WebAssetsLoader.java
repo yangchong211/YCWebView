@@ -61,6 +61,11 @@ public class WebAssetsLoader {
         return this;
     }
 
+    /**
+     * 获取url的path路径
+     * @param url                           url链接
+     * @return
+     */
     private String getUrlPath(String url){
         String uPath="";
         try {
@@ -144,7 +149,7 @@ public class WebAssetsLoader {
 
     private WebAssetsLoader initResourceNoneRecursion(String dir){
         try {
-            LinkedList<String> list = new LinkedList<String>();
+            LinkedList<String> list = new LinkedList<>();
             String[] resData = mContext.getAssets().list(dir);
             if (resData != null) {
                 for (String res : resData) {
@@ -188,6 +193,11 @@ public class WebAssetsLoader {
         return this;
     }
 
+    /**
+     * 从本地文件中获取数据，将file文件转化成数据流InputStream
+     * @param path
+     * @return
+     */
     public InputStream getAssetFileStream(String path) {
         try {
             //读取assets路径下的文件

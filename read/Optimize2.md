@@ -81,6 +81,7 @@
     ```
 
 
+
 ### 5.1.7 @JavascriptInterface注解方法注意点
 - 在js调用Android原生方法时，会用@JavascriptInterface注解标注那些需要被调用的Android原生方法，那么思考一下，这些原生方法是否可以执行耗时操作，如果有会阻塞通信吗？
 - JS会阻塞等待当前原生函数（耗时操作的那个）执行完毕再往下走，所以 @JavascriptInterface注解的方法里面最好也不要做耗时操作，最好利用Handler封装一下，让每个任务自己处理，耗时的话就开线程自己处理，这样是最好的。
@@ -258,8 +259,10 @@
     }
     ```
 
+
 ### 5.2.1 WebView独立进程解决方案
 - https://www.jianshu.com/p/b66c225c19e2
+- 待验证
 
 
 

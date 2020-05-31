@@ -16,7 +16,34 @@
 
 
 ### 4.3.1 Android与js传递数据大小有限制
-
+- android向H5传输图片，原生获取图片之后，最终转为base64后，通过js桥传送给H5
+    ```
+    mWebView.post(new Runnable() {
+        @Override
+        public void run() {
+            mWebView.loadUrl("javascript:jsFunc('" + msg + "')");
+         }
+    });
+    ```
+- 问题：有时候图片过大，又想高质量的传送，可能遇到下面问题
+    ```
+    [WARNING:navigator_impl.cc(315)] Refusing to load URL as it exceeds 2097152 characters.
+    //拒绝加载URL超过2097152个字符
+    ```
+- 解决方案
+    ```
+    if (script.length()>=URL_MAX_CHARACTER_NUM){
+        BridgeWebView.super.evaluateJavascript(script, new ValueCallback<String>(){
+            @Override
+            public void onReceiveValue(String s) {
+                X5LogUtils.i("---evaluateJavascript-2--"+s);
+            }
+        });
+    } else {
+        loadUrl(script);
+    }
+    ```
+- 参考资料：[拒绝加载URL超过2097152个字符](https://stackoverflow.com/questions/38066503/android-webview-send-base64-url-to-javascript-refusing-to-load-url-as-it-exceed)
 
 
 ### 4.3.2 多次调用callHandler部分回调函数未被调用

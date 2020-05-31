@@ -66,6 +66,7 @@
     ```
 
 
+
 ### 5.0.3 自定义加载异常error的状态页面，比如下面这些方法中可能会出现error
 - 当WebView加载页面出错时（一般为404 NOT FOUND），安卓WebView会默认显示一个出错界面。当WebView加载出错时，会在WebViewClient实例中的onReceivedError()，还有onReceivedTitle方法接收到错误
     ```
@@ -128,6 +129,7 @@
     ```
 
 
+
 ### 5.0.4 WebView硬件加速导致页面渲染闪烁
 - 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。解决这个问题的方法是在过渡期前将WebView的硬件加速临时关闭，过渡期后再开启
     ```
@@ -135,7 +137,10 @@
         webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
     ```
-    
+- 关于硬件加速的原理是什么？
+
+
+
     
 ### 5.0.5 WebView加载证书错误
 - webView加载一些别人的url时候，有时候会发生证书认证错误的情况，这时候我们希望能够正常的呈现页面给用户，我们需要忽略证书错误，需要调用WebViewClient类的onReceivedSslError方法，调用handler.proceed()来忽略该证书错误。
@@ -163,6 +168,7 @@
         }
     }
     ```
+
 
 
 #### 5.0.6 web音频播放销毁后还有声音
@@ -253,7 +259,7 @@
 
 
 ### 5.1.0 可以提前显示加载进度条
-- 提前显示进度条不是提升性能 ， 但是对用户体验来说也是很重要的一点 ， WebView.loadUrl("url") 不会立马就回调 onPageStarted 或者 onProgressChanged 因为在这一时间段，WebView 有可能在初始化内核，也有可能在与服务器建立连接，这个时间段容易出现白屏，白屏用户体验是很糟糕的 ，所以建议
+- 提前显示进度条不是提升性能，但是对用户体验来说也是很重要的一点 ， WebView.loadUrl("url") 不会立马就回调 onPageStarted 或者 onProgressChanged 因为在这一时间段，WebView 有可能在初始化内核，也有可能在与服务器建立连接，这个时间段容易出现白屏，白屏用户体验是很糟糕的 ，所以建议
     ```
     //正确
     pb.setVisibility(View.VISIBLE);
@@ -322,7 +328,6 @@
 - HttpDns，使用http协议向特定的DNS服务器进行域名解析请求，代替基于DNS协议向运营商的Local DNS发起解析请求，可以降低运营商DNS劫持带来的访问失败。
 - 阿里云HTTP-DNS是避免dns劫持的一种有效手段，在许多特殊场景如HTTPS/SNI、okhttp等都有最佳实践，事实上很多场景依然可以通过HTTP-DNS进行IP直连，这个方案具体可以看阿里的官方demo和文档，我自己本身也没有实践过，这里只是提一下。
     - 参考链接：[Android Webview + HttpDns最佳实践](https://help.aliyun.com/document_detail/60181.html?spm=5176.11065259.1996646101.searchclickresult.431f492dDakb73)
-- 
 
 
 ### 5.1.4 如何禁止WebView返回时刷新

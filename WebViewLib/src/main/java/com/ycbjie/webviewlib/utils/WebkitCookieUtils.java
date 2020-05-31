@@ -40,7 +40,7 @@ public final class WebkitCookieUtils {
             }
         }
         String cookies = cookieManager.getCookie(url);
-        X5LogUtils.d("cookies-------"+cookies);
+        X5LogUtils.d("WebkitCookieUtils-------"+cookies);
         flush();
     }
 
@@ -52,6 +52,19 @@ public final class WebkitCookieUtils {
         CookieSyncManager.createInstance(context);
         CookieSyncManager.getInstance().startSync();
         CookieManager.getInstance().removeSessionCookie();
+    }
+
+    /**
+     * 获取url的cookie操作
+     * @param context                       上下文
+     * @param url                           url
+     * @return
+     */
+    public static String getCookie(Context context , String url){
+        CookieManager cookieManager = CookieManager.getInstance();
+        String cookieStr = cookieManager.getCookie(url);
+        X5LogUtils.i( "WebkitCookieUtils----Cookies = " + cookieStr);
+        return cookieStr;
     }
 
 

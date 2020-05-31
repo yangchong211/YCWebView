@@ -257,6 +257,18 @@
 
 ### 4.1.1 如何代码开启硬件加速
 - 开启软硬件加速这个性能提升还是很明显的，但是会耗费更大的内存 。直接调用代码api即可完成，webView.setOpenLayerType(true);
+- 硬件加速分为四个级别：
+    - Application级别<application android:hardwareAccelerated="true"...>
+    - Activity级别<activity android:hardwareAccelerated="true"...>
+    - window级别（目前为止，Android还不支持在Window级别关闭硬件加速。）
+        ```
+        getWindow().setFlags(
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+        ```
+    - View级别view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+
 
 
 ### 4.1.2 WebView设置Cookie
@@ -317,18 +329,9 @@
 
 
 ### 4.1.3 开启硬件加速导致的闪烁问题
-- 硬件加速分为四个级别：
-    - Application级别<application android:hardwareAccelerated="true"...>
-    - Activity级别<activity android:hardwareAccelerated="true"...>
-    - window级别（目前为止，Android还不支持在Window级别关闭硬件加速。）
-        ```
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,         
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-        ```
-    - View级别view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 - WebView开启硬件加速导致屏幕花屏原因分析
-    - 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。
+    - 4.0以上的系统我们开启硬件加速后，WebView渲染页面更加快速，拖动也更加顺滑。
+    - 但有个副作用就是，当WebView视图被整体遮住一块，然后突然恢复时（比如使用SlideMenu将WebView从侧边滑出来时），这个过渡期会出现白块同时界面闪烁。
 - 在应用开启硬件加速后，WebView可能在加载过程出现闪烁现象。解决方案：
     - 为WebView关闭硬件加速功能。在过渡期前将WebView的硬件加速临时关闭，过渡期后再开启，webView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
 

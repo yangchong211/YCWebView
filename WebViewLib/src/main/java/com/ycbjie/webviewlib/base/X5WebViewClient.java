@@ -87,7 +87,6 @@ public class X5WebViewClient extends WebViewClient {
      * 记录重定向前的链接
      */
     private String mUrlBeforeRedirect;
-    private static int ERR_TOO_MANY_REDIRECTS = -9;
 
     /**
      * 获取是否加载完毕
@@ -124,6 +123,7 @@ public class X5WebViewClient extends WebViewClient {
      * @param url                               链接
      */
     private void recordUrl(String url) {
+        //判断当前url，是否和栈中栈顶部的url是否相同。如果不相同，则入栈操作
         if (!TextUtils.isEmpty(url) && !url.equals(getUrl())) {
             if (!TextUtils.isEmpty(mUrlBeforeRedirect)) {
                 mUrlStack.push(mUrlBeforeRedirect);
@@ -139,6 +139,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Nullable
     public String getUrl() {
+        //peek方法，查看此堆栈顶部的对象，而不将其从堆栈中删除。
         return mUrlStack.size() > 0 ? mUrlStack.peek() : null;
     }
 
@@ -147,6 +148,7 @@ public class X5WebViewClient extends WebViewClient {
      * @return
      */
     String popUrl() {
+        //pop方法，移除此堆栈顶部的对象并将该对象作为此函数的值返回。
         return mUrlStack.size() > 0 ? mUrlStack.pop() : null;
     }
 
@@ -391,7 +393,8 @@ public class X5WebViewClient extends WebViewClient {
         super.onReceivedError(view, errorCode, description, failingUrl);
         X5LogUtils.i("-------onReceivedError-------"+failingUrl);
         if (Build.VERSION.SDK_INT < 23) {
-            if (errorCode == ERR_TOO_MANY_REDIRECTS) {
+            //错误重定向循环
+            if (errorCode == ERROR_REDIRECT_LOOP) {
                 resolveRedirect(view);
                 return;
             }
@@ -448,7 +451,8 @@ public class X5WebViewClient extends WebViewClient {
         super.onReceivedError(view, request, error);
         X5LogUtils.i("-------onReceivedError-------"+error.getDescription().toString());
         if (Build.VERSION.SDK_INT >= 23) {
-            if (error != null && error.getErrorCode() == ERR_TOO_MANY_REDIRECTS) {
+            //错误重定向循环
+            if (error != null && error.getErrorCode() == ERROR_REDIRECT_LOOP) {
                 resolveRedirect(view);
                 return;
             }

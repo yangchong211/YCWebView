@@ -13,7 +13,7 @@
 
 
 
-### 4.6.6 WebView如何隐藏H5的部分内容
+### 4.6.6 WebView如何隐藏H5的部分内容问题
 - 产品需求
     - 要在App中打开xx的链接，并且要隐藏掉H5页面的某些内容，这个就需要在Java代码中操作WebView，让H5页面加载完成后能够隐藏掉某些内容。
 - 需要几个前提条件
@@ -24,6 +24,9 @@
     - 在H5页面中找到某个元素还是有很多方法的，比如getElementById()、getElementsByClassName()、getElementsByTagName()等，具体根据页面来选择
     - 找到要隐藏的h5视图div，然后可以看到有id，或者class。这里用class举例子，比如div的class叫做'copyright'
     - document.getElementsByClassName('copyright')[0].style.display='none'
+- 可能出现的问题
+    - 等到页面加载完毕后，执行隐藏div标签方法，会造成控件闪屏，不抬友好。但是如果在onProgressChanged执行到85左右隐藏标签又会导致偶发性没有隐藏成功。
+    - 如果有重定向，则会出现执行多次。写了这个隐藏逻辑，会造成所有的页面都会执行，不知道是否会影响性能？待研究……
 - 代码操作如下所示
     ```
     /**

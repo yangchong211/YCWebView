@@ -239,7 +239,7 @@
      * 3.界面变化之后，获取"可用高度"
      * 4.最后一步，重设高度
 - 具体看lib中的AndroidBug5497Workaround类代码
-
+    - [AndroidBug5497Workaround](https://github.com/yangchong211/YCWebView/blob/master/WebViewLib/src/main/java/com/ycbjie/webviewlib/tools/AndroidBug5497Workaround.java)
 
 
 ### 4.6.2 为什么打包之后JS调用出现失败
