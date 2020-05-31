@@ -1,16 +1,16 @@
-#### WebView分享目录介绍
+#### 目录介绍
 - 01.loadUrl到底做了什么
 - 02.触发加载网页的行为
 - 03.webView重定向怎么办
 - 04.js交互的一点知识分享
 - 05.拦截缓存如何优雅处理
 - 06.关于一些问题和优化
-- 07.关于一点面向对象的思想
-- 08.关于后期需要研究的目标
+- 07.关于一点面向对象思想
+- 08.关于后期需要研究目标
 
 
 
-### loadUrl到底做了什么
+### 01.loadUrl到底做了什么
 - WebView.loadUrl(url)加载网页做了什么？
     - 加载网页是一个复杂的过程，在这个过程中，我们可能需要执行一些操作，包括：
     - 加载网页前，重置WebView状态以及与业务绑定的变量状态。WebView状态包括重定向状态(mTouchByUser)、前端控制的回退栈(mBackStep)等，业务状态包括进度条、当前页的分享内容、分享按钮的显示隐藏等。
@@ -28,7 +28,7 @@
 
 
 
-### 触发加载网页的行为
+### 02.触发加载网页的行为
 - 触发加载网页的行为主要有两种方式：
     - （A）点击页面，触发<link>标签。
     - （B）调用WebView的loadUrl()方法
@@ -113,30 +113,51 @@
 
 
 
-### webView重定向怎么办
+### 03.webView重定向怎么办
 - webView出现302/303重定向
     - 302重定向又称之为302代表暂时性转移，比如你跳转A页面，但由于网页添加了约束条件，可能让你跳转到B页面，甚至多次重定向。
 - 导致的问题
     - 1.A-->B-->C，比如你跳转A页面，最终重定向到C页面。这个时候调用goBack方法，返回到B链接，但是B链接又会跳转到C链接，从而导致没法返回到A链接界面
     - 2.会多次执行onPageStarted和onPageFinished，如果你这里有加载进度条或者loading，那么会导致进度条或者loading执行多次
-    - 3.
-- 如何判断页面发生重定向
+- 常见的解决方案
+    - 手动管理回退栈，遇到重定向时回退两次。
+    - 通过HitTestResult判断是否是重定向，从而决定是否自己加载url。具体看：[16.301/302回退栈问题解决方案2](https://github.com/yangchong211/YCWebView/wiki/6.2-webView%E5%9F%BA%E7%A1%802)
+    - 通过设置标记位，在onPageStarted和onPageFinished分别标记变量避免重定向。具体看：[17.301/302回退栈问题解决方案3](https://github.com/yangchong211/YCWebView/wiki/6.2-webView%E5%9F%BA%E7%A1%802)
+    - 通过用户的touch事件来判断重定向。具体看：[15.301/302回退栈如何处理1](https://github.com/yangchong211/YCWebView/wiki/6.2-webView%E5%9F%BA%E7%A1%802)
+- 如何判断重定向
+    - 通过getHitTestResult()返回值，如果返回null，或者UNKNOWN_TYPE，则表示为重定向。具体看：[18.如何用代码判断是否重定向](https://github.com/yangchong211/YCWebView/wiki/6.2-webView%E5%9F%BA%E7%A1%802)
+    - 在加载一个页面开始的时候会回调onPageStarted方法，在该页面加载完成之后会回调onPageFinished方法。而如果该链接发生了重定向，回调shouldOverrideUrlLoading会在回调onPageFinished之前。
+- 终极解决方案如下
+    - 需要准备的条件
+        - 创建一个栈，主要是用来存取和移除url的操作。这个url包括所有的请求链接
+        - 定义一个变量，用于判断页面是否处于正在加载中。
+        - 定义一个变量，用于记录重定向前的链接url
+        - 定一个重定向时间间隔，主要为了避免刷新造成循环重定向
+    - 具体怎么操作呢
+        - 在执行onPageStarted时，先移除栈中上一个url，然后将url加载到栈中。
+        - 当出现错误重定向的时候，如果和上一次重定向的时间间隔大于3秒，则reload页面。
+        - 在回退操作的时候，判断如果可以回退，则从栈中获取最后停留的url，然后loadUrl。即可解决回退问题。
+    - 具体方法思路
+        - 可以看：[20.重定向终极优雅解决方案](https://github.com/yangchong211/YCWebView/wiki/6.2-webView%E5%9F%BA%E7%A1%802)
+        - 具体代码看：[X5WebViewClient](https://github.com/yangchong211/YCWebView/blob/master/WebViewLib/src/main/java/com/ycbjie/webviewlib/base/X5WebViewClient.java)
 
 
 
-
-### js交互的一点知识分享
+### 04.js交互的一点知识分享
 - js交互介绍
     - Java调用js方法有两种：
         - WebView.loadUrl("javascript:" + javascript);
         - WebView.evaluateJavascript(javascript, callbacck);
-    - js调用Java的方法有四种，分别是：
+    - js调用Java的方法有三种，分别是：
         - JavascriptInterface
         - WebViewClient.shouldOverrideUrlLoading()
-        - WebChromeClient.onConsoleMessage()
         - WebChromeClient.onJsPrompt()
 - js调用java方法比较和区别分析
-    -
+    - 1.通过 addJavascriptInterface 方法进行添加对象映射。js最终通过对象调用原生方法
+    - 2.shouldOverrideUrlLoading拦截操作，获取scheme匹配，与网页约定好一个协议，如果匹配，执行相应操作
+    - 3.利用WebChromeClient回调接口onJsPrompt拦截操作。
+        - onJsAlert 是不能返回值的，而 onJsConfirm 只能够返回确定或者取消两个值，只有 onJsPrompt 方法是可以返回字符串类型的值，操作最全面方便。
+    - 详细分析可以看：[03.Js调用Android](https://github.com/yangchong211/YCWebView/wiki/6.1-webView%E5%9F%BA%E7%A1%801)
 - js调用java原生方法可能存在的问题？
     - 提出问题
         - 1.原生方法是否可以执行耗时操作，如果有会阻塞通信吗？[4.4.8 prompt的一个坑导致js挂掉](https://github.com/yangchong211/YCWebView/wiki/4.4-%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB%E4%BB%8B%E7%BB%8D4)
@@ -157,7 +178,7 @@
 
 
 
-### 拦截缓存如何优雅处理
+### 05.拦截缓存如何优雅处理
 - WebView为何加载慢
     - webView是怎么加载网页的呢？
         - webView初始化->DOM下载→DOM解析→CSS请求+下载→CSS解析→渲染→绘制→合成
@@ -218,7 +239,9 @@
 
 
 
-### 关于一些问题和优化
+
+
+### 06.关于一些问题和优化
 - 影响页面加载的一些因素有那些？
     - 1.加载网页中，如果图片很多，而这些图片的请求又是一个个独立并且串行的请求。那么可能会导致加载页面比较缓慢……
     - 2.app原生和webView中请求，都会涉及到https的网络请求，那么在请求前会有域名dns的解析，这个也会有大约200毫秒的解析时间(主要耗费时间dns，connection，服务器处理等)……
@@ -244,7 +267,7 @@
 
 
 
-### 关于一点面向对象的思想
+### 07.关于一点面向对象的思想
 - 针对webView视频播放演变
     - 1.最刚开始把视频全屏show和hide的逻辑都放到X5WebChromeClient中处理，相当于这个类中逻辑比较多
     - 2.后期把视频全屏播放逻辑都抽到了VideoWebChromeClient类中处理，这样只需要继承该类即可。这个类独立，拿来即用。
@@ -266,18 +289,19 @@
 
 
 
-### 关于后期需要研究的目标
+### 08.关于后期需要研究的目标
 - 目标
-    - web页面特别消耗流量，每次打开页面都会请求网络，建议对流量的消耗进行优化……
+    - web页面特别消耗流量，每次打开页面都会请求网络，建议对流量的消耗进行优化……除了对lib库中对拦截做OkHttp缓存，还有什么其他方案
 - web页面涉及流量的几个方面
-    - 普通https请求，一般过程是服务端(对象)-->网络中(二进制流)-->客户端(对象)，文本内容会做传输压缩。
+    - 普通https请求，一般过程是服务端(对象)-->网络中(二进制流)-->客户端(对象)，文本内容会做传输压缩
     - 网络图片下载，图片下载消耗的流量较多
     - h5页面展示，由于h5页面是交由前端处理显示，客户端开发关注的少些，而此处消耗了大量的流量
 - 如何查看web页面消耗流量
     - 使用TrafficStats即可查看流量的消耗
 
 
-
+### 09.开源库
+- https://github.com/yangchong211/YCWebView
 
 
 

@@ -124,6 +124,9 @@ public final class WebSchemeIntent {
      * @return                                  true表示被处理
      */
     public static boolean handleAlive(@NonNull Context context, Uri uri) {
+        if (uri==null){
+            return false;
+        }
         final String scheme = uri.getScheme();
         if (TextUtils.isEmpty(scheme) || !isAliveType(scheme)) {
             return false;

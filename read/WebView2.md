@@ -5,10 +5,10 @@
 - 14.301/302回退栈问题描述
 - 15.301/302回退栈问题解决方案1
 - 16.301/302回退栈问题解决方案2
-- 17.如何设置WebView触摸点击事件
+- 17.301/302回退栈问题解决方案3
 - 18.如何用代码判断是否重定向
 - 19.shouldOverrideUrlLoading
-
+- 20.重定向终极优雅解决方案
 
 
 ### 12.301/302业务场景白屏描述
@@ -40,8 +40,9 @@
     ```
 - 这种方法最致命的弱点就是如果不经过特殊处理，那么按返回键是没有效果的，还会停留在302之前的页面。现有的解决方案无非就几种：
     - 手动管理回退栈，遇到重定向时回退两次。
-    - 通过HitTestResult判断是否是重定向，从而决定是否自己加载url。
-    - 通过设置标记位，在onPageStarted和onPageFinished分别标记变量避免重定向。
+    - 通过HitTestResult判断是否是重定向，从而决定是否自己加载url。具体看：16.301/302回退栈问题解决方案2
+    - 通过设置标记位，在onPageStarted和onPageFinished分别标记变量避免重定向。具体看：17.301/302回退栈问题解决方案3
+    - 通过用户的touch事件来判断重定向。这个看：15.301/302回退栈如何处理1
 - 这几种解决方案都不是完美的，都有缺陷。
 
 
@@ -87,17 +88,61 @@
         });
     }
     ```
-
-
-### 16.301/302回退栈问题解决方案2
-
-
-
-### 17.如何设置WebView触摸点击事件
 - 如何在android中的webView上获得onclick事件
     -  WebView似乎没有发送点击事件OnClickListener
 - 如何设置触摸事件
 
+
+
+
+### 16.301/302回退栈问题解决方案2
+- WebView有一个getHitTestResult():返回的是一个HitTestResult，一般会根据打开的链接的类型，返回一个extra的信息
+    - 如果打开链接不是一个url，或者打开的链接是JavaScript的url，他的类型是UNKNOWN_TYPE，这个url就会通过requestFocusNodeHref(Message)异步重定向。
+    - 返回的extra为null，或者没有返回extra。根据此方法的返回值，判断是否为null，可以用于解决网页重定向问题。
+- 代码如下所示
+    ```
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            WebView.HitTestResult hitTestResult = view.getHitTestResult();
+        //hitTestResult==null解决重定向问题
+        if (!TextUtils.isEmpty(url) && hitTestResult == null) {
+            view.loadUrl(url);
+            return true;
+        }
+        return super.shouldOverrideUrlLoading(view, url);
+    }
+    ```
+
+
+### 17.301/302回退栈问题解决方案3
+- 页面被重定向了会走怎样的步骤呢，首先会回调shouldOverrideUrlLoading，然后回调onPageStarted，最后走onPageFinished。
+    - 据此我们可以修改代码如下，增加一个计数器判断当前的onPageFinished
+- 代码如下所示
+    ```
+    mWebView.setWebViewClient(new WebViewClient() {
+        int running = 0;
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            running++;
+            return true;
+        }
+
+        @Override
+        public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
+            super.onPageStarted(webView, s, bitmap);
+            running = Math.max(running, 1);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            if (--running==0) {
+                setWebViewHeight();
+            }
+        }
+    });
+    ```
 
 
 ### 18.如何用代码判断是否重定向
@@ -218,4 +263,95 @@
     - https://mp.weixin.qq.com/s?__biz=MzA5MzI3NjE2MA==&mid=2650237226&idx=1&sn=d7d434b8644bb9543485ce81226125e5&chksm=88639845bf141153b265ee26b39aa8a2ef74248e010b568b288cffc0726012f8bce6f5a675bf&scene=38#wechat_redirect
 
 
+### 20.重定向终极优雅解决方案
+- 需要准备的条件
+    - 创建一个栈，主要是用来存取和移除url的操作。这个url包括所有的请求链接
+    - 定义一个变量，用于判断页面是否处于正在加载中。
+    - 定义一个变量，用于记录重定向前的链接url
+    - 定一个重定向时间间隔，主要为了避免刷新造成循环重定向
+- 具体怎么操作呢
+    - 在执行onPageStarted时，先移除栈中上一个url，然后将url加载到栈中。
+    - 当出现错误重定向的时候，如果和上一次重定向的时间间隔大于3秒，则reload页面。
+    - 在回退操作的时候，判断如果可以回退，则从栈中获取最后停留的url，然后loadUrl。即可解决回退问题。
+- 具体的代码如下所示
+    ```
+    /**
+     * 记录上次出现重定向的时间.
+     * 避免由于刷新造成循环重定向.
+     */
+    private long mLastRedirectTime = 0;
+    /**
+     * 默认重定向间隔.
+     * 避免由于刷新造成循环重定向.
+     */
+    private static final long DEFAULT_REDIRECT_INTERVAL = 3000;
+    /**
+     * URL栈
+     */
+    private final Stack<String> mUrlStack = new Stack<>();
+    /**
+     * 判断页面是否加载完成
+     */
+    private boolean mIsLoading = false;
+    /**
+     * 记录重定向前的链接
+     */
+    private String mUrlBeforeRedirect;
+    /**
+     * 太多的重定向错误
+     */
+    private static int ERR_TOO_MANY_REDIRECTS = -9;
+
+
+    @Override
+    public void onPageStarted(WebView webView, String url, Bitmap bitmap) {
+        super.onPageStarted(webView, url, bitmap);
+        if (mIsLoading && mUrlStack.size() > 0) {
+            mUrlBeforeRedirect = mUrlStack.pop();
+        }
+        recordUrl(url);
+        mIsLoading = true;
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        if (mIsLoading) {
+            mIsLoading = false;
+        }
+    }
+
+    private void recordUrl(String url) {
+        if (!TextUtils.isEmpty(url) && !url.equals(getUrl())) {
+            if (!TextUtils.isEmpty(mUrlBeforeRedirect)) {
+                mUrlStack.push(mUrlBeforeRedirect);
+                mUrlBeforeRedirect = null;
+            }
+        }
+    }
+
+    @Nullable
+    public String getUrl() {
+        //peek方法，查看此堆栈顶部的对象，而不将其从堆栈中删除。
+        return mUrlStack.size() > 0 ? mUrlStack.peek() : null;
+    }
+
+    /**
+     * 回退操作
+     * @param webView                           webView
+     * @return
+     */
+    public final boolean pageGoBack(@NonNull WebView webView) {
+        //判断是否可以回退操作
+        if (pageCanGoBack()) {
+            //获取最后停留的页面url
+            final String url = popBackUrl();
+            //如果不为空
+            if (!TextUtils.isEmpty(url)) {
+                webView.loadUrl(url);
+                return true;
+            }
+        }
+        return false;
+    }
+    ```
 
