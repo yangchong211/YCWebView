@@ -99,6 +99,7 @@
 - WebView有一个getHitTestResult():返回的是一个HitTestResult，一般会根据打开的链接的类型，返回一个extra的信息
     - 如果打开链接不是一个url，或者打开的链接是JavaScript的url，他的类型是UNKNOWN_TYPE，这个url就会通过requestFocusNodeHref(Message)异步重定向。
     - 返回的extra为null，或者没有返回extra。根据此方法的返回值，判断是否为null，可以用于解决网页重定向问题。
+    - requestFocusNodeHref的意思是：请求焦点节点Href
 - 代码如下所示
     ```
     @Override

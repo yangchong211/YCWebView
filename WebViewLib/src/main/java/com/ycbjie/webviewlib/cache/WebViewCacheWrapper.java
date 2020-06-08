@@ -32,6 +32,7 @@ import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.cache.CacheInterceptor;
 
 
 /**
@@ -101,7 +102,9 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
     }
 
     private void initAssetsLoader() {
-        WebAssetsLoader.getInstance().init(mContext).setDir(mAssetsDir).isAssetsSuffixMod(mIsSuffixMod);
+        WebAssetsLoader.getInstance().init(mContext)
+                .setDir(mAssetsDir)
+                .isAssetsSuffixMod(mIsSuffixMod);
     }
 
     /**
@@ -114,6 +117,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 .cache(cache)
                 .connectTimeout(mConnectTimeout, TimeUnit.SECONDS)
                 .readTimeout(mReadTimeout, TimeUnit.SECONDS)
+                //.addInterceptor(new CacheInterceptor(client.internalCache())
                 .addNetworkInterceptor(new HttpCacheInterceptor());
         if (mTrustAllHostname) {
             builder.hostnameVerifier(new HostnameVerifier() {
@@ -132,11 +136,17 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         mHttpClient = builder.build();
     }
 
-
+    /**
+     * 拦截处理的入口
+     * @param request                                   request请求
+     * @return
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public WebResourceResponse interceptRequest(WebResourceRequest request) {
-        return interceptRequest(request.getUrl().toString(), request.getRequestHeaders());
+        String url = request.getUrl().toString();
+        Map<String, String> requestHeaders = request.getRequestHeaders();
+        return interceptRequest(url, requestHeaders);
     }
 
     private Map<String, String> buildHeaders() {
@@ -155,9 +165,15 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         return headers;
     }
 
+    /**
+     * 拦截处理的入口
+     * @param url                                       url链接
+     * @return
+     */
     @Override
     public WebResourceResponse interceptRequest(String url) {
-        return interceptRequest(url, buildHeaders());
+        Map<String, String> requestHeaders = buildHeaders();
+        return interceptRequest(url, requestHeaders);
     }
 
     /**
@@ -180,7 +196,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         }
 
         String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
-        X5LogUtils.d("WebViewCacheWrapper---interceptRequest--------checkUrl---" +extension);
+        X5LogUtils.d("WebViewCacheWrapper---interceptRequest检查url--------checkUrl---" +extension);
         if (TextUtils.isEmpty(extension)) {
             return false;
         }
@@ -294,11 +310,17 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         if (mCacheType == WebCacheType.NORMAL) {
             return null;
         }
+        //第一步：判断拦截资源的条件。比如那些需要拦截，那些不需要拦截
+        //第一步：判断拦截资源的条件。比如那些需要拦截，那些不需要拦截
         if (!checkUrl(url)) {
             return null;
         }
 
+        //先从缓存中获取数据，也就是本地缓存文件中获取数据
         if (isEnableAssets()) {
+            //这种方式读数据效率不高
+            //阻塞I/O通信模式：调用InputStream.read()方法时是阻塞的，它会一直等到数据到来时才返回
+            //NIO通信模式：是一种非阻塞I/O，在Java NIO的服务端由一个专门的线程来处理所有I/O事件，并负责分发；线程之间通讯通过wait和notify等方式
             InputStream inputStream = WebAssetsLoader.getInstance().getResByUrl(url);
             if (inputStream != null) {
                 X5LogUtils.d("WebViewCacheWrapper---interceptRequest1--" +String.format("from assets: %s", url));
@@ -307,6 +329,11 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 return webResourceResponse;
             }
         }
+
+        //创建OkHttp的Request请求，将资源网络请求交给okHttp来处理，并且用它自带的缓存功能
+        //高效缓存
+        //1.三级缓存，网络缓存(http)，磁盘缓存(file)，内存缓存(Lru)
+        //2.使用okio流，数据进行了分块处理(Segment)，提供io流超时处理，对数据的读写都进行了封装和交给Buffer管理
         try {
             Request.Builder reqBuilder = new Request.Builder().url(url);
             String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
@@ -375,7 +402,6 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         private long mReadTimeout = 20;
         private CacheExtensionConfig mCacheExtensionConfig;
         private Context mContext;
-        private boolean mDebug = true;
         private WebCacheType mCacheType = WebCacheType.FORCE;
 
 
@@ -389,7 +415,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         private Dns mDns=null;
         public Builder(Context context) {
             mContext = context;
-            mCacheFile = new File(context.getCacheDir().toString(), "CacheWebViewCache");
+            mCacheFile = new File(context.getCacheDir().toString(), "YcWebViewCache");
             mCacheExtensionConfig = new CacheExtensionConfig();
         }
 

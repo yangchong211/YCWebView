@@ -15,7 +15,7 @@ public class App extends Application {
         super.onCreate();
         X5WebUtils.init(this);
         X5LogUtils.setIsLog(true);
-
+        //X5WebUtils.initCache(this);
         WebViewCacheDelegate.getInstance().init(new WebViewCacheWrapper.Builder(this));
     }
 }

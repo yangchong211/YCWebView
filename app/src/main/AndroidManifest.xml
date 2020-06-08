@@ -41,7 +41,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FirstActivity"/>
+        <activity android:name=".FirstActivity1"/>
+        <activity android:name=".FirstActivity2"/>
+        <activity android:name=".FirstActivity3"/>
         <activity android:name=".SecondActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".ThreeActivity"

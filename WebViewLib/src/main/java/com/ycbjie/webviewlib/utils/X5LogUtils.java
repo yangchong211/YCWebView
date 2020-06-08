@@ -34,7 +34,12 @@ public final class X5LogUtils {
         if(isLog){
             Log.i(TAG, message);
         }
+    }
 
+    public static void e(String message) {
+        if(isLog){
+            Log.e(TAG, message);
+        }
     }
 
     public static void e(String message, Throwable throwable) {

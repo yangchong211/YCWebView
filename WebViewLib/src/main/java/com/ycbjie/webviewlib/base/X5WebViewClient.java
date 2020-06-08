@@ -35,6 +35,7 @@ import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
+import com.ycbjie.webviewlib.utils.EncodeUtils;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.helper.WebSchemeIntent;
@@ -80,7 +81,8 @@ public class X5WebViewClient extends WebViewClient {
      */
     private final Stack<String> mUrlStack = new Stack<>();
     /**
-     * 判断页面是否加载完成
+     * 判断页面是否正在加载
+     * 在onPageStarted中为true，在onPageFinished中为false
      */
     private boolean mIsLoading = false;
     /**
@@ -125,6 +127,7 @@ public class X5WebViewClient extends WebViewClient {
     private void recordUrl(String url) {
         //判断当前url，是否和栈中栈顶部的url是否相同。如果不相同，则入栈操作
         if (!TextUtils.isEmpty(url) && !url.equals(getUrl())) {
+            //如果重定向之前的链接不为空
             if (!TextUtils.isEmpty(mUrlBeforeRedirect)) {
                 mUrlStack.push(mUrlBeforeRedirect);
                 mUrlBeforeRedirect = null;
@@ -210,7 +213,16 @@ public class X5WebViewClient extends WebViewClient {
     /**
      * 这个方法中可以做拦截
      * 主要的作用是处理各种通知和请求事件
-     * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+     *
+     * 不准确的说法如下：
+     * 1.返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+     * 2.返回: return true; 表示webView处理url是根据程序来执行的。 返回: return false; 表示webView处理url是在webView内部执行。
+     * 3.还有一种错误说法：WebView上的所有加载都经过这个方法。
+     *
+     * 准确说法，该方法说明如下所示：
+     * 若没有设置 WebViewClient 则由系统（Activity Manager）处理该 url，通常是使用浏览器打开或弹出浏览器选择对话框。
+     * 若设置 WebViewClient 且该方法返回 true ，则说明由应用的代码处理该 url，WebView 不处理，也就是程序员自己做处理。
+     * 若设置 WebViewClient 且该方法返回 false，则说明由 WebView 处理该 url，即用 WebView 加载该 url。
      * @param view                              view
      * @param url                               链接
      * @return                                  是否自己处理，true表示自己处理
@@ -225,11 +237,7 @@ public class X5WebViewClient extends WebViewClient {
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        url = EncodeUtils.urlDecode(url);
         /*WebView.HitTestResult hitTestResult = null;
         if (url.startsWith("http:") || url.startsWith("https:")){
             hitTestResult = view.getHitTestResult();
@@ -281,11 +289,7 @@ public class X5WebViewClient extends WebViewClient {
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        url = EncodeUtils.urlDecode(url);
         final Uri uri = Uri.parse(url);
         //scheme跳转支持
         if (uri!=null && uri.getScheme()!=null && WebSchemeIntent.isSilentType(uri.getScheme())) {
@@ -335,6 +339,7 @@ public class X5WebViewClient extends WebViewClient {
         }
         isLoadFinish = false;
         if (mIsLoading && mUrlStack.size() > 0) {
+            //从url栈中取出栈顶的链接
             mUrlBeforeRedirect = mUrlStack.pop();
         }
         recordUrl(url);
@@ -369,6 +374,24 @@ public class X5WebViewClient extends WebViewClient {
         //addImageClickListener();
         addImageArrayClickListener(webView);
         isLoadFinish = true;
+    }
+
+
+    /**
+     * 当缩放改变的时候会调用该方法
+     * @param view                              view
+     * @param oldScale                          之前的缩放比例
+     * @param newScale                          现在缩放比例
+     */
+    @Override
+    public void onScaleChanged(WebView view, float oldScale, float newScale) {
+        super.onScaleChanged(view, oldScale, newScale);
+        X5LogUtils.i("-------onScaleChanged-------"+newScale);
+        //视频全屏播放按返回页面被放大的问题
+        if (newScale - oldScale > 7) {
+            //异常放大，缩回去。
+            view.setInitialScale((int) (oldScale / newScale * 100));
+        }
     }
 
     /**
@@ -410,23 +433,6 @@ public class X5WebViewClient extends WebViewClient {
                 //其他情况
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
-        }
-    }
-
-    /**
-     * 当缩放改变的时候会调用该方法
-     * @param view                              view
-     * @param oldScale                          之前的缩放比例
-     * @param newScale                          现在缩放比例
-     */
-    @Override
-    public void onScaleChanged(WebView view, float oldScale, float newScale) {
-        super.onScaleChanged(view, oldScale, newScale);
-        X5LogUtils.i("-------onScaleChanged-------"+newScale);
-        //视频全屏播放按返回页面被放大的问题
-        if (newScale - oldScale > 7) {
-            //异常放大，缩回去。
-            view.setInitialScale((int) (oldScale / newScale * 100));
         }
     }
 
