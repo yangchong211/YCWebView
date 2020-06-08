@@ -32,6 +32,7 @@ import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.cache.CacheInterceptor;
 
 
 /**
@@ -101,7 +102,9 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
     }
 
     private void initAssetsLoader() {
-        WebAssetsLoader.getInstance().init(mContext).setDir(mAssetsDir).isAssetsSuffixMod(mIsSuffixMod);
+        WebAssetsLoader.getInstance().init(mContext)
+                .setDir(mAssetsDir)
+                .isAssetsSuffixMod(mIsSuffixMod);
     }
 
     /**
@@ -114,6 +117,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 .cache(cache)
                 .connectTimeout(mConnectTimeout, TimeUnit.SECONDS)
                 .readTimeout(mReadTimeout, TimeUnit.SECONDS)
+                //.addInterceptor(new CacheInterceptor(client.internalCache())
                 .addNetworkInterceptor(new HttpCacheInterceptor());
         if (mTrustAllHostname) {
             builder.hostnameVerifier(new HostnameVerifier() {
@@ -192,7 +196,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         }
 
         String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
-        X5LogUtils.d("WebViewCacheWrapper---interceptRequest--------checkUrl---" +extension);
+        X5LogUtils.d("WebViewCacheWrapper---interceptRequest检查url--------checkUrl---" +extension);
         if (TextUtils.isEmpty(extension)) {
             return false;
         }
@@ -314,6 +318,9 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
 
         //先从缓存中获取数据，也就是本地缓存文件中获取数据
         if (isEnableAssets()) {
+            //这种方式读数据效率不高
+            //阻塞I/O通信模式：调用InputStream.read()方法时是阻塞的，它会一直等到数据到来时才返回
+            //NIO通信模式：是一种非阻塞I/O，在Java NIO的服务端由一个专门的线程来处理所有I/O事件，并负责分发；线程之间通讯通过wait和notify等方式
             InputStream inputStream = WebAssetsLoader.getInstance().getResByUrl(url);
             if (inputStream != null) {
                 X5LogUtils.d("WebViewCacheWrapper---interceptRequest1--" +String.format("from assets: %s", url));
@@ -323,7 +330,10 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
             }
         }
 
-        //如果本地缓存没有，则创建OkHttp的Request请求，将资源网络请求交给okHttp来处理，并且用它自带的缓存功能
+        //创建OkHttp的Request请求，将资源网络请求交给okHttp来处理，并且用它自带的缓存功能
+        //高效缓存
+        //1.三级缓存，网络缓存(http)，磁盘缓存(file)，内存缓存(Lru)
+        //2.使用okio流，数据进行了分块处理(Segment)，提供io流超时处理，对数据的读写都进行了封装和交给Buffer管理
         try {
             Request.Builder reqBuilder = new Request.Builder().url(url);
             String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
@@ -392,7 +402,6 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         private long mReadTimeout = 20;
         private CacheExtensionConfig mCacheExtensionConfig;
         private Context mContext;
-        private boolean mDebug = true;
         private WebCacheType mCacheType = WebCacheType.FORCE;
 
 
@@ -406,7 +415,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         private Dns mDns=null;
         public Builder(Context context) {
             mContext = context;
-            mCacheFile = new File(context.getCacheDir().toString(), "CacheWebViewCache");
+            mCacheFile = new File(context.getCacheDir().toString(), "YcWebViewCache");
             mCacheExtensionConfig = new CacheExtensionConfig();
         }
 

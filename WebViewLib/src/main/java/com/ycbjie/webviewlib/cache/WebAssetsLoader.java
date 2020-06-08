@@ -94,6 +94,7 @@ public class WebAssetsLoader {
      * @return
      */
     public InputStream getResByUrl(String url){
+        //获取url的path路径
         String uPath = getUrlPath(url);
         if (TextUtils.isEmpty(uPath)){
             return null;
@@ -106,6 +107,7 @@ public class WebAssetsLoader {
             }
         }
         if (mAssetResSet!=null){
+            //直接遍历集合
             for (String p: mAssetResSet) {
                 if (uPath.endsWith(p)){
                     if (TextUtils.isEmpty(mDir)){

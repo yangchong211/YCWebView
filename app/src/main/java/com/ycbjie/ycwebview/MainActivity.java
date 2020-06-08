@@ -1,8 +1,13 @@
 package com.ycbjie.ycwebview;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -41,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_14_2).setOnClickListener(this);
         findViewById(R.id.tv_15).setOnClickListener(this);
         findViewById(R.id.tv_16).setOnClickListener(this);
+
+        checkReadPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+        checkReadPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 101);
     }
 
     @Override
@@ -138,6 +146,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(Intent.ACTION_VIEW, issuesUrl);
             context.startActivity(intent);
         }
+    }
+
+
+    /**
+     * 判断是否有某项权限
+     * @param string_permission                 权限
+     * @param request_code                      请求码
+     * @return
+     */
+    public boolean checkReadPermission(Context context, String string_permission, int request_code) {
+        boolean flag = false;
+        int permission = ContextCompat.checkSelfPermission(context, string_permission);
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            //已有权限
+            flag = true;
+        } else {
+            //申请权限
+            ActivityCompat.requestPermissions((Activity) context, new String[]{string_permission}, request_code);
+        }
+        return flag;
     }
 
 }
