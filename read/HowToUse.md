@@ -19,7 +19,7 @@
     implementation 'cn.yc:WebViewLib:1.2.4'
 
     //添加阿里https+dns解析版本
-    implementation 'cn.yc:WebViewLib:1.2.7'
+    implementation 'cn.yc:WebViewLib:1.3.1'
     ```
 
 
