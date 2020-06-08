@@ -348,19 +348,21 @@
     - 可以发现大概的执行顺序是：onPageStarted ——> shouldOverrideUrlLoading ——> onPageFinished
     - 那么为什么会执行多次呢，思考一下？具体可以看一下7.2得出的结论分析。
     ```
-    X5LogUtils: -------onPageStarted-------http://www.baidu.com/
-    X5LogUtils: -------shouldOverrideUrlLoading-------https://m.baidu.com/?from=844b&vit=fps
-    X5LogUtils: -------onPageFinished-------http://www.baidu.com/
-    X5LogUtils: -------onPageStarted-------https://m.baidu.com/?from=844b&vit=fps
-    X5LogUtils: -------onReceivedTitle-------百度一下
-    X5LogUtils: -------shouldOverrideUrlLoading-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-    X5LogUtils: -------onPageFinished-------https://m.baidu.com/?from=844b&vit=fps
-    X5LogUtils: -------shouldOverrideUrlLoading-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-    X5LogUtils: -------onPageStarted-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-    X5LogUtils: -------onPageFinished-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-    X5LogUtils: -------onPageStarted-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-    X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
-    X5LogUtils: -------onPageFinished-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
+    //访问json.cn网页
+    2020-06-08 21:03:11.648 28249-28249/com.ycbjie.ycwebview I/X5LogUtils: -------onPageStarted-------https://www.json.cn/
+    2020-06-08 21:03:11.656 28249-28249/com.ycbjie.ycwebview I/X5LogUtils: -------onReceivedTitle-------JSON在线解析及格式化验证 - JSON.cn
+    2020-06-08 21:03:11.731 28249-28249/com.ycbjie.ycwebview I/X5LogUtils: -------onPageFinished-------https://www.json.cn/
+
+    //访问百度网页
+    2020-06-08 21:04:06.969 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -----shouldOverrideUrlLoading------loadUrl-------https://m.baidu.com/?from=844b&vit=fps
+    2020-06-08 21:04:07.616 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onPageStarted-------https://m.baidu.com/?from=844b&vit=fps
+    2020-06-08 21:04:07.618 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onReceivedTitle-------百度一下
+    2020-06-08 21:04:08.133 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -----shouldOverrideUrlLoading------loadUrl-------http://m.baidu.com/?cip=124.127.44.210&baiduid=E6C897CAF02A1CDBB538FA62922E13E6&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=11784780363695702619&pu=sz%401321_480&t_noscript=jump
+    2020-06-08 21:04:08.139 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -----shouldOverrideUrlLoading------loadUrl-------https://m.baidu.com/?cip=124.127.44.210&baiduid=E6C897CAF02A1CDBB538FA62922E13E6&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=11784780363695702619&pu=sz%401321_480&t_noscript=jump
+    2020-06-08 21:04:08.144 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onPageFinished-------https://m.baidu.com/?from=844b&vit=fps
+    2020-06-08 21:04:08.248 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onPageStarted-------https://m.baidu.com/?cip=124.127.44.210&baiduid=E6C897CAF02A1CDBB538FA62922E13E6&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=11784780363695702619&pu=sz%401321_480&t_noscript=jump
+    2020-06-08 21:04:08.257 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
+    2020-06-08 21:04:08.365 28978-28978/com.ycbjie.ycwebview I/X5LogUtils: -------onPageFinished-------https://m.baidu.com/?cip=124.127.44
     ```
 - 在首页，点击一下“hao123”,跳转到www.hao123.com的主页上来，此时的行为属于（A）方式。
     - 可以发现大概的执行顺序是：shouldOverrideUrlLoading ——> onPageStarted ——> onPageFinished
@@ -387,17 +389,14 @@
     ```
     X5LogUtils: -------onPageStarted-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
     X5LogUtils: -------onReceivedTitle-------hao123导航-上网从这里开始
-    X5LogUtils: -------onReceivedTitle-------hao123导航-上网从这里开始
     X5LogUtils: -------onPageFinished-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
     ```
 - 然后从hao123页面回退到百度首页，看看又回执行哪些方法。
     ```
     X5LogUtils: -------onPageStarted-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
     X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
-    X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
     X5LogUtils: -------onPageFinished-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
     ```
-
 
 #### 7.2 得出结论分析说明
 - 在(A)行为方式下（用户点击链接的回调）：

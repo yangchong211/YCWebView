@@ -42,57 +42,7 @@
     - （B）调用WebView的loadUrl()方法
     - 这两种方法都会发出一条地址，区别就在于这条地址是目的地址还是重定向地址。以访问http://www.baidu.com百度的页面来测试一下方法的执行顺序。
 - 触发加载网页流程分析
-    - 在代码中通过loadUrl加载百度的首页，此时的行为属于（B）方式。【有问题，待验证？？？？】
-        - 可以发现大概的执行顺序是：onPageStarted ——> shouldOverrideUrlLoading ——> onPageFinished
-        - 那么为什么会执行多次呢，思考一下？
-        ```
-        X5LogUtils: -------onPageStarted-------http://www.baidu.com/
-        X5LogUtils: -------shouldOverrideUrlLoading-------https://m.baidu.com/?from=844b&vit=fps
-        X5LogUtils: -------onPageFinished-------http://www.baidu.com/
-        X5LogUtils: -------onPageStarted-------https://m.baidu.com/?from=844b&vit=fps
-        X5LogUtils: -------onReceivedTitle-------百度一下
-        X5LogUtils: -------shouldOverrideUrlLoading-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onPageFinished-------https://m.baidu.com/?from=844b&vit=fps
-        X5LogUtils: -------shouldOverrideUrlLoading-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onPageStarted-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onPageFinished-------http://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onPageStarted-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
-        X5LogUtils: -------onPageFinished-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        ```
-    - 在首页，点击一下“hao123”,跳转到www.hao123.com的主页上来，此时的行为属于（A）方式。
-        - 可以发现大概的执行顺序是：shouldOverrideUrlLoading ——> onPageStarted ——> onPageFinished
-        ```
-        X5LogUtils: -------shouldOverrideUrlLoading-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
-        X5LogUtils: -------onPageStarted-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
-        X5LogUtils: -------onReceivedTitle-------hao123导航-上网从这里开始
-        X5LogUtils: -------onPageFinished-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
-        ```
-    - 然后在hao123页面，点击优酷网进行跳转，此时的行为属于（A）方式。
-        ```
-        X5LogUtils: -------shouldOverrideUrlLoading-------http://m.hao123.com/j.php?z=2&page=index_cxv3&pos=cydhwt_n2&category=ty&title=%E4%BC%98%E9%85%B7%E7%BD%91&qt=tz&url=http%3A%2F%2Fwww.youku.com%2F&key=58193753e7a868d9a013056c6c4cd77b
-        X5LogUtils: -------onPageStarted-------http://m.hao123.com/j.php?z=2&page=index_cxv3&pos=cydhwt_n2&category=ty&title=%E4%BC%98%E9%85%B7%E7%BD%91&qt=tz&url=http%3A%2F%2Fwww.youku.com%2F&key=58193753e7a868d9a013056c6c4cd77b
-        X5LogUtils: -------shouldOverrideUrlLoading-------http://www.youku.com/
-        X5LogUtils: -------onPageFinished-------http://m.hao123.com/j.php?z=2&page=index_cxv3&pos=cydhwt_n2&category=ty&title=%E4%BC%98%E9%85%B7%E7%BD%91&qt=tz&url=http%3A%2F%2Fwww.youku.com%2F&key=58193753e7a868d9a013056c6c4cd77b
-        X5LogUtils: -------onPageStarted-------http://www.youku.com/
-        X5LogUtils: -------shouldOverrideUrlLoading-------https://www.youku.com/
-        X5LogUtils: -------onPageFinished-------http://www.youku.com/
-        X5LogUtils: -------onPageStarted-------https://www.youku.com/
-        X5LogUtils: -------onReceivedTitle-------优酷视频-首页
-        X5LogUtils: -------onPageFinished-------https://www.youku.com/
-        ```
-    - 然后从优酷页面回退到hao123页面，看看又回执行哪些方法。
-        ```
-        X5LogUtils: -------onPageStarted-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
-        X5LogUtils: -------onReceivedTitle-------hao123导航-上网从这里开始
-        X5LogUtils: -------onPageFinished-------http://m.hao123.com/?ssid=0&from=844b&bd_page_type=1&uid=0&pu=sz%401321_1002%2Cta%40utouch_2_9.0_2_6.2&idx=30000&itj=39
-        ```
-    - 然后从hao123页面回退到百度首页，看看又回执行哪些方法。
-        ```
-        X5LogUtils: -------onPageStarted-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        X5LogUtils: -------onReceivedTitle-------百度一下,你就知道
-        X5LogUtils: -------onPageFinished-------https://m.baidu.com/?cip=117.101.19.67&baiduid=C6FCEED198C994E0D653C094F2708C32&from=844b&vit=fps?from=844b&vit=fps&index=&ssid=0&bd_page_type=1&logid=12175252243175665635&pu=sz%401321_480&t_noscript=jump
-        ```
+    - 关于分析流程，由于内容较多，故这里暂不展示。具体看：[07.触发加载网页的行为](https://github.com/yangchong211/YCWebView/wiki/6.1-webView%E5%9F%BA%E7%A1%801)
 - 得出结论分析说明
     - 在(A)行为方式下（用户点击链接的回调）：
         - 1.如果是目的地址，那么方法的执行顺序是：
@@ -223,11 +173,6 @@
         - 步骤2:创建一个输入流，这里可以先从内存中拿，拿不到从磁盘中拿，再拿不到就从网络获取数据
         - 步骤3:打开需要替换的资源(存放在assets文件夹里)，或者从lru中取出缓存的数据
         - 步骤4:替换资源
-    - 有几个问题
-        - 如何判断url中资源是否需要拦截，或者说是否需要缓存
-        - 如何缓存js，css等
-        - 缓存数据是否有时效性
-        - 关于缓存下载的问题，是引入okhttp还是原生网络请求，缓存下载失败该怎么处理
     - 在哪里进行拦截
         - webView在加载网页的时候，用户能够通过系统提供的API干预各个中间过程。我们要拦截的就是网页资源请求的环节。这个过程，WebViewClient当中提供了以下两个入口：
             ```java
@@ -249,9 +194,11 @@
     - okHttp缓存原理大概是什么？
         - CacheInterceptor，在建立连接之前，我们检查响应是否已经被缓存、缓存是否可用，如果是则直接返回缓存的数据，否则就进行后面的流程，并在返回之前，把网络的数据写入缓存。
         - 主要涉及 HTTP 协议缓存细节的实现，而具体的缓存逻辑 OkHttp 内置封装了一个Cache类，它利用DiskLruCache，用磁盘上的有限大小空间进行缓存，按照 LRU 算法进行缓存淘汰（主要用到LinkedHashMap），这里也不再展开。
+        - 关于CacheInterceptor缓存拦截的代码分析，具体可以看：[OkHttp缓存介绍](https://github.com/yangchong211/YCWebView/blob/master/read/WebCache5.md)
     - okHttp缓存优势
         - 1.三级缓存，网络缓存(http)，磁盘缓存(file)，内存缓存(Lru)
-        - 2.使用okio流，数据进行了分块处理(Segment)，提供io流超时处理，对数据的读写都进行了封装和交给Buffer管理。具体看这篇文章：[OkHttp中OKio分析]()
+        - 2.使用okio流，数据进行了分块处理(Segment)，提供io流超时处理，对数据的读写都进行了封装和交给Buffer管理。具体看这篇文章：[OkHttp中OKio分析](https://github.com/yangchong211/YCWebView/blob/master/read/WebCache6.md)
+
 
 
 ### 06.关于一些问题和优化
@@ -286,8 +233,9 @@
     - 2.后期把视频全屏播放逻辑都抽到了VideoWebChromeClient类中处理，这样只需要继承该类即可。这个类独立，拿来即用。
     - 3.后期演变，一个视频全屏播放接口 + 接口实现类 + VideoChromeClient，接口主要能够解耦
 - 关于webView拦截缓存处理
-    - 1.代码结构大概是：拦截缓存接口 + 接口实现类 + 接口委派类
-    - 2.优点：委派类和实现类解耦；便于增加过滤功能(比如用了https+dns优化就不用拦截缓存)；
+    - 1.最开始把拦截的逻辑都放到X5WebViewClient类中的shouldInterceptRequest方法中。后期演变抽取+接口
+    - 2.代码结构大概是：拦截缓存接口 + 接口实现类 + 接口委派类
+    - 3.优点：委派类和实现类解耦；便于增加过滤功能(比如用了https+dns优化就不用拦截缓存)；
     ```
     //1.创建委托对象
     WebViewCacheDelegate webViewCacheDelegate = WebViewCacheDelegate.getInstance();

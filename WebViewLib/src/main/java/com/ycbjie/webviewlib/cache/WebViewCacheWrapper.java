@@ -360,6 +360,7 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 //没有缓存
                 X5LogUtils.d("WebViewCacheWrapper---interceptRequest3--" +String.format("from server: %s", url));
             }
+            //获取资源响应的MIME类型，例如text/html
             String mimeType = MimeTypeMapUtils.getMimeTypeFromUrl(url);
             WebResourceResponse webResourceResponse = null;
             if (response.body() != null) {

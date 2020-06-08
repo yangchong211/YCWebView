@@ -35,7 +35,7 @@ public class WebHttpFileUtils {
         String key = ByteString.encodeUtf8(url).md5().hex();
         File entryFile =  new File(path.getAbsolutePath(),  key+"."+ENTRY_METADATA);
         File bodyFile =  new File(path.getAbsolutePath(),  key+"."+ENTRY_BODY);
-        if (entryFile != null && entryFile.exists() && bodyFile!=null&&bodyFile.exists()) {
+        if (entryFile != null && entryFile.exists() && bodyFile!=null && bodyFile.exists()) {
             try {
                 BufferedReader fr = new BufferedReader(new FileReader(entryFile),1024);
                 String line="";

@@ -24,10 +24,10 @@ import com.ycbjie.webviewlib.widget.WebProgress;
 
 public class FirstActivity2 extends AppCompatActivity {
 
-    private BaseWebView webView;
+    private WebView webView;
     private WebProgress progress;
     private TextView tvTitle;
-    private ImageView ivRefresh;
+    private TextView tvRefresh;
     private RotateAnimation rotate;
 
     @Override
@@ -74,36 +74,24 @@ public class FirstActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view1);
+        setContentView(R.layout.activity_web_view3);
         webView = findViewById(R.id.web_view);
         progress = findViewById(R.id.progress);
         tvTitle = findViewById(R.id.tv_title);
-        ivRefresh = findViewById(R.id.iv_refresh);
+        tvRefresh = findViewById(R.id.tv_refresh);
 
 
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-        String url = "http://www.baidu.com";
+        final String url = "http://www.baidu.com";
         webView.loadUrl(url);
 
-        ivRefresh.setOnClickListener(new View.OnClickListener() {
+        tvRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                webView.reload();
-                if (rotate != null) {
-                    ivRefresh.startAnimation(rotate);
-                }  else {
-                    rotate = new RotateAnimation(0, 3600,
-                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    rotate.setDuration(2000);
-                    rotate.setFillAfter(true);
-                    //减速- 动画插入器
-                    rotate.setInterpolator(new DecelerateInterpolator());
-                    ivRefresh.setAnimation(rotate);
-                    ivRefresh.startAnimation(rotate);
-                }
+                webView.loadUrl(url);
             }
         });
     }
@@ -126,6 +114,7 @@ public class FirstActivity2 extends AppCompatActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             //判断重定向的方式一
+            X5LogUtils.i("-----shouldOverrideUrlLoading------loadUrl-------"+url);
             WebView.HitTestResult hitTestResult = view.getHitTestResult();
             if(hitTestResult == null) {
                 return false;
@@ -134,12 +123,7 @@ public class FirstActivity2 extends AppCompatActivity {
                 //X5LogUtils.i("-------重定向-------");
                 return false;
             }
-
-            if (webView.isTouchByUser()){
-                X5LogUtils.i("-------点击事件-------");
-            }
             view.loadUrl(url);
-            X5LogUtils.i("-----shouldOverrideUrlLoading------loadUrl-------");
 //            running++;
             return true;
             //return super.shouldOverrideUrlLoading(view, url);
@@ -162,6 +146,7 @@ public class FirstActivity2 extends AppCompatActivity {
 //            }
         }
     }
+
 
     private class MyWebChromeClient extends WebChromeClient {
         @Override
@@ -187,7 +172,7 @@ public class FirstActivity2 extends AppCompatActivity {
         WebHistoryItem item = forwardList.getCurrentItem();
         if (item != null) {
             tvTitle.setText(item.getTitle());
-           // X5LogUtils.i("-------onReceivedTitle----getWebTitle---"+item.getTitle());
+            // X5LogUtils.i("-------onReceivedTitle----getWebTitle---"+item.getTitle());
         }
     }
 }
