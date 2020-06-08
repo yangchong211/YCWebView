@@ -19,7 +19,9 @@ public final class CacheExtensionConfig {
     private HashSet<String> statics = new HashSet(STATIC);
     private HashSet<String> no_cache = new HashSet(NO_CACH);
 
-    //全局默认的
+    /**
+     * 全局默认的
+     */
     private static HashSet STATIC = new HashSet() {
         {
             add("html");
@@ -46,6 +48,10 @@ public final class CacheExtensionConfig {
             add("webp");
         }
     };
+
+    /**
+     * 下面这些是不用进行缓存的
+     */
     private static HashSet NO_CACH = new HashSet() {
         {
             add("mp4");
@@ -137,6 +143,7 @@ public final class CacheExtensionConfig {
         }
         return false;
     }
+
     public void clearAll() {
         clearDiskExtension();
     }

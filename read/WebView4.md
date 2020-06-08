@@ -3,6 +3,8 @@
 - 42.WebView中长按处理逻辑
 - 43.8.0关于WebView新特性
 - 44.H5页面为何加载速度慢
+- 45.shouldOverrideUrlLoading返回值
+- 46.webBackForwardList用法
 - 47.WebView多布局连贯滑动
 - 48.开启Google安全浏览服务
 - 50.webView使用上的建议
@@ -103,6 +105,43 @@
             - HTML外部引用的JS、CSS、字体文件，图片也是一个独立的 HTTP 请求
         - 每一个请求都串行的，这么多请求串起来，这导致 H5页面资源加载缓慢
 - 总结：H5页面加载速度慢的原因：渲染速度慢 & 页面资源加载缓慢 导致。
+
+
+
+### 45.shouldOverrideUrlLoading返回值
+- 返回值是什么意思？
+     * 不准确的说法如下：
+         * 1.返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+         * 2.返回: return true; 表示webView处理url是根据程序来执行的。 返回: return false; 表示webView处理url是在webView内部执行。
+     * 准确说法，该方法说明如下所示：
+        * 1.若没有设置 WebViewClient 则由系统（Activity Manager）处理该 url，通常是使用浏览器打开或弹出浏览器选择对话框。
+        * 2.1若设置 WebViewClient 且该方法返回 true ，则说明由应用的代码处理该 url，WebView 不处理，也就是程序员自己做处理。
+        * 2.2若设置 WebViewClient 且该方法返回 false，则说明由 WebView 处理该 url，即用 WebView 加载该 url。
+- 该方法何时调用
+    - WebView的前进、后退、刷新、以及post请求都不会调用shouldOverrideUrlLoading方法
+    - 除去以上行为，还得满足（ ! isLoadUrl || isRedirect）即（不是通过webView.loadUrl来加载的 或者 是重定向） 这个条件，才会调用shouldOverrideUrlLoading方法。
+- 一些词汇解释
+    - isRedirect就是重定向的url,即重定向url也会触发shouldOverrideUrlLoading；
+    - isLoadUrl是什么意思？凡是webView.loadUrl出load页面的，isLoadUrl都是true(原因是webView.loadUrl最终会调到loadUrl(LoadUrlParams params)，进而params.setTransitionType(params.getTransitionType() | PageTransition.FROM_API))．
+- 参考文章
+    - shouldOverrideUrlLoading深度分析：https://blog.csdn.net/a0407240134/article/details/51482021?winzoom=1
+
+
+
+### 46.webBackForwardList用法
+- WebBackForwardList webBackForwardList = webView.copyBackForwardList()获取webView加载栈，然后更具加载栈做逻辑操作。
+- webBackForwardList常用的方法
+    ```
+    int size = webBackForwardList.getSize()
+    webBackForwardList.getCurrentItem()
+    webBackForwardList.getCurrentIndex()
+    webBackForwardList.getItemAtIndex(index)
+    getSize()方法获取当前加载栈的长度；
+    getCurrentItem()获取当前webView所加载的界面，我们可以在这个方法下获得url,title等内容；
+    getCurrentIndex()获取当前加载在加载栈中的位置；
+    webBackForwardList.getItemAtIndex(index)获取加载栈中第index页面；
+    ```
+-
 
 
 

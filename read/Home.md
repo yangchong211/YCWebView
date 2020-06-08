@@ -7,6 +7,7 @@
 - 06.WebView知识点
 
 
+
 ### 01.该库具有的功能
 
 
@@ -154,6 +155,16 @@
 - [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
+
+### 07.WebView缓存
+- 01.WebView为何加载慢
+- 02.解决WebView加载慢
+- 03.浏览器缓存机制
+- 04.WebView设置缓存
+- 05.具体缓存那些内容
+- 06.本地资源替换操作
+- 07.如何处理预加载数据
+- [更多内容查看wiki](https://github.com/yangchong211/YCWebView/wiki/7.1-%E7%BC%93%E5%AD%98%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86)
 
 
 

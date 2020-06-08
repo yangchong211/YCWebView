@@ -26,9 +26,14 @@ public class WebAssetsLoader {
     private Context mContext;
     /**
      * 资源内存缓存集合
+     * 多线程条件是数据安全的，没有用到锁，但是用到读写分离。【底层双数组实现，但有一点不具有时效性】
+     * CopyOnWriteArrayList适合使用在读操作远远大于写操作的场景里，比如缓存。
      */
     private CopyOnWriteArraySet<String> mAssetResSet;
-    private String mDir="";
+    /**
+     * 文件名称
+     */
+    private String mDir = "";
     /**
      * 是否清理
      */
@@ -83,6 +88,11 @@ public class WebAssetsLoader {
         return uPath;
     }
 
+    /**
+     * 通过路径找到对应的资源，然后将file文件转化成数据流InputStream， 并且返回回来
+     * @param url                           url地址
+     * @return
+     */
     public InputStream getResByUrl(String url){
         String uPath = getUrlPath(url);
         if (TextUtils.isEmpty(uPath)){
@@ -114,6 +124,10 @@ public class WebAssetsLoader {
         return this;
     }
 
+    /**
+     * 初始化数据
+     * @return
+     */
     public WebAssetsLoader initData(){
         if (!mIsSuffixMod){
             return this;
@@ -136,6 +150,10 @@ public class WebAssetsLoader {
         }
     }
 
+    /**
+     * 将asset的file添加到集合中
+     * @param file
+     */
     private void addAssetsFile(String file){
         String flag = mDir + File.separator;
         if (!TextUtils.isEmpty(mDir)){
@@ -147,6 +165,11 @@ public class WebAssetsLoader {
         mAssetResSet.add(file);
     }
 
+    /**
+     * 初始化资源，拿到缓存路径，然后遍历中的所有文件。将文件的路径保存到集合中
+     * @param dir
+     * @return
+     */
     private WebAssetsLoader initResourceNoneRecursion(String dir){
         try {
             LinkedList<String> list = new LinkedList<>();

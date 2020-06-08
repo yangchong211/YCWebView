@@ -491,4 +491,5 @@ public final class X5WebUtils {
     private static String getKdtUnionUrl(@NonNull Uri uri) {
         return uri.isOpaque() ? null : uri.getQueryParameter("redirect_uri");
     }
+
 }

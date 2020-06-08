@@ -33,6 +33,10 @@ public class WebViewCacheDelegate implements WebViewRequestClient {
         }
     }
 
+    /**
+     * 单利获取对象
+     * @return                          对象
+     */
     public static WebViewCacheDelegate getInstance(){
         if (webViewCacheInterceptorInst==null){
             synchronized (WebViewCacheDelegate.class){

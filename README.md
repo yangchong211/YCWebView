@@ -3,9 +3,12 @@
 - 02.该库如何使用
 - 03.js调用原理
 - 04.问题反馈总结
-- 05.webView优化
+- 05.WebView优化
 - 06.WebView知识点
-- 07.其他说明介绍
+- 07.WebView缓存
+- 08.其他说明介绍
+
+
 
 
 ### 01.前沿说明
@@ -179,9 +182,19 @@
 
 
 
+### 07.WebView缓存
+- 01.WebView为何加载慢
+- 02.解决WebView加载慢
+- 03.浏览器缓存机制
+- 04.WebView设置缓存
+- 05.具体缓存那些内容
+- 06.本地资源替换操作
+- 07.如何处理预加载数据
+- [更多内容查看wiki](https://github.com/yangchong211/YCWebView/wiki/7.1-%E7%BC%93%E5%AD%98%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86)
 
 
-### 07.其他说明介绍
+
+### 08.其他说明介绍
 #### 关于其他内容介绍
 ![image](https://upload-images.jianshu.io/upload_images/4432347-7100c8e5a455c3ee.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 

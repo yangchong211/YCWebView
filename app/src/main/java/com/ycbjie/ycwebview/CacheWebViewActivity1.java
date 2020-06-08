@@ -220,8 +220,7 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
          */
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
-            WebResourceResponse request = WebViewCacheDelegate.getInstance().
-                    interceptRequest(webResourceRequest);
+            WebResourceResponse request = WebViewCacheDelegate.getInstance().interceptRequest(webResourceRequest);
             return WebResponseAdapter.adapter(request);
         }
 

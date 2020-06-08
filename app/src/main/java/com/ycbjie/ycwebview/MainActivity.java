@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.tv_1).setOnClickListener(this);
+        findViewById(R.id.tv_1_2).setOnClickListener(this);
+        findViewById(R.id.tv_1_3).setOnClickListener(this);
         findViewById(R.id.tv_2_1).setOnClickListener(this);
         findViewById(R.id.tv_2_2).setOnClickListener(this);
         findViewById(R.id.tv_2_3).setOnClickListener(this);
@@ -45,7 +47,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.tv_1:
-                startActivity(new Intent(this,FirstActivity.class));
+                startActivity(new Intent(this, FirstActivity1.class));
+                break;
+            case R.id.tv_1_2:
+                startActivity(new Intent(this,FirstActivity2.class));
+                break;
+            case R.id.tv_1_3:
+                startActivity(new Intent(this,FirstActivity3.class));
                 break;
             case R.id.tv_2_1:
                 startActivity(new Intent(this,SecondActivity.class));

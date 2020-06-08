@@ -132,11 +132,17 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         mHttpClient = builder.build();
     }
 
-
+    /**
+     * 拦截处理的入口
+     * @param request                                   request请求
+     * @return
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public WebResourceResponse interceptRequest(WebResourceRequest request) {
-        return interceptRequest(request.getUrl().toString(), request.getRequestHeaders());
+        String url = request.getUrl().toString();
+        Map<String, String> requestHeaders = request.getRequestHeaders();
+        return interceptRequest(url, requestHeaders);
     }
 
     private Map<String, String> buildHeaders() {
@@ -155,9 +161,15 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         return headers;
     }
 
+    /**
+     * 拦截处理的入口
+     * @param url                                       url链接
+     * @return
+     */
     @Override
     public WebResourceResponse interceptRequest(String url) {
-        return interceptRequest(url, buildHeaders());
+        Map<String, String> requestHeaders = buildHeaders();
+        return interceptRequest(url, requestHeaders);
     }
 
     /**
@@ -294,10 +306,13 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         if (mCacheType == WebCacheType.NORMAL) {
             return null;
         }
+        //第一步：判断拦截资源的条件。比如那些需要拦截，那些不需要拦截
+        //第一步：判断拦截资源的条件。比如那些需要拦截，那些不需要拦截
         if (!checkUrl(url)) {
             return null;
         }
 
+        //先从缓存中获取数据，也就是本地缓存文件中获取数据
         if (isEnableAssets()) {
             InputStream inputStream = WebAssetsLoader.getInstance().getResByUrl(url);
             if (inputStream != null) {
@@ -307,6 +322,8 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
                 return webResourceResponse;
             }
         }
+
+        //如果本地缓存没有，则创建OkHttp的Request请求，将资源网络请求交给okHttp来处理，并且用它自带的缓存功能
         try {
             Request.Builder reqBuilder = new Request.Builder().url(url);
             String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
