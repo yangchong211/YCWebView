@@ -139,7 +139,7 @@ public class X5WebChromeClient extends VideoChromeClient {
                 webListener.showTitle(title);
             }
         }
-        X5LogUtils.i("-------onReceivedTitle-------"+title);
+        X5LogUtils.i("-------onReceivedTitle-------"+title + "----"+view.getUrl());
     }
 
     /**
@@ -323,6 +323,10 @@ public class X5WebChromeClient extends VideoChromeClient {
      */
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        String message = consoleMessage.message();
+        ConsoleMessage.MessageLevel messageLevel = consoleMessage.messageLevel();
+        String sourceId = consoleMessage.sourceId();
+        X5LogUtils.i("-------onConsoleMessage-------"+message+"----"+sourceId);
         return super.onConsoleMessage(consoleMessage);
     }
 
@@ -332,7 +336,9 @@ public class X5WebChromeClient extends VideoChromeClient {
      */
     @Override
     public boolean onJsTimeout() {
-        return super.onJsTimeout();
+        boolean jsTimeout = super.onJsTimeout();
+        X5LogUtils.i("-------onJsTimeout----js是否超时---"+jsTimeout);
+        return jsTimeout;
     }
 
     /**

@@ -7,6 +7,7 @@
 - 46.webBackForwardList用法
 - 47.WebView多布局连贯滑动
 - 48.开启Google安全浏览服务
+- 49.shouldOverrideUrlLoading不执行
 - 50.webView使用上的建议
 
 
@@ -163,6 +164,13 @@
         </application>
     </manifest>
     ```
+
+
+### 49.shouldOverrideUrlLoading不执行
+- 原因1：shouldOverrideUrlLoading不执行，原因是因为在js里面设置了计时器实现可以判断用户长按的功能，当android遇到html的js代码里面执行有计时器如：setTimeout就不会执行android WebView 里面的 shouldOverrideUrlLoading 。
+- 原因2：
+    - https://blog.csdn.net/weixin_37806077/article/details/85488680
+    - https://blog.csdn.net/KevinsCSDN/article/details/89598789
 
 
 
