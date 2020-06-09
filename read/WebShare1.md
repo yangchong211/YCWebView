@@ -18,10 +18,10 @@
     - 开始执行页面加载操作时，可以设置获取H5页面标题，加载进度，开始加载，加载完成，以及加载error等不同的状态。
 - 加载页面的过程中回调哪些方法？
     - WebChromeClient.onReceivedTitle(webview, title)，用来设置标题。需要注意的是，在部分Android系统版本中可能会回调多次这个方法，而且有时候回调的title是一个url，客户端可以针对这种情况进行特殊处理，避免在标题栏显示不必要的链接。
-    - WebChromeClient.onProgressChanged(webview, progress)，根据这个回调，可以控制进度条的进度（包括显示与隐藏）。一般情况下，想要达到100%的进度需要的时间较长（特别是首次加载），用户长时间等待进度条不消失必定会感到焦虑，影响体验。其实当progress达到80的时候，加载出来的页面已经基本可用了。事实上，国内厂商大部分都会提前隐藏进度条，让用户以为网页加载很快。
-    - WebViewClient.shouldInterceptRequest(webview, request)，无论是普通的页面请求(使用GET/POST)，还是页面中的异步请求，或者页面中的资源请求，都会回调这个方法，给开发一次拦截请求的机会。在这个方法中，我们可以进行静态资源的拦截并使用缓存数据代替，也可以拦截页面，使用自己的网络框架来请求数据。包括后面介绍的WebView免流方案，也和此方法有关。
-    - WebViewClient.shouldOverrideUrlLoading(webview, request)，如果遇到了重定向，或者点击了页面中的a标签实现页面跳转，那么会回调这个方法。可以说这个是WebView里面最重要的回调之一，后面WebView与Native页面交互一节将会详细介绍这个方法。
-    - WebViewClient.onReceivedError(webview,handler,error)，加载页面的过程中发生了错误，会回调这个方法。主要是http错误以及ssl错误。在这两个回调中，我们可以进行异常上报，监控异常页面、过期页面，及时反馈给运营或前端修改。在处理ssl错误时，遇到不信任的证书可以进行特殊处理，例如对域名进行判断，针对自己公司的域名“放行”，防止进入丑陋的错误证书页面。也可以与Chrome一样，弹出ssl证书疑问弹窗，给用户选择的余地。
+    - WebChromeClient.onProgressChanged(webview, progress)，根据这个回调，可以控制进度条的进度（包括显示与隐藏）。一般情况下，想要达到100%的进度需要的时间较长（特别是首次加载），用户长时间等待进度条不消失必定会感到焦虑，影响体验。其实当progress达到80的时候，加载出来的页面已经基本可用了。事实上大部分都会提前隐藏进度条，让用户以为网页加载很快。
+    - WebViewClient.shouldInterceptRequest(webview, request)，无论是普通的页面请求(使用GET/POST)，还是页面中的异步请求，或者页面中的资源请求，都会回调这个方法，给开发一次拦截请求的机会。在这个方法中，可以进行静态资源的拦截并使用缓存数据代替，也可以拦截页面，使用自己的网络框架来请求数据。
+    - WebViewClient.shouldOverrideUrlLoading(webview, request)，如果遇到了重定向，或者点击了页面中的a标签实现页面跳转，那么会回调这个方法。可以说这个是WebView里面最重要的回调之一。
+    - WebViewClient.onReceivedError(webview,handler,error)，加载页面的过程中发生了错误，会回调这个方法。主要是http错误以及ssl错误。在这两个回调中，我们可以进行异常上报，监控异常页面、过期页面，及时反馈给运营或前端修改。在处理ssl错误时，遇到不信任的证书可以进行特殊处理，例如对域名进行判断，针对自己公司的域名“放行”，防止进入丑陋的错误证书页面。
 - 加载页面结束回调哪些方法
     - 会回调WebViewClient.onPageFinished(webview,url)。
     - 这时候可以根据回退栈的情况判断是否显示关闭WebView按钮。通过mActivityWeb.canGoBackOrForward(-1)判断是否可以回退。
@@ -40,7 +40,7 @@
 - 触发加载网页的行为主要有两种方式：
     - （A）点击页面，触发<link>标签。
     - （B）调用WebView的loadUrl()方法
-    - 这两种方法都会发出一条地址，区别就在于这条地址是目的地址还是重定向地址。以访问http://www.baidu.com百度的页面来测试一下方法的执行顺序。
+    - 这两种方法都会发出一条地址，区别就在于这条地址是目的地址还是重定向地址。以访问 http://www.baidu.com 百度的页面来测试一下方法的执行顺序。
 - 触发加载网页流程分析
     - 关于分析流程，由于内容较多，故这里暂不展示。具体看：[07.触发加载网页的行为](https://github.com/yangchong211/YCWebView/wiki/6.1-webView%E5%9F%BA%E7%A1%801)
 - 得出结论分析说明
@@ -166,12 +166,16 @@
     ws.setCacheMode(WebSettings.LOAD_DEFAULT);
     ```
     - 一般设置为默认的缓存模式就可以了。关于缓存的配置, 主要还是靠web前端和后台设置。关于[浏览器缓存机制](https://github.com/yangchong211/YCWebView/wiki/7.1-%E7%BC%93%E5%AD%98%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86)
+- 具体会缓存那些内容
+    - 当我们加载Html时候，会在我们data/应用package下生成database与cache两个文件夹。具体可以看：[05.具体缓存那些内容](https://github.com/yangchong211/YCWebView/blob/master/read/WebCache1.md)
+    - 网页数据缓存（存储打开过的页面及资源）：指加载一个网页时的html、JS、CSS，图片等页面或者资源数据。通过配置HTTP响应头影响浏览器的行为才能间接地影响到这些缓存数据，该案例通过配置OkHttp可以做到
+    - 数据缓存：数据缓存分为AppCache和DOM Storage两种，这些缓存资源是由开发者的直接行为而产生，所有的缓存数据都由开发者直接完全地掌控。这块可以直接交给OkHttp去做，会把数据下载到本地磁盘缓存
 - 自身构建缓存方案
     - 拦截处理
         - 在shouldInterceptRequest方法中拦截处理
         - 步骤1:判断拦截资源的条件，即判断url里的图片资源的文件名
         - 步骤2:创建一个输入流，这里可以先从内存中拿，拿不到从磁盘中拿，再拿不到就从网络获取数据
-        - 步骤3:打开需要替换的资源(存放在assets文件夹里)，或者从lru中取出缓存的数据
+        - 步骤3:打开需要替换的资源(存放在指定文件夹里)，或者从lru中取出缓存的数据
         - 步骤4:替换资源
     - 在哪里进行拦截
         - webView在加载网页的时候，用户能够通过系统提供的API干预各个中间过程。我们要拦截的就是网页资源请求的环节。这个过程，WebViewClient当中提供了以下两个入口：
@@ -198,7 +202,10 @@
     - okHttp缓存优势
         - 1.三级缓存，网络缓存(http)，磁盘缓存(file)，内存缓存(Lru)
         - 2.使用okio流，数据进行了分块处理(Segment)，提供io流超时处理，对数据的读写都进行了封装和交给Buffer管理。具体看这篇文章：[OkHttp中OKio分析](https://github.com/yangchong211/YCWebView/blob/master/read/WebCache6.md)
-
+    - 如何查看缓存
+        - 1.在data/data文件下找到自己设置的缓存文件，比如设置的是YcCacheWebView。在该目录下，直接点开文件，可以看到.0后缀名文件是缓存内容，.1后缀名文件是缓存file。具体可以点进去看看
+        - 2.调用response.cacheResponse()方法，如果缓存得到的内容不为空，则表示缓存成功呢
+        - 3.使用流量获取的方式，比较没有缓存的情况和有缓存的情况，它们消耗的网络流量对比
 
 
 ### 06.关于一些问题和优化
@@ -242,12 +249,18 @@
     //2.通过委托对象调用方法
     WebResourceResponse webResourceResponse = webViewCacheDelegate.interceptRequest(url);
     ```
+    - 接口(WebViewRequestClient)和实现(WebViewCacheWrapper)相分离，封装不稳定的实现，暴露稳定的接口。上游系统面向接口而非实现编程，不依赖不稳定的实现细节，这样当实现发生变化的时候，上游系统的代码基本上不需要做改动，以此来降低代码间的耦合性，提高代码的扩展性。
 - 关于shouldOverrideUrlLoading处理多类型
-    - 比如：封装库中需要处理打电话，发短信，发邮件，地图定位，图片，超链接等拦截逻辑
+    - 比如：封装库中需要处理打电话，发短信，发邮件，地图定位，图片，超链接等拦截逻辑。还有关于在shouldOverrideUrlLoading拦截做js交互的逻辑……可以说最开始这个类代码很臃肿！
     - 最刚开始是把处理的逻辑都放到了WebViewClient中的shouldOverrideUrlLoading方法中处理。不过发现这个类代码越来越多……
     - 后期演变，针对电话短信等将处理逻辑抽取到WebSchemeIntent类中，针对图片处理逻辑抽取到SaveImageProcessor类中。具体看[WebSchemeIntent](https://github.com/yangchong211/YCWebView/blob/master/WebViewLib/src/main/java/com/ycbjie/webviewlib/helper/WebSchemeIntent.java)
+    - 后期演变，将js操作单独抽取出来写到JsX5WebViewClient，这样极大提高了阅读性，类的结构也是更加清晰呢
     - 这样做，相当于保证了类的单一性职责，即类尽量保证内部处理的功能尽可能单一，而不是错综复杂……
-
+- 其他的一些感受
+    - 合理使用注解限定符，比如InterWebListener接口中的showErrorView方法，异常的类型可能会出现多种，设置type如果是1，2，3等容易让人看不懂。这时候限定符就发挥作用呢！
+    - 项目库中如果有和业务代码交接的地方，可以通过接口暴露出来，这样避免了功能和业务耦合，增强了拓展性
+    - 对于某些不想让别人修改或者继承的类，可以使用finial修饰。比如有赞webView的sdk中，比如ChromeClientWrapper继承了WebChromeClient，为了避免内部不被修改和反射。
+    - 有抽象意识、封装意识、接口意识。接口的定义只表明做什么，而不是怎么做。在设计接口的时候，这样的接口设计是否足够通用，是否能够做到在替换具体的接口实现的时候，不需要任何接口定义的改动。
 
 
 ### 08.关于后期需要研究的目标
@@ -261,8 +274,9 @@
     - 使用TrafficStats即可查看流量的消耗
 
 
-### 09.开源库
-- https://github.com/yangchong211/YCWebView
+
+### 09.关于其他说明
+- 由于分享文章有限，很多问题和技术细节点，都附带有链接。demo的地址：https://github.com/yangchong211/YCWebView
 
 
 

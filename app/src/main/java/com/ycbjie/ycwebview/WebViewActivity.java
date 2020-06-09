@@ -62,8 +62,9 @@ public class WebViewActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.onResume();
         }
+
     }
 
     @Override

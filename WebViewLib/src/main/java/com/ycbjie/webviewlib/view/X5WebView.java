@@ -224,7 +224,7 @@ public class X5WebView extends BridgeWebView {
     /**
      * 页面不可见关闭js交互
      */
-    protected void onStop() {
+    public void onStop() {
         this.getSettings().setJavaScriptEnabled(false);
     }
 

@@ -84,7 +84,7 @@
     - 数据缓存分为AppCache和DOM Storage两种。
     - 这些缓存资源是由开发者的直接行为而产生，所有的缓存数据都由开发者直接完全地掌控。
     - Android中Webkit使用一个db文件来保存AppCache数据（my_path/ApplicationCache.db）
-    - Android中Webkit会为DOM Storage产生两个文件（my_path/localstorage/http_h5.m.taobao.com_0.localstorage和my_path/localstorage/Databases.db）
+    - Android中Webkit会为DOM Storage产生两个文件（my_path/localstorage/xxx.db和my_path/localstorage/Databases.db）
 
 
 
