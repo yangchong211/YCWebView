@@ -183,6 +183,7 @@ public class X5WebViewClient extends WebViewClient {
     }
 
     /**
+     * 将最后停留的页面url弹出
      * 获取最后停留的页面url
      * @return null 表示已经没有上一页了
      */
@@ -418,6 +419,7 @@ public class X5WebViewClient extends WebViewClient {
         if (Build.VERSION.SDK_INT < 23) {
             //错误重定向循环
             if (errorCode == ERROR_REDIRECT_LOOP) {
+                //避免由于缓存造成的循环重定向
                 resolveRedirect(view);
                 return;
             }
@@ -459,6 +461,7 @@ public class X5WebViewClient extends WebViewClient {
         if (Build.VERSION.SDK_INT >= 23) {
             //错误重定向循环
             if (error != null && error.getErrorCode() == ERROR_REDIRECT_LOOP) {
+                //避免由于缓存造成的循环重定向
                 resolveRedirect(view);
                 return;
             }
@@ -574,7 +577,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onLoadResource(WebView webView, String s) {
         super.onLoadResource(webView, s);
-        X5LogUtils.i("-------onLoadResource-------"+ s);
+        //X5LogUtils.i("-------onLoadResource-------"+ s);
     }
 
     /**
@@ -605,6 +608,7 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, String s) {
+        X5LogUtils.i("---shouldInterceptRequest-------->---"+s);
         return super.shouldInterceptRequest(webView, s);
     }
 
@@ -620,6 +624,8 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
+        String method = webResourceRequest.getMethod();
+        X5LogUtils.i("---shouldInterceptRequest-------->21---"+method + "----" +webResourceRequest.getUrl());
         return super.shouldInterceptRequest(webView, webResourceRequest);
     }
 

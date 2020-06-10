@@ -7,6 +7,18 @@
 - 06.该库交互流程图
 
 
+### 00.大概流程梳理
+- Android调用js
+    - 调用callHandler方法，然后将方法中的三个属性封装到WebJsMessage对象中。如果用户传递callback不为空，则添加到map集合中
+    - 然后开始分发数据，把这些先都添加到list集合中。那么何时调用呢？
+    - 然后看一下JsX5WebViewClient类的onPageFinished，获取list集合，然后遍历依次调用dispatchMessage处理事件。注意这里借助了handler发送到主线程队列中处理
+    - 补充一下：
+- js调用Android
+    - 调用registerHandler方法，设置Android方法和handler存放到messageHandlers集合中。那么那个地方去获取集合信息，然后处理事件呢？
+    - 然后在shouldOverrideUrlLoading方法中，拦截url是否是自己定义的scheme，则开始分发消息
+
+
+
 ### 01.WebView加载html页面
 - webView.registerHandler(“submitFromWeb”, …);这是Java层注册了一个叫”submitFromWeb”的接口方法，目的是提供给Js来调用。这个”submitFromWeb”的接口方法的回调就是BridgeHandler.handler()。
 - webView.callHandler(“functionInJs”, …, new CallBackFunction());这是Java层主动调用Js的”functionInJs”方法。
@@ -36,7 +48,9 @@
         }
     }
     ```
-- 一层层深入callHandler()方法的实现。这其中会调用到doSend()方法，这里想解释下m.setCallbackId(callbackStr)方法的作用。该方法设置的callbackId生成后不仅仅会被传到Js，而且会以key-value对的形式和responseCallback配对保存到responseCallbacks这个Map里面。它的目的，就是为了等Js把处理结果回调给Java层后，Java层能根据callbackId找到对应的responseCallback，做后续的回调处理。
+- 一层层深入callHandler()方法的实现。这其中会调用到doSend()方法，这里想解释下m.setCallbackId(callbackStr)方法的作用。
+    - 该方法设置的callbackId生成后不仅仅会被传到Js，而且会以key-value对的形式和responseCallback配对保存到responseCallbacks这个Map里面。
+    - 它的目的，就是为了等Js把处理结果回调给Java层后，Java层能根据callbackId找到对应的responseCallback，做后续的回调处理。
     ```
     private void doSend(String handlerName, String data, CallBackFunction responseCallback) {
         Message m = new Message();
@@ -112,7 +126,8 @@
 
 
 ### 03.分析WebViewJavascriptBridge.js
-- 看看WebViewJavascriptBridge.js的代码，就能找到function _handleMessageFromNative()这个Js方法了。_handleMessageFromNative()方法里面会调用_dispatchMessageFromNative()方法。当处理来自Java层的主动调用时候会走“直接发送”的else分支。message.callbackId会被取出来，实例化一个responseCallback，而它是用来Js处理完成后把结果数据回调给Java层代码的。接着会根据message.handleName（在这个分析例子中，handleName的值就是”functionInJs”）在messageHandlers这个Map去获取handler，最后交给handler去处理。
+- 看看WebViewJavascriptBridge.js的代码，就能找到function _handleMessageFromNative()这个Js方法了。
+    - _handleMessageFromNative()方法里面会调用_dispatchMessageFromNative()方法。当处理来自Java层的主动调用时候会走“直接发送”的else分支。message.callbackId会被取出来，实例化一个responseCallback，而它是用来Js处理完成后把结果数据回调给Java层代码的。接着会根据message.handleName（在这个分析例子中，handleName的值就是”functionInJs”）在messageHandlers这个Map去获取handler，最后交给handler去处理。
     ```
     function _dispatchMessageFromNative(messageJSON) {
         setTimeout(function() {

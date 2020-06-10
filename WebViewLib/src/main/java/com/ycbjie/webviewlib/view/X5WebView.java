@@ -105,6 +105,10 @@ public class X5WebView extends BridgeWebView {
         }
     }
 
+    public void setWebViewClient(X5WebViewClient webViewClient){
+        this.setWebViewClient(webViewClient);
+    }
+
     public HttpDnsService getHttpDns() {
         return httpDns;
     }
@@ -380,7 +384,7 @@ public class X5WebView extends BridgeWebView {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             return getX5WebViewClient().pageCanGoBack();
         } else {
-            return validPreviousUrl() && canGoBack();
+            return validPreviousUrl() && this.canGoBack();
         }
     }
 
