@@ -341,6 +341,7 @@ public class X5WebViewClient extends WebViewClient {
         isLoadFinish = false;
         if (mIsLoading && mUrlStack.size() > 0) {
             //从url栈中取出栈顶的链接
+            X5LogUtils.i("-------onPageStarted-------"+mIsLoading);
             mUrlBeforeRedirect = mUrlStack.pop();
         }
         recordUrl(url);

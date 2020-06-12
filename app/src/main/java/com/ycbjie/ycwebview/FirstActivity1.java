@@ -88,7 +88,8 @@ public class FirstActivity1 extends AppCompatActivity {
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
         //final String url = "http://www.baidu.com";
-        final String url = "https://www.json.cn/";
+        //final String url = "https://www.json.cn/";
+        final String url = "https://h5.youzan.com/v2/feature/e24rDsqa2r";
         webView.loadUrl(url);
         tvRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
