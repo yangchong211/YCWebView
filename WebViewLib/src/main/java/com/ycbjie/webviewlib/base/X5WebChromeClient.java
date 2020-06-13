@@ -283,7 +283,7 @@ public class X5WebChromeClient extends VideoChromeClient {
 
     /**
      * 为'<input type="file" />'显示文件选择器，返回false使用默认处理
-     * For Android > 5.0
+     * For Android 大于 5.0
      * @param webView                           webview
      * @param uploadMsg                         msg
      * @param fileChooserParams                 参数
@@ -323,6 +323,10 @@ public class X5WebChromeClient extends VideoChromeClient {
      */
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        String message = consoleMessage.message();
+        ConsoleMessage.MessageLevel messageLevel = consoleMessage.messageLevel();
+        String sourceId = consoleMessage.sourceId();
+        //X5LogUtils.i("-------onConsoleMessage-------"+message+"----"+sourceId);
         return super.onConsoleMessage(consoleMessage);
     }
 
@@ -332,7 +336,9 @@ public class X5WebChromeClient extends VideoChromeClient {
      */
     @Override
     public boolean onJsTimeout() {
-        return super.onJsTimeout();
+        boolean onJsTimeout = super.onJsTimeout();
+        X5LogUtils.i("-------onJsTimeout----是否js超时---"+onJsTimeout);
+        return onJsTimeout;
     }
 
     /**

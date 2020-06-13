@@ -119,7 +119,7 @@ public class JsX5WebViewClient extends X5WebViewClient {
     }
 
     /**
-     * 增加shouldOverrideUrlLoading在api>=24时
+     * 增加shouldOverrideUrlLoading在api大于24时
      * 主要的作用是处理各种通知和请求事件
      * 返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
      * @param view                              view

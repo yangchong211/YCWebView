@@ -52,7 +52,7 @@ public final class BridgeUtil {
 	public final static String JAVASCRIPT_STR = "javascript:";
 
 	/**
-	 * 例子 javascript:WebViewJavascriptBridge._fetchQueue(); --> _fetchQueue
+	 * 例子 javascript:WebViewJavascriptBridge._fetchQueue(); 指向 _fetchQueue
 	 * @param jsUrl				url
 	 * @return					返回字符串，注意获取的时候判断空
 	 */
