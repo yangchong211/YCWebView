@@ -389,8 +389,9 @@ public class WebViewCacheWrapper implements WebViewRequestClient {
         private Dns mDns=null;
         public Builder(Context context) {
             mContext = context;
-            mCacheFile = new File(context.getCacheDir().toString(), "CacheWebViewCache");
+            mCacheFile = new File(context.getCacheDir().toString(), "YcCacheWebView");
             mCacheExtensionConfig = new CacheExtensionConfig();
+            X5LogUtils.d("WebViewCacheWrapper---缓存文件--" +mCacheFile);
         }
 
         public void setResourceInterceptor(InterResourceInterceptor resourceInterceptor) {
