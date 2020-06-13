@@ -332,22 +332,38 @@ public class X5WebView extends BridgeWebView {
         return false;
     }
 
+    /**
+     * 判断以前Url是否是有效的
+     * @return                          是否是有效的
+     */
     public boolean validPreviousUrl() {
-            WebBackForwardList list = this.copyBackForwardList();
-            final int curIndex = list.getCurrentIndex();
-            final int preIndex = curIndex > 0 ? curIndex - 1 : -1;
-            if (preIndex >= 0) {
-                WebHistoryItem item = list.getItemAtIndex(preIndex);
-                return item != null && (!X5WebUtils.shouldSkipUrl(item.getUrl()) || preIndex != 0);
-            }
+        //获取webView加载栈
+        WebBackForwardList list = this.copyBackForwardList();
+        //获取当前加载在加载栈中的位置
+        final int curIndex = list.getCurrentIndex();
+        //获取上一个索引的位置
+        final int preIndex = curIndex > 0 ? curIndex - 1 : -1;
+        if (preIndex >= 0) {
+            //获取加载栈中第index页面
+            WebHistoryItem item = list.getItemAtIndex(preIndex);
+            return item != null && (!X5WebUtils.shouldSkipUrl(item.getUrl()) || preIndex != 0);
+        }
         return false;
     }
 
+    /**
+     * 获取先前的url
+     * @return                          先前的url
+     */
     public String getPreviousUrl() {
+        //获取webView加载栈
         WebBackForwardList list = this.copyBackForwardList();
+        //获取当前加载在加载栈中的位置
         final int curIndex = list.getCurrentIndex();
+        //获取上一个索引的位置
         final int preIndex = curIndex > 0 ? curIndex - 1 : -1;
         if (preIndex >= 0) {
+            //获取加载栈中第index页面
             WebHistoryItem item = list.getItemAtIndex(preIndex);
             return item != null ? item.getUrl() : null;
         }

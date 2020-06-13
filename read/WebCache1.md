@@ -2,8 +2,10 @@
 - 01.WebView为何加载慢
 - 02.解决WebView加载慢
 - 03.浏览器缓存机制
-- 04.具体缓存那些内容
-- 05.预加载数据
+- 04.WebView设置缓存
+- 05.具体缓存那些内容
+- 06.本地资源替换操作
+- 07.如何处理预加载数据
 
 
 
@@ -22,7 +24,8 @@
             - HTML 主 URL 自身的请求；
             - HTML外部引用的JS、CSS、字体文件，图片也是一个独立的 HTTP 请求
         - 每一个请求都串行的，这么多请求串起来，这导致 H5页面资源加载缓慢
-- 总结：H5页面加载速度慢的原因：渲染速度慢 & 页面资源加载缓慢 导致。
+- 总结：
+    - H5页面加载速度慢的原因：渲染速度慢 & 页面资源加载缓慢 导致。
 
 
 
@@ -51,7 +54,12 @@
     - Last-Modified && ETag
         - 这两个字段的作用是：发起请求时，服务器决定文件是否需要更新。服务端响应浏览器的请求时会添加一个Last-Modified的头部字段，字段内容表示请求的文件最后的更改时间。
         - 而浏览器会在下一次请求通过If-Modified-Since头部字段将这个值返回给服务端，以决定是否需要更新文件
-- 这些技术都是协议层所定义的，在Android的webView当中我们可以通过配置决定是否采纳这几个协议的头部属性
+- 一般设置为默认的缓存模式就可以了。关于缓存的配置, 主要还是靠web前端和后台设置。这些技术都是协议层所定义的，在Android的webView当中我们可以通过配置决定是否采纳这几个协议的头部属性
+
+
+
+### 04.WebView设置缓存
+- 针对WebView设置缓存
     ```java
     // LOAD_CACHE_ONLY: 不使用网络，只读取本地缓存数据
     // LOAD_DEFAULT: （默认）根据cache-control决定是否从网络上取数据。
@@ -59,15 +67,109 @@
     // LOAD_CACHE_ELSE_NETWORK，只要本地有，无论是否过期，或者no-cache，都使用缓存中的数据。
     ws.setCacheMode(WebSettings.LOAD_DEFAULT);
     ```
-- 一般设置为默认的缓存模式就可以了。关于缓存的配置, 主要还是靠web前端和后台设置。
 
 
 
-### 04.具体缓存那些内容
+### 05.具体缓存那些内容
+- 会缓存那些内容？
+    - 当我们加载Html时候，会在我们data/应用package下生成database与cache两个文件夹:
+    - 请求的Url记录是保存在webviewCache.db里，而url的内容是保存在webviewCache文件夹下
+    - WebView中存在着两种缓存：网页数据缓存（存储打开过的页面及资源）、H5缓存（即AppCache）。
+- 页面缓存:
+    - 指加载一个网页时的html、JS、CSS等页面或者资源数据。
+    - 这些缓存资源是由于浏览器的行为而产生，开发者只能通过配置HTTP响应头影响浏览器的行为才能间接地影响到这些缓存数据。
+    - 缓存的索引存放在/data/data/package_name/databases下。
+    - 文件存放在/data/data/package_name/cache/xxxwebviewcachexxx下。
+- 数据缓存 :
+    - 数据缓存分为AppCache和DOM Storage两种。
+    - 这些缓存资源是由开发者的直接行为而产生，所有的缓存数据都由开发者直接完全地掌控。
+    - Android中Webkit使用一个db文件来保存AppCache数据（my_path/ApplicationCache.db）
+    - Android中Webkit会为DOM Storage产生两个文件（my_path/localstorage/http_h5.m.taobao.com_0.localstorage和my_path/localstorage/Databases.db）
 
 
 
-### 05.预加载数据
+### 06.本地资源替换操作
+- 操作思路
+    - 用本地文件js，css，png替换网络请求下来的文件
+- 该案例存在问题
+    - 需要提前在本地存放大量缓存文件，如果是服务器下发比较麻烦；如果直接放本地缓存文件，则需要app升级；
+- 代码案例如下所示
+    ```
+    //获得下载列表
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        WebResourceResponse response = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+            response = super.shouldInterceptRequest(view,url);
+            if (url.contains(".js")||url.contains(".png")||url.contains(".css")){
+                Log.e("fileUrl",url);
+                String[] arr = StrUtil.getStrArr(url,"/");
+                String jsFileName = arr[arr.length-1];
+                String[] arrEnd = StrUtil.getStrArr(jsFileName,"\\.");
+                if (arr.length!=0){
+                    if(arrEnd.length != 0) {
+                        Log.e("arr",jsFileName);
+                        if(jsFileName.equals("fastclick.min.js")){
+                            Log.e("fastclick","fastclick");
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("fastclick.min.js"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if(jsFileName.equals("geolocation.min.js")){
+                            Log.e("geolocation","geolocation");
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("geolocation.min.js"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if(jsFileName.equals("g2.min.js")){
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("g2.min.js"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                        if(jsFileName.equals("login_bg.5563a40.png")){
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("login_bg.5563a40.png"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if(jsFileName.equals("favicon-16x16.png")){
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("favicon-16x16.png"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if(jsFileName.equals("favicon-32x32.png")){
+                            try {
+                                return new WebResourceResponse("application/x-javascript","utf-8",getBaseContext().getAssets().open("favicon-32x32.png"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                }
+            }
+
+        }
+        return  response;
+    }
+    ```
+
+
+
+
+
+### 07.如何处理预加载数据
 - 大概思路介绍
     - 预加载数据就是在客户端初始化WebView的同时，直接由native开始网络请求数据, 当页面初始化完成后，向native获取其代理请求的数据, 数据请求和WebView初始化可以并行进行，缩短总体的页面加载时间。
     - 简单来说就是配置一个预加载列表，在APP启动或某些时机时提前去请求，这个预加载列表需要包含所需H5模块的页面和资源, 客户端可以接管所有请求的缓存，不走webView默认缓存逻辑, 自行实现缓存机制, 原理其实就是拦截WebViewClient的那两个shouldInterceptRequest方法。

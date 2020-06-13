@@ -30,7 +30,27 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="1. 自带webView浏览普通的网页"/>
+            android:text="1.1 自带webView浏览普通的网页(使用普通webView)"/>
+
+        <TextView
+            android:id="@+id/tv_1_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="1.2 自带webView浏览普通的网页（使用BaseWebView记录点击）"/>
+
+        <TextView
+            android:id="@+id/tv_1_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="1.3 自带webView浏览普通的网页（使用BaseWebView记录点击）"/>
 
         <TextView
             android:id="@+id/tv_2_1"

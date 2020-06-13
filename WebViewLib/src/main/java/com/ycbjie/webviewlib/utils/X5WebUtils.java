@@ -119,15 +119,21 @@ public final class X5WebUtils {
         }
     }
 
+    /**
+     * 初始化缓存
+     * @param application                       上下文
+     */
     public static void initCache(Application application){
         //1.创建委托对象
         WebViewCacheDelegate webViewCacheDelegate = WebViewCacheDelegate.getInstance();
         //2.创建调用处理器对象，实现类
         WebViewCacheWrapper.Builder builder = new WebViewCacheWrapper.Builder(application);
         //设置缓存路径，默认getCacheDir，名称CacheWebViewCache
-        builder.setCachePath(new File(application.getCacheDir(),"CacheWebViewCache"))
+        builder.setCachePath(new File(application.getCacheDir(),"CacheWebView"))
                 //设置缓存大小，默认100M
                 .setCacheSize(1024*1024*100)
+                //设置本地路径
+                //.setAssetsDir("yc")
                 //设置http请求链接超时，默认20秒
                 .setConnectTimeoutSecond(20)
                 //设置http请求链接读取超时，默认20秒
@@ -491,4 +497,5 @@ public final class X5WebUtils {
     private static String getKdtUnionUrl(@NonNull Uri uri) {
         return uri.isOpaque() ? null : uri.getQueryParameter("redirect_uri");
     }
+
 }

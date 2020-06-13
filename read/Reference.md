@@ -11,6 +11,8 @@
     - https://blog.csdn.net/weixin_33670786/article/details/87957222?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase
 - Android Webview复用池+独立进程
     - https://www.heng666.cn/324.html
+- webView方法说明【还未看和吸收】
+    - https://www.jianshu.com/p/a6f7b391a0b8
 
 
 ### 性能优化

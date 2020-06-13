@@ -125,9 +125,9 @@ public final class BridgeUtil {
 
 	/**
 	 * 解析assets文件夹里面的代码,去除注释,取可执行的代码
-	 * @param c context
-	 * @param urlStr 路径
-	 * @return 可执行代码
+	 * @param c 										context
+	 * @param urlStr 									路径
+	 * @return 											可执行代码
 	 */
 	public static String assetFile2Str(Context c, String urlStr){
 		InputStream in = null;
