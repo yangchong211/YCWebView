@@ -68,6 +68,7 @@ public class X5WebChromeClient extends VideoChromeClient {
     private WebView webView;
     public static final int REQUEST_LOCATION = 100;
 
+
     /**
      * 设置监听时间，包括常见状态页面切换，进度条变化等
      * @param listener                          listener
