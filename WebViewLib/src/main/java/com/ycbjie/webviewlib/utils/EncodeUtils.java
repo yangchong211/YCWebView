@@ -109,7 +109,7 @@ public final class EncodeUtils {
      * @return                              base64编码字节
      */
     public static byte[] base64Encode(final byte[] input) {
-        return Base64.encode(input, Base64.NO_WRAP);
+        return Base64.encode(input, Base64.DEFAULT);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class EncodeUtils {
      * @return                              base64编码字符串
      */
     public static String base64Encode2String(final byte[] input) {
-        return Base64.encodeToString(input, Base64.NO_WRAP);
+        return Base64.encodeToString(input, Base64.DEFAULT);
     }
 
     /**
@@ -129,7 +129,7 @@ public final class EncodeUtils {
      * @return                              解码base64编码的字节
      */
     public static byte[] base64Decode(final String input) {
-        return Base64.decode(input, Base64.NO_WRAP);
+        return Base64.decode(input, Base64.DEFAULT);
     }
 
     /**
@@ -139,7 +139,7 @@ public final class EncodeUtils {
      * @return                              解码base64编码的字节
      */
     public static byte[] base64Decode(final byte[] input) {
-        return Base64.decode(input, Base64.NO_WRAP);
+        return Base64.decode(input, Base64.DEFAULT);
     }
 
     /**

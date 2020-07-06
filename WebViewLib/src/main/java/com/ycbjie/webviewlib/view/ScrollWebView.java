@@ -27,6 +27,7 @@ import android.view.View;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 
 import java.util.Map;
@@ -67,35 +68,6 @@ public class ScrollWebView extends X5WebView {
                 return false;
             }
         });
-        /*this.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                WebView.HitTestResult result = ((WebView)v).getHitTestResult();
-                if (null == result){
-                    return false;
-                }
-                int type = result.getType();
-                if (type == WebView.HitTestResult.UNKNOWN_TYPE){
-                    return false;
-                }
-                // 这里可以拦截很多类型，我们只处理图片类型就可以了
-                switch (type) {
-                    case WebView.HitTestResult.PHONE_TYPE: // 处理拨号
-                        break;
-                    case WebView.HitTestResult.EMAIL_TYPE: // 处理Email
-                        break;
-                    case WebView.HitTestResult.GEO_TYPE: // 地图类型
-                        break;
-                    case WebView.HitTestResult.SRC_ANCHOR_TYPE: // 超链接
-                        break;
-                    case WebView.HitTestResult.IMAGE_TYPE: // 处理长按图片的菜单项
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });*/
     }
 
 
@@ -226,72 +198,54 @@ public class ScrollWebView extends X5WebView {
 
     @Override
     public void setWebViewClient(final WebViewClient client) {
-        super.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, url);
-                if (handleByChild) {
-                    // 开放client接口给上层业务调用，如果返回true，表示业务已处理。
-                    return true;
-                } else if (!isTouchByUser()) {
-                    // 如果业务没有处理，并且在加载过程中用户没有再次触摸屏幕，认为是301/302事件，直接交由系统处理。
-                    return super.shouldOverrideUrlLoading(view, url);
-                } else {
-                    //否则，属于二次加载某个链接的情况，为了解决拼接参数丢失问题，重新调用loadUrl方法添加固有参数。
-                    loadUrl(url);
-                    return true;
-                }
-            }
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, request);
-                if (handleByChild) {
-                    return true;
-                } else if (!isTouchByUser()) {
-                    return super.shouldOverrideUrlLoading(view, request);
-                } else {
-                    loadUrl(request.getUrl().toString());
-                    return true;
-                }
-            }
-        });
+        super.setWebViewClient(new MyWebViewClient(this,getContext(),client));
     }
 
-    private long m_DownTime ;
-    public class CheckForClickTouchLister implements View.OnTouchListener {
+    private class MyWebViewClient extends JsX5WebViewClient{
 
-        private final static long MAX_TOUCH_DURATION = 100;
+        private WebViewClient client;
+
+        /**
+         * 构造方法
+         * @param webView                               需要传进来webView
+         * @param context                               上下文
+         * @param client                                client
+         */
+        public MyWebViewClient(X5WebView webView, Context context, WebViewClient client) {
+            super(webView, context);
+            this.client = client;
+        }
 
         @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    m_DownTime = event.getEventTime();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if(event.getEventTime() - m_DownTime <= MAX_TOUCH_DURATION) {
-                        //处理点击事件
-                        if (listener!=null){
-                            listener.OnClick(v);
-                        }
-                    }
-                    break;
-                default:
-                    break;
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, url);
+            if (handleByChild) {
+                // 开放client接口给上层业务调用，如果返回true，表示业务已处理。
+                return true;
+            } else if (!isTouchByUser()) {
+                // 如果业务没有处理，并且在加载过程中用户没有再次触摸屏幕，认为是301/302事件，直接交由系统处理。
+                return super.shouldOverrideUrlLoading(view, url);
+            } else {
+                //否则，属于二次加载某个链接的情况，为了解决拼接参数丢失问题，重新调用loadUrl方法添加固有参数。
+                loadUrl(url);
+                return true;
             }
-            return false;
         }
-    }
 
-    public interface OnClickListener{
-        void OnClick(View view);
-    }
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            boolean handleByChild = null != client && client.shouldOverrideUrlLoading(view, request);
+            if (handleByChild) {
+                return true;
+            } else if (!isTouchByUser()) {
+                return super.shouldOverrideUrlLoading(view, request);
+            } else {
+                loadUrl(request.getUrl().toString());
+                return true;
+            }
+        }
 
-    private OnClickListener listener;
-
-    public void setListener(OnClickListener listener) {
-        this.listener = listener;
     }
 
 }

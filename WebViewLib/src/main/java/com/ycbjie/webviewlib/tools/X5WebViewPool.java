@@ -36,7 +36,6 @@ public class X5WebViewPool {
 
     //Android Webview复用池+独立进程
     //https://www.heng666.cn/324.html
-    private static final String DEMO_URL = "https://www.heng666.cn";
     private static List<X5WebView> available = new ArrayList<>();
     private static final byte[] lock = new byte[]{};
     private static int maxSize = 2;
@@ -55,7 +54,7 @@ public class X5WebViewPool {
     }
 
     /**
-     * Webview 初始化
+     * webView 初始化
      * 最好放在application oncreate里
      */
     public static void init(Context context) {
@@ -67,7 +66,7 @@ public class X5WebViewPool {
     }
 
     /**
-     * 获取webview
+     * 获取webView
      */
     public X5WebView getWebView(Context context) {
         synchronized (lock) {
@@ -75,7 +74,7 @@ public class X5WebViewPool {
             if (available.size() > 0) {
                 webView = available.get(0);
                 available.remove(0);
-                currentSize++;
+                currentSize--;
             } else {
                 webView = new X5WebView(context);
                 available.add(webView);
@@ -111,7 +110,7 @@ public class X5WebViewPool {
     }
 
     /**
-     * 回收webview ,解绑
+     * 回收webView ,解绑
      *
      * @param webView 需要被回收的webview
      */
@@ -137,7 +136,7 @@ public class X5WebViewPool {
     }
 
     /**
-     * 设置webview池个数
+     * 设置webView池个数
      *
      * @param size webview池个数
      */

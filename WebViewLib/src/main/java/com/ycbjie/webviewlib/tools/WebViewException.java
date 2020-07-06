@@ -10,7 +10,7 @@ package com.ycbjie.webviewlib.tools;
  *     revise:
  * </pre>
  */
-public class WebViewException extends Exception {
+public class WebViewException extends RuntimeException {
 
     private int mCode = 0;
 

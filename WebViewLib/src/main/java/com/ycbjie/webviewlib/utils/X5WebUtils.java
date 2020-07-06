@@ -50,6 +50,7 @@ import com.ycbjie.webviewlib.cache.WebCacheType;
 import com.ycbjie.webviewlib.cache.WebViewCacheDelegate;
 import com.ycbjie.webviewlib.cache.WebViewCacheWrapper;
 import com.ycbjie.webviewlib.tools.WebViewException;
+import com.ycbjie.webviewlib.view.X5WebView;
 
 import java.io.File;
 import java.lang.annotation.Retention;
@@ -114,6 +115,8 @@ public final class X5WebUtils {
             };
             //x5内核初始化接口
             QbSdk.initX5Environment(context,  cb);
+            ToastUtils.init(application);
+            X5WebView.isLongClick = true;
         }else {
             throw new UnsupportedOperationException("context must be application...");
         }
@@ -123,13 +126,16 @@ public final class X5WebUtils {
      * 初始化缓存
      * @param application                       上下文
      */
-    public static void initCache(Application application){
+    public static void initCache(Application application , String path){
+        if (path==null || path.length()==0){
+            path = "YcCacheWebView";
+        }
         //1.创建委托对象
         WebViewCacheDelegate webViewCacheDelegate = WebViewCacheDelegate.getInstance();
         //2.创建调用处理器对象，实现类
         WebViewCacheWrapper.Builder builder = new WebViewCacheWrapper.Builder(application);
         //设置缓存路径，默认getCacheDir，名称CacheWebViewCache
-        builder.setCachePath(new File(application.getCacheDir(),"CacheWebView"))
+        builder.setCachePath(new File(application.getCacheDir().toString(),path))
                 //设置缓存大小，默认100M
                 .setCacheSize(1024*1024*100)
                 //设置本地路径
@@ -139,7 +145,7 @@ public final class X5WebUtils {
                 //设置http请求链接读取超时，默认20秒
                 .setReadTimeoutSecond(20)
                 //设置缓存为正常模式，默认模式为强制缓存静态资源
-                .setCacheType(WebCacheType.NORMAL);
+                .setCacheType(WebCacheType.FORCE);
         webViewCacheDelegate.init(builder);
     }
 

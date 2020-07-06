@@ -26,10 +26,14 @@ import android.view.ViewGroup;
 import com.alibaba.sdk.android.httpdns.HttpDns;
 import com.alibaba.sdk.android.httpdns.HttpDnsService;
 import com.tencent.smtt.sdk.WebBackForwardList;
+import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
+import com.ycbjie.webviewlib.tools.WebViewException;
+import com.ycbjie.webviewlib.utils.FastClickUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
@@ -55,6 +59,7 @@ public class X5WebView extends BridgeWebView {
     private X5WebChromeClient x5WebChromeClient;
     private volatile boolean mInitialized;
     private HttpDnsService httpDns;
+    public static boolean isLongClick = true;
 
     @Override
     protected void onDetachedFromWindow() {
@@ -87,7 +92,7 @@ public class X5WebView extends BridgeWebView {
         mInitialized = true;
         //初始化https+dns域名解析功能，如果没有初始化，则默认不使用
         initSetHttpDns();
-        //initListener();
+        initListener();
     }
 
     /**
@@ -103,10 +108,6 @@ public class X5WebView extends BridgeWebView {
             // 允许过期IP以实现懒加载策略
             httpDns.setExpiredIPEnabled(true);
         }
-    }
-
-    public void setWebViewClient(X5WebViewClient webViewClient){
-        this.setWebViewClient(webViewClient);
     }
 
     public HttpDnsService getHttpDns() {
@@ -183,23 +184,25 @@ public class X5WebView extends BridgeWebView {
 
 
     private void initListener() {
-        this.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                // 这里不能像普通WebView一样将view强转为WebView然后获取HitTestResult，因为x5传来的view不是
-                // 标准的WebView
-                WebView.HitTestResult result = X5WebView.this.getHitTestResult();
-                if (result == null) {
+        if (isLongClick){
+            this.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    // 这里不能像普通WebView一样将view强转为WebView然后获取HitTestResult，因为x5传来的view不是
+                    // 标准的WebView
+                    WebView.HitTestResult result = X5WebView.this.getHitTestResult();
+                    if (result == null) {
+                        return false;
+                    }
+                    int type = result.getType();
+                    if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+                        // 图片
+                        return new SaveImageProcessor().showActionMenu(X5WebView.this);
+                    }
                     return false;
                 }
-                int type = result.getType();
-                if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
-                    // 图片
-                    return new SaveImageProcessor().showActionMenu(X5WebView.this);
-                }
-                return false;
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -254,6 +257,33 @@ public class X5WebView extends BridgeWebView {
         return getCustomWebViewClient();
     }
 
+
+    @Override
+    public void setWebChromeClient(WebChromeClient webChromeClient) {
+        if (webChromeClient!=null){
+            if (webChromeClient instanceof X5WebChromeClient){
+                super.setWebChromeClient(webChromeClient);
+            } else {
+                throw new WebViewException("please use client must be extends X5WebChromeClient");
+            }
+        } else {
+            super.setWebChromeClient(null);
+        }
+    }
+
+    @Override
+    public void setWebViewClient(WebViewClient webViewClient) {
+        if (webViewClient!=null){
+            if (webViewClient instanceof JsX5WebViewClient){
+                super.setWebViewClient(webViewClient);
+            } else {
+                throw new WebViewException("please use client must be extends JsX5WebViewClient");
+            }
+        } else {
+            super.setWebViewClient(null);
+        }
+    }
+
     /**
      * 设置是否自定义视频视图
      * @param isShowCustomVideo         设置是否自定义视频视图
@@ -266,6 +296,10 @@ public class X5WebView extends BridgeWebView {
      * 刷新界面可以用这个方法
      */
     public void reLoadView(){
+        //防止短时间多次触发load方法
+        if (FastClickUtils.isFastDoubleClick()){
+            return;
+        }
         this.reload();
     }
 
@@ -451,7 +485,7 @@ public class X5WebView extends BridgeWebView {
      * 可能存在问题：
      * onPageFinished没有执行，导致这段代码没有走
      */
-    private void hideBottom(String className) {
+    public void hideHtmlDivView(String className) {
         try {
             //定义javaScript方法
             String javascript = "javascript:function hideBottom() { "
