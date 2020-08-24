@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public final class FastClickUtils {
 
-    private static final int MAX_INTERVAL = 500;
+    private static final int MAX_INTERVAL = 1000;
     private static long mLastClickTime;
     private static HashMap<String, Long> tagMaps = new HashMap<>();
 
@@ -57,7 +57,9 @@ public final class FastClickUtils {
         long interval = 0;
         if (tagMaps.containsKey(tag)) {
             // 获取上次保存时间离现在的时间间距.
-            interval = current - tagMaps.get(tag);
+            Long aLong = tagMaps.get(tag);
+            //noinspection ConstantConditions
+            interval = current - aLong;
         }
         if ((interval > 0) && (interval < maxInterval)) {
             return true;

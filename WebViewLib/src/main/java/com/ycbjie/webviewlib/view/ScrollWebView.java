@@ -245,7 +245,6 @@ public class ScrollWebView extends X5WebView {
                 return true;
             }
         }
-
     }
 
 }

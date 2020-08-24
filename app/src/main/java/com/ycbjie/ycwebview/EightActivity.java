@@ -75,12 +75,12 @@ public class EightActivity extends AppCompatActivity {
         progress.setColor(this.getResources().getColor(R.color.colorAccent));
         String url = "https://juejin.im/post/5d401cabf265da03a53a12fe";
         webView.loadUrl(url);
-        webView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return handleLongImage();
-            }
-        });
+//        webView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                return handleLongImage();
+//            }
+//        });
         YcX5WebViewClient webViewClient = new YcX5WebViewClient(webView, this);
         webView.setWebViewClient(webViewClient);
         YcX5WebChromeClient webChromeClient = new YcX5WebChromeClient(webView,this);

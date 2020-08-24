@@ -69,7 +69,17 @@ public class FirstActivity2 extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        webView.onPause();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        webView.onResume();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +90,7 @@ public class FirstActivity2 extends AppCompatActivity {
         tvTitle = findViewById(R.id.tv_title);
         tvRefresh = findViewById(R.id.tv_refresh);
 
+        webView.reload();
 
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));

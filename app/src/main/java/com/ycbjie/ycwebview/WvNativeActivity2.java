@@ -16,6 +16,9 @@ import android.widget.Toast;
 import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.widget.WebProgress;
+import com.ycbjie.webviewlib.wv.MethodExistCallback;
+import com.ycbjie.webviewlib.wv.ResponseCallback;
+import com.ycbjie.webviewlib.wv.WvJsHandler;
 import com.ycbjie.webviewlib.wv.WvWebView;
 import com.ycbjie.webviewlib.wv.X5WvWebView;
 
@@ -106,7 +109,7 @@ public class WvNativeActivity2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 无参数调用
-                mWebView.callHandler("jsRcvResponseTest", "", new WvWebView.WVJBResponseCallback<Object>() {
+                mWebView.callHandler("jsRcvResponseTest", "", new ResponseCallback<Object>() {
                     @Override
                     public void onResult(Object data) {
                         Toast.makeText(WvNativeActivity2.this,"reponse data from js " + data, LENGTH_SHORT).show();
@@ -118,7 +121,7 @@ public class WvNativeActivity2 extends AppCompatActivity {
         findViewById(R.id.two).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mWebView.callHandler("echoHandler", "你个傻逼", new WvWebView.WVJBResponseCallback<Object>() {
+                mWebView.callHandler("echoHandler", "你个傻逼", new ResponseCallback<Object>() {
                     @Override
                     public void onResult(Object data) {
                         Log.i("java调用web----", "reponse data from js " + data);
@@ -130,7 +133,7 @@ public class WvNativeActivity2 extends AppCompatActivity {
         findViewById(R.id.three).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWebView.hasJavascriptMethod("echoHandler", new WvWebView.WVJBMethodExistCallback() {
+                mWebView.hasJavascriptMethod("echoHandler", new MethodExistCallback() {
                     @Override
                     public void onResult(boolean exist) {
                         if(exist) {
@@ -198,15 +201,15 @@ public class WvNativeActivity2 extends AppCompatActivity {
     @JavascriptInterface
     public void initWebViewBridge() {
         //js调native
-        mWebView.registerHandler("toSeller", new WvWebView.WVJBHandler<Object, Object>() {
+        mWebView.registerHandler("toSeller", new WvJsHandler<Object, Object>() {
             @Override
-            public void handler(Object data, WvWebView.WVJBResponseCallback<Object> callback) {
+            public void handler(Object data, ResponseCallback<Object> callback) {
                 callback.onResult(data);
             }
         });
-        mWebView.registerHandler("javaEchoToJs", new WvWebView.WVJBHandler() {
+        mWebView.registerHandler("javaEchoToJs", new WvJsHandler() {
             @Override
-            public void handler(Object data, WvWebView.WVJBResponseCallback callback) {
+            public void handler(Object data, ResponseCallback callback) {
                 Toast.makeText(WvNativeActivity2.this,data.toString(),LENGTH_SHORT).show();
                 Log.d("js调native",data.toString());
                 callback.onResult(data+"我是小杨逗比");

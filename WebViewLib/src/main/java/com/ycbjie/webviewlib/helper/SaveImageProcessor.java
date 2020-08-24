@@ -26,6 +26,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.widget.Toast;
+
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.utils.EncodeUtils;
 import com.ycbjie.webviewlib.utils.ToastUtils;
@@ -75,20 +79,25 @@ public final class SaveImageProcessor {
     }
 
     private void saveImage(final Context context, final WebView webView) {
+        File rootImagePath = WebFileUtils.getImageDir(context);
+        if (rootImagePath == null) {
+            ToastUtils.showRoundRectToast("保存图片失败");
+            return;
+        }
         WebView.HitTestResult hitTestResult = webView.getHitTestResult();
         if (hitTestResult == null) {
             ToastUtils.showRoundRectToast("保存图片失败");
             return;
         }
-        String rootImagePath = WebFileUtils.getLocalImagePath();
-        final String imageUrl = hitTestResult.getExtra();
+        String imageUrl = hitTestResult.getExtra();
         if (imageUrl == null) {
-            ToastUtils.showRoundRectToast("图片链接无效");
+            ToastUtils.showRoundRectToast("保存图片失败");
+            return;
         } else if (imageUrl.startsWith("data:")) {
             String imageData = imageUrl.replaceFirst("data:image\\/\\w+;base64,", "");
             byte[] imageDataBytes = EncodeUtils.base64Decode(imageData);
-            String imageName = WebFileUtils.getImageName("");
-            File imageFile = new File(rootImagePath,imageName);
+            String fileName = WebFileUtils.getImageName("");
+            File imageFile = new File(rootImagePath, fileName);
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
                 fileOutputStream.write(imageDataBytes);
@@ -97,14 +106,16 @@ public final class SaveImageProcessor {
                 insertMedia(context, imagePath);
                 ToastUtils.showRoundRectToast("保存图片成功"+imagePath);
             } catch (IOException e) {
-                ToastUtils.showRoundRectToast("请稍后再试");
+                ToastUtils.showRoundRectToast("保存图片成功");
                 e.printStackTrace();
             }
         } else {
             Uri imageUri = Uri.parse(imageUrl);
             String fileName = imageUri.getLastPathSegment();
-            String imageName = WebFileUtils.getImageName(fileName);
-            final File imageFile = new File(rootImagePath,imageName);
+            if (TextUtils.isEmpty(fileName)) {
+                fileName = WebFileUtils.getStringMd5(imageUrl);
+            }
+            final File imageFile = new File(rootImagePath, fileName);
             OkHttpUtils.downloadFile(context, imageUrl, imageFile, new OkHttpUtils.FileCallback() {
                 @Override
                 public void success() {

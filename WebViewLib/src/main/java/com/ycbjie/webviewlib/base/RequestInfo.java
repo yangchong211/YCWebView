@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.ycbjie.webviewlib.base;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Map;
  *     revise:
  * </pre>
  */
-public class RequestInfo {
+public class RequestInfo implements Serializable {
 
     public String url;
 

@@ -64,7 +64,6 @@ public class WebViewActivity extends AppCompatActivity {
         if (mWebView != null) {
             mWebView.onResume();
         }
-
     }
 
     @Override
@@ -73,6 +72,12 @@ public class WebViewActivity extends AppCompatActivity {
         if (mWebView != null) {
             mWebView.getSettings().setJavaScriptEnabled(false);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mWebView.onPause();
     }
 
     @Override
@@ -97,7 +102,8 @@ public class WebViewActivity extends AppCompatActivity {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
 
-        mWebView.loadUrl("https://github.com/yangchong211/YCLiveDataBus");
+        String url = "http://10.3.138.78:8080/wangzhebiyeji";
+        mWebView.loadUrl(url);
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
     }

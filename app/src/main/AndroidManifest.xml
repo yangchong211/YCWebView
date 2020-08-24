@@ -82,6 +82,7 @@
         <activity android:name=".WvNativeActivity3"/>
         <activity android:name=".WebViewActivity2"/>
         <activity android:name=".ImageActivity"/>
+        <activity android:name=".ThreeActivity2"/>
 
 
     </application>

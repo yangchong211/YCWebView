@@ -23,8 +23,8 @@ import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.base.RequestInfo;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
+import com.ycbjie.webviewlib.view.BaseWebView;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -44,26 +44,17 @@ import java.util.Map;
  *     desc  : 自定义WebView类
  *     revise: demo地址：https://github.com/yangchong211/YCWebView
  *             该demo可以作为学习案例，实现js交互的思路和BridgeWebView不一样，对比学习
- *             该案例参考：https://github.com/wendux/WebViewJavascriptBridge
  * </pre>
  */
-public class WvWebView extends WebView {
+public class WvWebView extends BaseWebView {
 
     private static final String BRIDGE_NAME = "WVJBInterface";
-    private static final int EXEC_SCRIPT = 1;
-    private static final int LOAD_URL = 2;
-    private static final int LOAD_URL_WITH_HEADERS = 3;
     private static final int HANDLE_MESSAGE = 4;
-    private final static String CALLBACK_ID_STR = "callbackId";
-    private final static String RESPONSE_ID_STR = "responseId";
-    private final static String RESPONSE_DATA_STR = "responseData";
-    private final static String DATA_STR = "data";
-    private final static String HANDLER_NAME_STR = "handlerName";
     private MyHandler mainThreadHandler = null;
-    private JavascriptCloseWindowListener javascriptCloseWindowListener=null;
+    private JsCloseListener javascriptCloseWindowListener=null;
     private ArrayList<WvMessage> startupMessageQueue = null;
-    private Map<String, WVJBResponseCallback> responseCallbacks = null;
-    private Map<String, WVJBHandler> messageHandlers = null;
+    private Map<String, ResponseCallback> responseCallbacks = null;
+    private Map<String, WvJsHandler> messageHandlers = null;
     private long uniqueId = 0;
     private boolean alertBoxBlock=true;
     
@@ -82,16 +73,6 @@ public class WvWebView extends WebView {
             final Context context = mContextReference.get();
             if (context != null) {
                 switch (msg.what) {
-                    case EXEC_SCRIPT:
-                        evaluateJavascriptUrl((String) msg.obj);
-                        break;
-                    case LOAD_URL:
-                        WvWebView.super.loadUrl((String) msg.obj);
-                        break;
-                    case LOAD_URL_WITH_HEADERS:
-                        RequestInfo info = (RequestInfo) msg.obj;
-                        WvWebView.super.loadUrl(info.url, info.headers);
-                        break;
                     case HANDLE_MESSAGE:
                         WvWebView.this.handleMessage((String) msg.obj);
                         break;
@@ -102,14 +83,6 @@ public class WvWebView extends WebView {
         }
     }
 
-    private class WvMessage {
-        Object data = null;
-        String callbackId = null;
-        String handlerName = null;
-        String responseId = null;
-        Object responseData = null;
-    }
-
     public WvWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -118,25 +91,6 @@ public class WvWebView extends WebView {
     public WvWebView(Context context) {
         super(context);
         init();
-    }
-
-    public interface WVJBResponseCallback<T> {
-        void onResult(T data);
-    }
-
-    public interface WVJBMethodExistCallback {
-        void onResult(boolean exist);
-    }
-
-    public interface JavascriptCloseWindowListener {
-        /**
-         * @return  If true, close the current activity, otherwise, do nothing.
-         */
-        boolean onClose();
-    }
-
-    public interface WVJBHandler<T,R> {
-        void handler(T data, WVJBResponseCallback<R> callback);
     }
 
     public void disableJavascriptAlertBoxSafetyTimeout(boolean disable){
@@ -151,7 +105,7 @@ public class WvWebView extends WebView {
         callHandler(handlerName, data, null);
     }
 
-    public  <T> void callHandler(String handlerName, Object data, WVJBResponseCallback<T> responseCallback) {
+    public  <T> void callHandler(String handlerName, Object data, ResponseCallback<T> responseCallback) {
         sendData(data, responseCallback, handlerName);
     }
 
@@ -160,8 +114,8 @@ public class WvWebView extends WebView {
      * @param handlerName
      * @param callback
      */
-    public void hasJavascriptMethod(String handlerName, final WVJBMethodExistCallback callback){
-        callHandler("_hasJavascriptMethod", handlerName, new WVJBResponseCallback() {
+    public void hasJavascriptMethod(String handlerName, final MethodExistCallback callback){
+        callHandler("_hasJavascriptMethod", handlerName, new ResponseCallback() {
             @Override
             public void onResult(Object data) {
                 callback.onResult((boolean)data);
@@ -172,7 +126,7 @@ public class WvWebView extends WebView {
     /**
      * set a listener for javascript closing the current activity.
      */
-    public void setJavascriptCloseWindowListener(JavascriptCloseWindowListener listener){
+    public void setJavascriptCloseWindowListener(JsCloseListener listener){
         javascriptCloseWindowListener=listener;
     }
 
@@ -183,7 +137,7 @@ public class WvWebView extends WebView {
      * @param <T>                                       T
      * @param <R>                                       R
      */
-    public <T,R> void registerHandler(String handlerName, WVJBHandler<T,R> handler) {
+    public <T,R> void registerHandler(String handlerName, WvJsHandler<T,R> handler) {
         if (handlerName == null || handlerName.length() == 0 || handler == null) {
             return;
         }
@@ -197,7 +151,7 @@ public class WvWebView extends WebView {
      * @param responseCallback                          callback
      * @param handlerName                               handlerName
      */
-    private void sendData(Object data, WVJBResponseCallback responseCallback, String handlerName) {
+    private void sendData(Object data, ResponseCallback responseCallback, String handlerName) {
         if (data == null && (handlerName == null || handlerName.length() == 0)) {
             return;
         }
@@ -225,25 +179,26 @@ public class WvWebView extends WebView {
     }
 
     private void dispatchMessage(WvMessage message) {
-        String messageJson = messageToJsonObject(message).toString();
-        evaluateJavascript(String.format("WebViewJavascriptBridge._handleMessageFromJava(%s)", messageJson));
+        String messageJson = JsonHelper.messageToJsonObject(message).toString();
+        String format = String.format("WebViewJavascriptBridge._handleMessageFromJava(%s)", messageJson);
+        WvWebView.super.evaluateJavascript(format);
     }
 
     // handle the onResult message from javascript
     private void handleMessage(String info) {
         try {
             JSONObject jo = new JSONObject(info);
-            WvMessage message = JsonObjectToMessage(jo);
+            WvMessage message = JsonHelper.JsonObjectToMessage(jo);
             if (message.responseId != null) {
-                WVJBResponseCallback responseCallback = responseCallbacks.remove(message.responseId);
+                ResponseCallback responseCallback = responseCallbacks.remove(message.responseId);
                 if (responseCallback != null) {
                     responseCallback.onResult(message.responseData);
                 }
             } else {
-                WVJBResponseCallback responseCallback = null;
+                ResponseCallback responseCallback = null;
                 if (message.callbackId != null) {
                     final String callbackId = message.callbackId;
-                    responseCallback = new WVJBResponseCallback() {
+                    responseCallback = new ResponseCallback() {
                         @Override
                         public void onResult(Object data) {
                             WvMessage msg = new WvMessage();
@@ -254,7 +209,7 @@ public class WvWebView extends WebView {
                     };
                 }
 
-                WVJBHandler handler;
+                WvJsHandler handler;
                 handler = messageHandlers.get(message.handlerName);
                 if (handler != null) {
                     handler.handler(message.data, responseCallback);
@@ -265,53 +220,6 @@ public class WvWebView extends WebView {
         }
     }
 
-    private JSONObject messageToJsonObject(WvMessage message) {
-        JSONObject jo = new JSONObject();
-        try {
-            if (message.callbackId != null) {
-                jo.put(CALLBACK_ID_STR, message.callbackId);
-            }
-            if (message.data != null) {
-                jo.put(DATA_STR, message.data);
-            }
-            if (message.handlerName != null) {
-                jo.put(HANDLER_NAME_STR, message.handlerName);
-            }
-            if (message.responseId != null) {
-                jo.put(RESPONSE_ID_STR, message.responseId);
-            }
-            if (message.responseData != null) {
-                jo.put(RESPONSE_DATA_STR, message.responseData);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jo;
-    }
-
-    private WvMessage JsonObjectToMessage(JSONObject jo) {
-        WvMessage message = new WvMessage();
-        try {
-            if (jo.has(CALLBACK_ID_STR)) {
-                message.callbackId = jo.getString(CALLBACK_ID_STR);
-            }
-            if (jo.has(DATA_STR)) {
-                message.data = jo.get(DATA_STR);
-            }
-            if (jo.has(HANDLER_NAME_STR)) {
-                message.handlerName = jo.getString(HANDLER_NAME_STR);
-            }
-            if (jo.has(RESPONSE_ID_STR)) {
-                message.responseId = jo.getString(RESPONSE_ID_STR);
-            }
-            if (jo.has(RESPONSE_DATA_STR)) {
-                message.responseData = jo.get(RESPONSE_DATA_STR);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return message;
-    }
 
     @Keep
     void init() {
@@ -321,23 +229,23 @@ public class WvWebView extends WebView {
         this.startupMessageQueue = new ArrayList<>();
         super.setWebChromeClient(mWebChromeClient);
         super.setWebViewClient(mWebViewClient);
-        registerHandler("_hasNativeMethod", new WVJBHandler() {
+        registerHandler("_hasNativeMethod", new WvJsHandler() {
             @Override
-            public void handler(Object data, WVJBResponseCallback callback) {
+            public void handler(Object data, ResponseCallback callback) {
                 callback.onResult(messageHandlers.get(data) != null);
             }
         });
-        registerHandler("_closePage", new WVJBHandler() {
+        registerHandler("_closePage", new WvJsHandler() {
             @Override
-            public void handler(Object data, WVJBResponseCallback callback) {
+            public void handler(Object data, ResponseCallback callback) {
                 if(javascriptCloseWindowListener==null ||javascriptCloseWindowListener.onClose()){
                     ((Activity) getContext()).onBackPressed();
                 }
             }
         });
-        registerHandler("_disableJavascriptAlertBoxSafetyTimeout", new WVJBHandler() {
+        registerHandler("_disableJavascriptAlertBoxSafetyTimeout", new WvJsHandler() {
             @Override
-            public void handler(Object data, WVJBResponseCallback callback) {
+            public void handler(Object data, ResponseCallback callback) {
                 disableJavascriptAlertBoxSafetyTimeout((boolean)data);
             }
         });
@@ -352,44 +260,6 @@ public class WvWebView extends WebView {
             }, BRIDGE_NAME);
         }
 
-    }
-
-    private void evaluateJavascriptUrl(String script) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WvWebView.super.evaluateJavascript(script, null);
-        } else {
-            super.loadUrl("javascript:" + script);
-        }
-    }
-
-    /**
-     * This method can be called in any thread, and if it is not called in the main thread,
-     * it will be automatically distributed to the main thread.
-     * @param script
-     */
-    public void evaluateJavascript(final String script) {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            evaluateJavascriptUrl(script);
-        } else {
-            Message msg = mainThreadHandler.obtainMessage(EXEC_SCRIPT, script);
-            mainThreadHandler.sendMessage(msg);
-        }
-    }
-
-    /**
-     * 这个方法可以在任何线程中调用，如果在主线程中没有调用它，它将自动分配给主线程。通过handler实现不同线程
-     * @param url                                   url
-     */
-    @Override
-    public void loadUrl(String url) {
-        Message msg = mainThreadHandler.obtainMessage(LOAD_URL, url);
-        mainThreadHandler.sendMessage(msg);
-    }
-
-    @Override
-    public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
-        Message msg = mainThreadHandler.obtainMessage(LOAD_URL_WITH_HEADERS, new RequestInfo(url, additionalHttpHeaders));
-        mainThreadHandler.sendMessage(msg);
     }
 
     protected X5WebViewClient generateBridgeWebViewClient() {
@@ -416,7 +286,7 @@ public class WvWebView extends WebView {
                     is.read(buffer);
                     is.close();
                     String js = new String(buffer);
-                    evaluateJavascript(js);
+                    WvWebView.super.evaluateJavascript(js);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

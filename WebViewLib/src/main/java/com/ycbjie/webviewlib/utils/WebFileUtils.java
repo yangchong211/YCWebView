@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,13 +73,27 @@ public final class WebFileUtils {
      * @return
      */
     public static String getImageName(String name){
-        return generateRandomName() + name+ ".png";
+        return generateRandomName() + name + ".png";
+    }
+
+    public static String getStringMd5(String str) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            byte[] array = messageDigest.digest(str.getBytes("UTF-8"));
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public static String generateRandomName() {
         return UUID.randomUUID().toString();
     }
-
 
     public static File getImageDir(Context context) {
         String path = null;
@@ -89,10 +104,12 @@ public final class WebFileUtils {
                     path = extPath.getAbsolutePath() + PROPERTY + APP_ROOT_SAVE_PATH + PROPERTY + IMAGE_FILE_PATH;
                 }
             }
-        } catch (Exception e) { // catch accidental exception
+        } catch (Exception e) {
+            // catch accidental exception
             e.printStackTrace();
         }
-        if (TextUtils.isEmpty(path)) { // data storage
+        if (TextUtils.isEmpty(path)) {
+            // data storage
             path = context.getFilesDir().getAbsolutePath() + PROPERTY + APP_ROOT_SAVE_PATH + PROPERTY + IMAGE_FILE_PATH;
         }
         File file = new File(path);
@@ -199,7 +216,6 @@ public final class WebFileUtils {
         return !getSDCardPaths(context).isEmpty();
     }
 
-
     /**
      * 判断是否有sd卡
      * @return                      是否有sd
@@ -207,7 +223,6 @@ public final class WebFileUtils {
     private static boolean isExistSDCard() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
-
 
 
     /**

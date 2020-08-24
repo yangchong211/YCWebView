@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.widget.WebProgress;
+import com.ycbjie.webviewlib.wv.ResponseCallback;
+import com.ycbjie.webviewlib.wv.WvJsHandler;
 import com.ycbjie.webviewlib.wv.WvWebView;
 import com.ycbjie.webviewlib.wv.X5WvWebView;
 
@@ -113,7 +115,7 @@ public class WvNativeActivity3 extends AppCompatActivity {
                 HashMap<String,String> data=new HashMap<String, String>(){{
                     put("greetingFromJava", "Hi there, JS!");
                 }};
-                mWebView.callHandler("testJavascriptHandler",new JSONObject(data) , new WvWebView.WVJBResponseCallback<Object>() {
+                mWebView.callHandler("testJavascriptHandler",new JSONObject(data) , new ResponseCallback<Object>() {
                     @Override
                     public void onResult(Object data) {
                         Toast.makeText(WvNativeActivity3.this,"reponse data from js " + data, LENGTH_SHORT).show();
@@ -181,15 +183,15 @@ public class WvNativeActivity3 extends AppCompatActivity {
     @JavascriptInterface
     public void initWebViewBridge() {
         //js调native
-        mWebView.registerHandler("toSeller", new WvWebView.WVJBHandler<Object, Object>() {
+        mWebView.registerHandler("toSeller", new WvJsHandler<Object, Object>() {
             @Override
-            public void handler(Object data, WvWebView.WVJBResponseCallback<Object> callback) {
+            public void handler(Object data, ResponseCallback<Object> callback) {
                 callback.onResult(data);
             }
         });
-        mWebView.registerHandler("testJavaCallback", new WvWebView.WVJBHandler() {
+        mWebView.registerHandler("testJavaCallback", new WvJsHandler() {
             @Override
-            public void handler(Object data, WvWebView.WVJBResponseCallback callback) {
+            public void handler(Object data, ResponseCallback callback) {
                 Toast.makeText(WvNativeActivity3.this,data.toString(),LENGTH_SHORT).show();
                 Log.d("js调native",data.toString());
                 callback.onResult("Response from testJavaCallback"+"我是小杨逗比");

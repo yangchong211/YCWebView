@@ -25,6 +25,7 @@ import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.tls.WebTlsHelper;
+import com.ycbjie.webviewlib.utils.EncodeUtils;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
@@ -85,13 +86,9 @@ public class JsX5WebViewClient extends X5WebViewClient {
         if (!activityAlive){
             return false;
         }
+        url = EncodeUtils.urlDecode(url);
         if (TextUtils.isEmpty(url)) {
             return false;
-        }
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
         // 如果是返回数据
         if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
@@ -136,13 +133,9 @@ public class JsX5WebViewClient extends X5WebViewClient {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String url = request.getUrl().toString();
+            url = EncodeUtils.urlDecode(url);
             if (TextUtils.isEmpty(url)) {
                 return false;
-            }
-            try {
-                url = URLDecoder.decode(url, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                ex.printStackTrace();
             }
             //如果是返回数据
             if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) {
@@ -174,6 +167,11 @@ public class JsX5WebViewClient extends X5WebViewClient {
         //这个时候添加js注入方法
         //WebViewJavascriptBridge.js
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.TO_LOAD_JS);
+
+        //对于Android调用js。有两种业务场景：
+        //第一种是在onPageFinished方法之后，调用callHandler方法，则在BridgeWebView类中，会直接dispatchMessage处理
+        //第二种是在onPageFinished方法之前，比如你在创建webView时候，就调用了n个callHandler方法。则会在下面代码中for循环dispatchMessage处理
+        //针对第二种情况，如何m集合中数量多，比如几十个，为了避免Android调用js方法evaluateJavascript每一个都调用，这里使用handler发消息来加入队列来达到需求
         if (mWebView.getStartupMessage() != null) {
             for (WebJsMessage m : mWebView.getStartupMessage()) {
                 //分发message 必须在主线程才分发成功

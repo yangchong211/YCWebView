@@ -1,7 +1,9 @@
 //notation: js file can only use this kind of comments
 //since comments will cause error when use in webview.loadurl,
 //comments will be remove by java use regexp
+//function 是指定义一个函数
 (function() {
+    //
     if (window.WebViewJavascriptBridge) {
         return;
     }
@@ -12,7 +14,9 @@
     var receiveMessageQueue = [];
     var messageHandlers = {};
 
+    //这个是自定义scheme协议
     var CUSTOM_PROTOCOL_SCHEME = 'yy';
+    //队列消息
     var QUEUE_HAS_MESSAGE = '__QUEUE_MESSAGE__/';
 
     var responseCallbacks = {};
@@ -30,6 +34,7 @@
         bizMessagingIframe.style.display = 'none';
         doc.documentElement.appendChild(bizMessagingIframe);
     }
+
     //set default messageHandler  初始化默认的消息线程
     function init(messageHandler) {
         if (WebViewJavascriptBridge._messageHandler) {
@@ -130,6 +135,7 @@
     function _handleMessageFromNative(messageJSON) {
         console.log(messageJSON);
         if (receiveMessageQueue) {
+            //添加到队列中
             receiveMessageQueue.push(messageJSON);
         }
         _dispatchMessageFromNative(messageJSON);

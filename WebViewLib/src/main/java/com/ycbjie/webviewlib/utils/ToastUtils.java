@@ -4,16 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Looper;
-import android.support.annotation.ColorInt;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +34,8 @@ public final class ToastUtils {
 
     @SuppressLint("StaticFieldLeak")
     private static Application mApp;
-    private static int toastBackColor;
     private static SoftReference<Toast> mToast;
+    public static int background = R.drawable.shape_toast_bg_r10;
 
     /**
      * 初始化吐司工具类
@@ -45,12 +43,6 @@ public final class ToastUtils {
      */
     public static void init(@NonNull final Application app) {
         mApp = app;
-        toastBackColor = Color.BLACK;
-    }
-
-
-    public static void setToastBackColor(@ColorInt int color){
-        toastBackColor = color;
     }
 
     /**
@@ -112,9 +104,7 @@ public final class ToastUtils {
                 .setOffset(0)
                 .setTitle(notice)
                 .setTextColor(Color.WHITE)
-                .setBackgroundColor(toastBackColor)
-                .setRadius(dip2px(mApp, 10))
-                .setElevation(dip2px(mApp, 0))
+                .setBackgroundColor(background)
                 .build()
                 .show();
     }
@@ -134,9 +124,7 @@ public final class ToastUtils {
                 .setDesc(desc)
                 .setTitle(notice)
                 .setTextColor(Color.WHITE)
-                .setBackgroundColor(toastBackColor)
-                .setRadius(dip2px(mApp, 10))
-                .setElevation(dip2px(mApp, 0))
+                .setBackgroundColor(background)
                 .build()
                 .show();
     }
@@ -170,9 +158,7 @@ public final class ToastUtils {
         private int yOffset;
         private int duration = Toast.LENGTH_SHORT;
         private int textColor = Color.WHITE;
-        private int backgroundColor = Color.BLACK;
-        private float radius;
-        private int elevation;
+        private int backgroundColor = R.drawable.shape_toast_bg_r10;
         private int layout;
 
 
@@ -220,16 +206,6 @@ public final class ToastUtils {
             return this;
         }
 
-        public Builder setRadius(float radius) {
-            this.radius = radius;
-            return this;
-        }
-
-        public Builder setElevation(int elevation) {
-            this.elevation = elevation;
-            return this;
-        }
-
         public Builder setLayout(@LayoutRes int layout) {
             this.layout = layout;
             return this;
@@ -248,16 +224,10 @@ public final class ToastUtils {
             toast.setDuration(duration);
             toast.setMargin(0, 0);
             if(layout==0){
-                CardView rootView = (CardView) LayoutInflater.from(context).inflate(R.layout.view_toast_custom, null);
+                FrameLayout rootView = (FrameLayout) LayoutInflater.from(context).inflate(R.layout.view_toast_custom, null);
                 TextView textView = rootView.findViewById(R.id.toastTextView);
                 TextView descTv = rootView.findViewById(R.id.desc);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    //rootView.setElevation(elevation);
-                    rootView.setCardElevation(elevation);
-                }
-                rootView.setRadius(radius);
-                rootView.setCardBackgroundColor(backgroundColor);
-                //rootView.setBackgroundColor(backgroundColor);
+                rootView.setBackgroundResource(backgroundColor);
                 textView.setTextColor(textColor);
                 textView.setText(title);
                 if(TextUtils.isEmpty(desc)){
@@ -284,19 +254,10 @@ public final class ToastUtils {
         return false;
     }
 
-    private static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
     private static void checkMainThread(){
-        if (!isMainThread()){
+        if (!X5WebUtils.isMainThread()){
             throw new IllegalStateException("请不要在子线程中做弹窗操作");
         }
-    }
-
-    private static boolean isMainThread(){
-        return Looper.getMainLooper() == Looper.myLooper();
     }
 
 }

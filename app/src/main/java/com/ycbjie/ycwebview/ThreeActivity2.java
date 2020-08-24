@@ -9,12 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.view.X5WebView;
 
-public class ThreeActivity extends AppCompatActivity {
+public class ThreeActivity2 extends AppCompatActivity {
 
     private X5WebView webView;
 
@@ -59,7 +60,7 @@ public class ThreeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.web_view);
 
-        String url = "file:///android_asset/callsms.html";
+        String url = "file:///android_asset/editer/index.html";
         webView.loadUrl(url);
     }
 

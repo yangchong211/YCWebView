@@ -267,6 +267,15 @@
             android:background="@color/colorAccent"
             android:text="14.2 截取WebView屏幕的整个可视区域和截取长图"/>
 
+        <TextView
+            android:id="@+id/tv_14_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="14.3 使用webView富文本控件"/>
 
         <TextView
             android:layout_width="match_parent"

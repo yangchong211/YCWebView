@@ -235,10 +235,10 @@ public class X5WebViewClient extends WebViewClient {
         if (!activityAlive){
             return false;
         }
+        url = EncodeUtils.urlDecode(url);
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        url = EncodeUtils.urlDecode(url);
         /*WebView.HitTestResult hitTestResult = null;
         if (url.startsWith("http:") || url.startsWith("https:")){
             hitTestResult = view.getHitTestResult();
@@ -287,10 +287,10 @@ public class X5WebViewClient extends WebViewClient {
             return false;
         }
         String url = request.getUrl().toString();
+        url = EncodeUtils.urlDecode(url);
         if (TextUtils.isEmpty(url)) {
             return false;
         }
-        url = EncodeUtils.urlDecode(url);
         final Uri uri = Uri.parse(url);
         //scheme跳转支持
         if (uri!=null && uri.getScheme()!=null && WebSchemeIntent.isSilentType(uri.getScheme())) {
@@ -359,11 +359,9 @@ public class X5WebViewClient extends WebViewClient {
         if (mIsLoading) {
             mIsLoading = false;
         }
-        if (!X5WebUtils.isConnected(webView.getContext()) && webListener!=null) {
+        if (webListener!=null){
             //隐藏进度条方法
             webListener.hindProgressBar();
-            //显示异常页面
-            webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
         }
         super.onPageFinished(view, url);
         //设置网页在加载的时候暂时不加载图片

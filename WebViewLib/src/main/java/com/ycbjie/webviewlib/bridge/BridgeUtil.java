@@ -18,6 +18,7 @@ package com.ycbjie.webviewlib.bridge;
 import android.content.Context;
 
 import com.tencent.smtt.sdk.WebView;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,6 +94,7 @@ public final class BridgeUtil {
 	public static String getFunctionFromReturnUrl(String url) {
 		// temp = _fetchQueue/[{"responseId":"JAVA_CB_1_360","responseData":"Javascript Says Right back aka!"}]
 		String temp = url.replace(YY_RETURN_DATA, EMPTY_STR);
+		X5LogUtils.i("------BridgeUtil--------getFunctionFromReturnUrl--"+temp);
 		String[] functionAndData = temp.split(SPLIT_MARK);
 		if(functionAndData.length >= 1){
 			// functionAndData[0] = _fetchQueue
@@ -120,6 +122,10 @@ public final class BridgeUtil {
 	 */
     public static void webViewLoadLocalJs(WebView view, String path){
         String jsContent = assetFile2Str(view.getContext(), path);
+		X5LogUtils.i("------BridgeUtil--------webViewLoadLocalJs--"+jsContent);
+		if (jsContent==null){
+			return;
+		}
         view.loadUrl("javascript:" + jsContent);
     }
 

@@ -32,12 +32,16 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
+import com.ycbjie.webviewlib.inter.HeartJavaScriptFunction;
+import com.ycbjie.webviewlib.tools.CrashMonitor;
 import com.ycbjie.webviewlib.tools.WebViewException;
 import com.ycbjie.webviewlib.utils.FastClickUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.helper.SaveImageProcessor;
+
+import java.util.Date;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 
@@ -94,7 +98,7 @@ public class X5WebView extends BridgeWebView {
         initSetHttpDns();
         initListener();
     }
-
+    
     /**
      * 初始化https+dns优化，目前已经集成阿里开源的httpdns库，已经非常稳定
      * 具体更加详细内容，可以参考阿里httpdns官方文档
@@ -221,19 +225,6 @@ public class X5WebView extends BridgeWebView {
         return null;
     }
 
-    /**
-     * 页面可见开启js交互
-     */
-    public void onResume() {
-        this.getSettings().setJavaScriptEnabled(true);
-    }
-
-    /**
-     * 页面不可见关闭js交互
-     */
-    public void onStop() {
-        this.getSettings().setJavaScriptEnabled(false);
-    }
 
     /**
      * 获取设置的X5WebChromeClient对象
@@ -300,7 +291,7 @@ public class X5WebView extends BridgeWebView {
         if (FastClickUtils.isFastDoubleClick()){
             return;
         }
-        this.reload();
+        X5WebView.super.reload();
     }
 
     /**

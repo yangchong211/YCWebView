@@ -7,6 +7,7 @@
 - 06.该库交互流程图
 
 
+
 ### 00.大概流程梳理
 - Android调用js
     - 调用callHandler方法，然后将方法中的三个属性封装到WebJsMessage对象中。如果用户传递callback不为空，则添加到map集合中
@@ -127,7 +128,10 @@
 
 ### 03.分析WebViewJavascriptBridge.js
 - 看看WebViewJavascriptBridge.js的代码，就能找到function _handleMessageFromNative()这个Js方法了。
-    - _handleMessageFromNative()方法里面会调用_dispatchMessageFromNative()方法。当处理来自Java层的主动调用时候会走“直接发送”的else分支。message.callbackId会被取出来，实例化一个responseCallback，而它是用来Js处理完成后把结果数据回调给Java层代码的。接着会根据message.handleName（在这个分析例子中，handleName的值就是”functionInJs”）在messageHandlers这个Map去获取handler，最后交给handler去处理。
+    - _handleMessageFromNative()方法里面会调用_dispatchMessageFromNative()方法。
+    - 当处理来自Java层的主动调用时候会走“直接发送”的else分支。
+    - message.callbackId会被取出来，实例化一个responseCallback，而它是用来Js处理完成后把结果数据回调给Java层代码的。
+    - 接着会根据message.handleName（在这个分析例子中，handleName的值就是”functionInJs”）在messageHandlers这个Map去获取handler，最后交给handler去处理。
     ```
     function _dispatchMessageFromNative(messageJSON) {
         setTimeout(function() {

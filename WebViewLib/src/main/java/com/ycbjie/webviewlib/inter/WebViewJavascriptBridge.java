@@ -16,8 +16,6 @@ limitations under the License.
 package com.ycbjie.webviewlib.inter;
 
 
-import com.ycbjie.webviewlib.inter.CallBackFunction;
-
 /**
  * <pre>
  *     @author yangchong
@@ -29,7 +27,10 @@ import com.ycbjie.webviewlib.inter.CallBackFunction;
  */
 public interface WebViewJavascriptBridge {
 	
-	void send(String data);
-	void send(String data, CallBackFunction responseCallback);
+	void callHandler(String handlerName);
+	void callHandler(String handlerName, String data);
+	void callHandler(String handlerName, String data, CallBackFunction callBack);
+	void unregisterHandler(String handlerName);
+	void registerHandler(String handlerName, BridgeHandler handler);
 
 }
