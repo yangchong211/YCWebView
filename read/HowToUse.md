@@ -333,8 +333,19 @@
     }
     -dontwarn com.ycbjie.webviewlib.**
     ```
-
-
+- 关于腾讯x5混淆
+    ```
+    -dontwarn dalvik.**
+    -dontwarn com.tencent.smtt.**
+    
+    -keep class com.tencent.smtt.** {
+        *;
+    }
+    
+    -keep class com.tencent.tbs.** {
+        *;
+    }
+    ```
 
 
 

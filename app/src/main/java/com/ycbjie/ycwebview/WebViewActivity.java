@@ -16,6 +16,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -102,7 +103,11 @@ public class WebViewActivity extends AppCompatActivity {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
 
-        String url = "http://10.3.138.78:8080/wangzhebiyeji";
+        //String url = "http://10.3.138.78:8080/wangzhebiyeji";
+        if (url==null || url.length()==0){
+            url = "https://baidu.com";
+            ToastUtils.showRoundRectToast("输入地址不能为空");
+        }
         mWebView.loadUrl(url);
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
