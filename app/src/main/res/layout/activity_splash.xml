@@ -47,6 +47,26 @@
             android:background="@color/colorAccent"
             android:text="2.其他demo案例"/>
 
+        <TextView
+            android:id="@+id/tv_3_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="3.1 隐藏标题栏，默认是隐藏的"/>
+
+        <TextView
+            android:id="@+id/tv_3_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="3.2 展示标题栏"/>
+
     </LinearLayout>
 
 </ScrollView>
