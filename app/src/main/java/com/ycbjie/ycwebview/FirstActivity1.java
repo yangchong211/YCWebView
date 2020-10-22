@@ -1,5 +1,6 @@
 package com.ycbjie.ycwebview;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.widget.WebProgress;
 
@@ -31,6 +33,7 @@ public class FirstActivity1 extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvRefresh;
     private RotateAnimation rotate;
+    private String url;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -83,12 +86,20 @@ public class FirstActivity1 extends AppCompatActivity {
         tvRefresh = findViewById(R.id.tv_refresh);
 
 
+        Intent intent = getIntent();
+        if (intent!=null){
+            url = intent.getStringExtra("url");
+        }
+
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
         //final String url = "http://www.baidu.com";
-        final String url = "https://www.json.cn/";
+        if (url==null || url.length()==0){
+            url = "https://www.json.cn/";
+            ToastUtils.showRoundRectToast("输入地址不能为空");
+        }
 //        final String url = "https://h5.youzan.com/v2/feature/e24rDsqa2r";
         webView.loadUrl(url);
         tvRefresh.setOnClickListener(new View.OnClickListener() {

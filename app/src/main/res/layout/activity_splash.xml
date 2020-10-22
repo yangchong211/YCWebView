@@ -25,7 +25,17 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="1.输入网址后跳转网页"/>
+            android:text="1.1 输入网址后跳转网页，使用x5"/>
+
+        <TextView
+            android:id="@+id/tv_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="1.2 输入网址后跳转网页，使用原生"/>
 
         <TextView
             android:id="@+id/tv_2"
