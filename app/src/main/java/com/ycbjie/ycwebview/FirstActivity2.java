@@ -96,7 +96,7 @@ public class FirstActivity2 extends AppCompatActivity {
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-        final String url = "http://www.baidu.com";
+        final String url = "https://www.wanandroid.com/index";
         webView.loadUrl(url);
 
         tvRefresh.setOnClickListener(new View.OnClickListener() {

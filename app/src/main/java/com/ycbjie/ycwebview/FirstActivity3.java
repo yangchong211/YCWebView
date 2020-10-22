@@ -85,7 +85,7 @@ public class FirstActivity3 extends AppCompatActivity {
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-        String url = "http://www.baidu.com";
+        String url = "https://github.com/yangchong211/YCVideoPlayer";
         webView.loadUrl(url);
 
         ivRefresh.setOnClickListener(new View.OnClickListener() {

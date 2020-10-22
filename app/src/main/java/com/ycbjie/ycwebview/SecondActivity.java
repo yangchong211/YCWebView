@@ -63,7 +63,7 @@ public class SecondActivity extends AppCompatActivity {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
 
-        webView.loadUrl("http://www.baidu.com");
+        webView.loadUrl("https://github.com/yangchong211/YCVideoPlayer");
         webView.getX5WebChromeClient().setWebListener(interWebListener);
         webView.getX5WebViewClient().setWebListener(interWebListener);
     }
