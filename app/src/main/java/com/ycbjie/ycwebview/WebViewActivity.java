@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.ycbjie.webviewlib.inter.InterWebListener;
@@ -35,6 +36,7 @@ public class WebViewActivity extends AppCompatActivity {
     private X5WebView mWebView;
     private WebProgress progress;
     private String url;
+    private boolean hide = false;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -94,8 +96,31 @@ public class WebViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent!=null){
             url = intent.getStringExtra("url");
+            hide = intent.getBooleanExtra("hide",false);
+            if (hide){
+                hideSysBar();
+            }
         }
     }
+
+
+    private void hideSysBar() {
+        if (getWindow()==null){
+            return;
+        }
+        View decorView = this.getWindow().getDecorView();
+        int uiOptions = decorView.getSystemUiVisibility();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+        decorView.setSystemUiVisibility(uiOptions);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
 
     public void initView() {
         mWebView = findViewById(R.id.web_view);

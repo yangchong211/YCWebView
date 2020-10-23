@@ -17,6 +17,7 @@ public class SplashActivity extends AppCompatActivity {
     private TextView mTv1;
     private TextView mTv2;
     private TextView mTv3;
+    private TextView mTv4;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class SplashActivity extends AppCompatActivity {
         mTv1 = findViewById(R.id.tv_1);
         mTv2 = findViewById(R.id.tv_2);
         mTv3 = findViewById(R.id.tv_3);
+        mTv4 = findViewById(R.id.tv_4);
 
 
         mTv1.setOnClickListener(new View.OnClickListener() {
@@ -44,6 +46,7 @@ public class SplashActivity extends AppCompatActivity {
                 }
                 Intent intent = new Intent(SplashActivity.this,WebViewActivity.class);
                 intent.putExtra("url",url);
+                intent.putExtra("hide",false);
                 startActivity(intent);
             }
         });
@@ -68,6 +71,25 @@ public class SplashActivity extends AppCompatActivity {
                 }
                 Intent intent = new Intent(SplashActivity.this,WvNativeActivity.class);
                 intent.putExtra("url",url);
+                startActivity(intent);
+            }
+        });
+        mTv4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Editable text = mEt.getText();
+                if (text==null || text.toString()==null || text.toString().trim()==null || text.toString().length()==0){
+                    ToastUtils.showRoundRectToast("输入地址不能为空");
+                    return;
+                }
+                String url = text.toString().trim();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    ToastUtils.showRoundRectToast("输入地址需要是http或者https开头");
+                    return;
+                }
+                Intent intent = new Intent(SplashActivity.this,WebViewActivity.class);
+                intent.putExtra("url",url);
+                intent.putExtra("hide",true);
                 startActivity(intent);
             }
         });
