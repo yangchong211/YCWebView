@@ -180,10 +180,18 @@
 - 29.关于拦截处理注意要点
 - 30.FileChooser文件处理
 - [41.管理Cookies分析说明](https://github.com/yangchong211/YCWebView/blob/master/read/WebView4.md)
+- 41.管理Cookies分析说明
 - 42.WebView中长按处理逻辑
 - 43.8.0关于WebView新特性
 - 44.H5页面为何加载速度慢
+- 45.shouldOverrideUrlLoading返回值
+- 46.webBackForwardList用法
 - 47.WebView多布局连贯滑动
+- 48.开启Google安全浏览服务
+- 49.shouldOverrideUrlLoading不执行
+- 50.webView使用上的建议
+- [51.关于图片显示隐藏设置](https://github.com/yangchong211/YCWebView/blob/master/read/WebView5.md)
+- 51.关于图片显示隐藏设置
 - [更多内容看wiki](https://github.com/yangchong211/YCWebView/wiki)
 
 
