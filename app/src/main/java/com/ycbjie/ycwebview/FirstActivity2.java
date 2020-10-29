@@ -29,6 +29,7 @@ public class FirstActivity2 extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvRefresh;
     private RotateAnimation rotate;
+    private String url;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -89,20 +90,34 @@ public class FirstActivity2 extends AppCompatActivity {
         progress = findViewById(R.id.progress);
         tvTitle = findViewById(R.id.tv_title);
         tvRefresh = findViewById(R.id.tv_refresh);
+        initWebView();
+        initListener();
+    }
 
-        webView.reload();
-
+    private void initWebView() {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-        final String url = "https://www.wanandroid.com/index";
+        url = "https://www.wanandroid.com/index";
         webView.loadUrl(url);
+    }
 
+    private void initListener() {
         tvRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 webView.loadUrl(url);
+            }
+        });
+        findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webView.canGoBack()) {
+                    webView.goBack();
+                    return;
+                }
+                finish();
             }
         });
     }

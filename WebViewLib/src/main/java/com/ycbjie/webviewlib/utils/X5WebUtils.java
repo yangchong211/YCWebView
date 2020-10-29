@@ -60,6 +60,8 @@ public final class X5WebUtils {
     private static Application application;
     /**
      * 初始化，是否开启https+dns优化
+     * 具体看文档：https://help.aliyun.com/document_detail/150879.html?spm=a2c4g.11174283.3.2.4a41110cCH6pDw
+     * 可以看Android接入文档，已经用于实践，默认是不开启的
      */
     public static boolean isHttpDns = false;
     /**

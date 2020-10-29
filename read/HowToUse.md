@@ -13,13 +13,13 @@
 
 
 ### 2.1 如何引入
-- **如何引用，该x5的库已经更新到最新版本，引用最新4.3.0稳定版**
+- **如何引用，该x5的库已经更新到最新版本，引用最新稳定版，采用maven依赖**
     ```
     //普通版本
     implementation 'cn.yc:WebViewLib:1.2.4'
 
     //添加阿里https+dns解析版本
-    implementation 'cn.yc:WebViewLib:1.4.0'
+    implementation 'cn.yc:WebViewLib:1.4.6'
     ```
 
 
@@ -157,6 +157,23 @@
     WebkitCookieUtils.syncCookie(this,url,cookieList);
     //清除cookie
     WebkitCookieUtils.remove(url);
+    ```
+- 关于x5相关的功能
+    ```
+    //夜间模式，enable:true(日间模式)，enable：false（夜间模式）
+    mWebView.setDayOrNight(true);
+    //前进后退缓存，true表示缓存
+    mWebView.setContentCacheEnable(true);
+    //对于无法缩放的页面当用户双指缩放时会提示强制缩放，再次操作将触发缩放功能
+    mWebView.setForcePinchScaleEnabled(true);
+    //设置无痕模式
+    mWebView.setShouldTrackVisitedLinks(true);
+    //刘海屏适配
+    mWebView.setDisplayCutoutEnable(true);
+    //一次性删除所有缓存
+    mWebView.clearAllWebViewCache(true);
+    //缓存清除，针对性删除
+    mWebView.clearCache();
     ```
 
 

@@ -84,8 +84,11 @@ public class FirstActivity1 extends AppCompatActivity {
         progress = findViewById(R.id.progress);
         tvTitle = findViewById(R.id.tv_title);
         tvRefresh = findViewById(R.id.tv_refresh);
+        initWebView();
+        initListener();
+    }
 
-
+    private void initWebView() {
         Intent intent = getIntent();
         if (intent!=null){
             url = intent.getStringExtra("url");
@@ -102,10 +105,24 @@ public class FirstActivity1 extends AppCompatActivity {
         }
 //        final String url = "https://h5.youzan.com/v2/feature/e24rDsqa2r";
         webView.loadUrl(url);
+    }
+
+    private void initListener() {
         tvRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 webView.loadUrl(url);
+            }
+        });
+
+        findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webView.canGoBack()) {
+                    webView.goBack();
+                    return;
+                }
+                finish();
             }
         });
     }

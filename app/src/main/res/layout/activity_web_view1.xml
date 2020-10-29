@@ -15,6 +15,8 @@
             android:textSize="18sp"
             android:textColor="@color/colorAccent"
             android:gravity="center"
+            android:maxLength="12"
+            android:ellipsize="end"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"/>

@@ -2,12 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
-        versionCode 41
-        versionName "1.4.1"
+        versionCode 46
+        versionName "1.4.6"
 
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -26,6 +27,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:28.0.0'
     //okhttp库
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
@@ -33,11 +35,12 @@ dependencies {
     implementation('com.aliyun.ams:alicloud-android-httpdns:1.1.7@aar') {
         transitive true
     }
+    //查询地址：https://mvnrepository.com/artifact/com.tencent.tbs.tbssdk/sdk?repo=jcenter
+    api 'com.tencent.tbs.tbssdk:sdk:43967'
     //x5库
     //仅仅在编译时使用，但最终不会被编译到apk或aar里
     //provided files('libs/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
-    //implementation 'com.tencent.tbs.tbssdk:sdk:4.3.0.3'
-    implementation files('libs/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
+    //api files('libs/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
 }
 
 
@@ -56,7 +59,7 @@ group = "cn.yc"
 //发布到JCenter上的项目名字，必须填写
 def libName = "WebViewLib"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.4.1"
+version = "1.4.6"
 
 //生成源文件
 task sourcesJar(type: Jar) {

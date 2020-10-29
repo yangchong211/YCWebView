@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.ycbjie.webviewlib.R;
 
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Field;
 
 /**
  * <pre>
@@ -216,6 +219,7 @@ public final class ToastUtils {
                 mToast.get().cancel();
             }
             Toast toast = new Toast(context);
+            HookToast.hook(toast);
             if (isFill) {
                 toast.setGravity(gravity | Gravity.FILL_HORIZONTAL, 0, yOffset);
             } else {
@@ -258,6 +262,66 @@ public final class ToastUtils {
         if (!X5WebUtils.isMainThread()){
             throw new IllegalStateException("请不要在子线程中做弹窗操作");
         }
+    }
+
+    /**
+     * <pre>
+     *     @author yangchong
+     *     email  : yangchong211@163.com
+     *     time  : 20120/5/6
+     *     desc  : 利用hook解决toast崩溃问题
+     *     revise:
+     * </pre>
+     */
+    public static class HookToast {
+
+        private static Field sField_TN;
+        private static Field sField_TN_Handler;
+
+        static {
+            try {
+                Class<?> clazz =  Toast.class;
+                sField_TN = clazz.getDeclaredField("mTN");
+                sField_TN.setAccessible(true);
+                sField_TN_Handler = sField_TN.getType().getDeclaredField("mHandler");
+                sField_TN_Handler.setAccessible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static void hook(Toast toast) {
+            try {
+                Object tn = sField_TN.get(toast);
+                Handler preHandler = (Handler) sField_TN_Handler.get(tn);
+                sField_TN_Handler.set(tn, new HookToast.SafelyHandler(preHandler));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static class SafelyHandler extends Handler {
+
+            private Handler impl;
+
+            public SafelyHandler(Handler impl) {
+                this.impl = impl;
+            }
+
+            public void dispatchMessage(Message msg) {
+                try {
+                    super.dispatchMessage(msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public void handleMessage(Message msg) {
+                //需要委托给原Handler执行
+                impl.handleMessage(msg);
+            }
+        }
+
     }
 
 }

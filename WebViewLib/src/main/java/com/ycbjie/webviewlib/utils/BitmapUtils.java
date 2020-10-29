@@ -12,8 +12,7 @@ public final class BitmapUtils {
         bitmapOption.inPreferredConfig = Bitmap.Config.ARGB_4444;
         String[] split = base64Data.split(",");
         byte[] decodedString = Base64.decode(split[1], Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString,
-                0, decodedString.length, bitmapOption);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, bitmapOption);
         return decodedByte;
     }
 

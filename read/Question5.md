@@ -3,7 +3,7 @@
 - 4.6.7 setUserAgentString作用是干什么
 - 4.6.8 WebView中onPause和onResume误区
 - 4.6.9 iframe是什么东西
-
+- 4.6.10 如何设置字体大小或者更换字体
 
 
 
@@ -123,8 +123,79 @@
 
 
 
+### 4.6.10 如何设置字体大小或者更换字体
+- 如何设置字体大小
+    ``` java
+    //WebView加上这个设置后,WebView里的字体就不会随系统字体大小设置发生变化了.
+    webview.getSettings().setTextZoom(100);
+    ```
+- 设置字体大小
+    ``` java
+    /**
+     * 设置字体大小
+     * @param fontSize                      字体大小
+     */
+    public void setTextSize(int fontSize){
+        WebSettings settings = this.getSettings();
+        settings.setSupportZoom( true);
+        switch (fontSize) {
+            case  1:
+                settings.setTextSize(WebSettings.TextSize.SMALLEST);
+                break;
+            case  2:
+                settings.setTextSize(WebSettings.TextSize.SMALLER);
+                break;
+            case  3:
+                settings.setTextSize(WebSettings.TextSize.NORMAL);
+                break;
+            case  4:
+                settings.setTextSize(WebSettings.TextSize.LARGER);
+                break;
+            case  5:
+                settings.setTextSize(WebSettings.TextSize.LARGEST);
+                break;
+            default:
+                settings.setTextSize(WebSettings.TextSize.NORMAL);
+                break;
+        }
+    }
+    ```
+- 通过屏幕密度调整分辨率
+    ```
+    /**
+     * 通过屏幕密度调整分辨率
+     */
+    public void setDensityZoom(){
+        WebSettings settings = this.getSettings();
+        int screenDensity = getResources().getDisplayMetrics().densityDpi;
+        WebSettings.ZoomDensity zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+        switch (screenDensity) {
+            case DisplayMetrics.DENSITY_LOW:
+                //75
+                zoomDensity = WebSettings.ZoomDensity.CLOSE;
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                //100
+                zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                //150
+                zoomDensity = WebSettings.ZoomDensity.FAR;
+                break;
+        }
+        settings.setDefaultZoom(zoomDensity);
+    }
+    ```
+- 设置自适应
+    ``` java
+    settings.setUseWideViewPort(true); 
+    settings.setLoadWithOverviewMode(true); 
+    settings.setTextZoom(100);
+    ```
+- 如何更换字体
+```
 
-
+```
 
 
 

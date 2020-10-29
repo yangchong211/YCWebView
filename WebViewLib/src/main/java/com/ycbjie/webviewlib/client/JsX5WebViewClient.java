@@ -34,9 +34,6 @@ import com.ycbjie.webviewlib.bridge.WebJsMessage;
 import com.ycbjie.webviewlib.bridge.BridgeUtil;
 import com.ycbjie.webviewlib.view.BridgeWebView;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 /**
  * <pre>
  *     @author yangchong

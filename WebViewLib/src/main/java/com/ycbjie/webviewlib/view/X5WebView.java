@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,8 +33,7 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
-import com.ycbjie.webviewlib.inter.HeartJavaScriptFunction;
-import com.ycbjie.webviewlib.tools.CrashMonitor;
+import com.ycbjie.webviewlib.inter.InterExtensionListener;
 import com.ycbjie.webviewlib.tools.WebViewException;
 import com.ycbjie.webviewlib.utils.FastClickUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
@@ -86,7 +86,7 @@ public class X5WebView extends BridgeWebView {
             this.setWebViewClient(getCustomWebViewClient());
         }
         if (getCustomWebViewClient() == null){
-            x5WebChromeClient = new X5WebChromeClient(this,(Activity) getContext());
+            x5WebChromeClient = new X5WebChromeClient(this, getContext());
             this.setWebChromeClient(x5WebChromeClient);
         } else {
             this.setWebChromeClient(getCustomWebChromeClient());
@@ -184,8 +184,62 @@ public class X5WebView extends BridgeWebView {
         setSavePassword(false);
         //移除高危风险js监听
         setRemoveJavascriptInterface();
+        //设置白天模式
+        setDayOrNight(true);
     }
 
+    /**
+     * 设置字体大小
+     * @param fontSize                      字体大小
+     */
+    public void setTextSize(int fontSize){
+        WebSettings settings = this.getSettings();
+        settings.setSupportZoom( true);
+        switch (fontSize) {
+            case  1:
+                settings.setTextSize(WebSettings.TextSize.SMALLEST);
+                break;
+            case  2:
+                settings.setTextSize(WebSettings.TextSize.SMALLER);
+                break;
+            case  3:
+                settings.setTextSize(WebSettings.TextSize.NORMAL);
+                break;
+            case  4:
+                settings.setTextSize(WebSettings.TextSize.LARGER);
+                break;
+            case  5:
+                settings.setTextSize(WebSettings.TextSize.LARGEST);
+                break;
+            default:
+                settings.setTextSize(WebSettings.TextSize.NORMAL);
+                break;
+        }
+    }
+
+    /**
+     * 通过屏幕密度调整分辨率
+     */
+    public void setDensityZoom(){
+        WebSettings settings = this.getSettings();
+        int screenDensity = getResources().getDisplayMetrics().densityDpi;
+        WebSettings.ZoomDensity zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+        switch (screenDensity) {
+            case DisplayMetrics.DENSITY_LOW:
+                //75
+                zoomDensity = WebSettings.ZoomDensity.CLOSE;
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                //100
+                zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                //150
+                zoomDensity = WebSettings.ZoomDensity.FAR;
+                break;
+        }
+        settings.setDefaultZoom(zoomDensity);
+    }
 
     private void initListener() {
         if (isLongClick){

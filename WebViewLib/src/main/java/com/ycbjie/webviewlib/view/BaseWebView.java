@@ -9,8 +9,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 
+import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.GeolocationPermissions;
+import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.ValueCallback;
+import com.tencent.smtt.sdk.WebIconDatabase;
+import com.tencent.smtt.sdk.WebStorage;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewDatabase;
 import com.ycbjie.webviewlib.base.RequestInfo;
 import com.ycbjie.webviewlib.utils.FastClickUtils;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
@@ -163,6 +169,101 @@ public class BaseWebView extends WebView {
     }
 
     /**
+     * 向下翻页
+     * @param b                     向下翻页
+     * @return
+     */
+    @Override
+    public boolean pageDown(boolean b) {
+        return super.pageDown(b);
+    }
+
+    /**
+     * 将这个WebView的内容滚动到视图大小的一半。
+     * @param b                     向上滚动
+     * @return
+     */
+    @Override
+    public boolean pageUp(boolean b) {
+        return super.pageUp(b);
+    }
+
+    /**
+     * 缓存清除
+     * 针对性删除
+     */
+    public void clearCache(){
+        //清除cookie
+        CookieManager.getInstance().removeAllCookies(null);
+        //清除storage相关缓存
+        WebStorage.getInstance().deleteAllData();;
+        //清除用户密码信息
+        WebViewDatabase.getInstance(getContext()).clearUsernamePassword();
+        //清除httpauth信息
+        WebViewDatabase.getInstance(getContext()).clearHttpAuthUsernamePassword();
+        //清除表单数据
+        WebViewDatabase.getInstance(getContext()).clearFormData();
+        //清除页面icon图标信息
+        WebIconDatabase.getInstance().removeAllIcons();
+        //删除地理位置授权，也可以删除某个域名的授权（参考接口类）
+        GeolocationPermissions.getInstance().clearAll();
+    }
+
+    /**
+     * 一次性删除所有缓存
+     * @param isClearCookie                         是否清除cookie操作
+     */
+    public void clearAllWebViewCache(boolean isClearCookie){
+        //清除cookie
+        QbSdk.clearAllWebViewCache(getContext(),isClearCookie);
+    }
+
+    /**
+     * 刘海屏适配
+     * @param displayCutoutEnable                   是否适配
+     */
+    public void setDisplayCutoutEnable(boolean displayCutoutEnable){
+        // 对于刘海屏机器如果webview被遮挡会自动padding
+        this.getSettingsExtension().setDisplayCutoutEnable(displayCutoutEnable);
+    }
+
+    /**
+     * 设置无痕模式
+     * @param visitedLinks                          true表示无痕模式
+     */
+    public void setShouldTrackVisitedLinks(boolean visitedLinks){
+        //无痕模式
+        this.getSettingsExtension().setShouldTrackVisitedLinks(visitedLinks);
+    }
+
+    /**
+     * 强制缩放
+     * @param scaleEnabled                          true表示强制缩放
+     */
+    public void setForcePinchScaleEnabled(boolean scaleEnabled){
+        //对于无法缩放的页面当用户双指缩放时会提示强制缩放，再次操作将触发缩放功能
+        this.getSettingsExtension().setForcePinchScaleEnabled(scaleEnabled);
+    }
+
+    /**
+     * 前进后退缓存
+     * @param cacheEnable                           true表示缓存
+     */
+    public void setContentCacheEnable(boolean cacheEnable){
+        //开启后前进后退将不再重新加载页面，默认关闭，开启方法如下
+        this.getSettingsExtension().setContentCacheEnable(cacheEnable);
+    }
+
+    /**
+     * 夜间模式
+     * @param dayOrNight                            true(日间模式)
+     */
+    public void setDayOrNight(boolean dayOrNight){
+        // enable:true(日间模式)，enable：false（夜间模式）
+        this.getSettingsExtension().setDayOrNight(dayOrNight);
+    }
+
+    /**
      * 重新加载
      */
     @Override
@@ -191,6 +292,7 @@ public class BaseWebView extends WebView {
      * 页面可见开启js交互
      */
     public void resume(){
+        //生命周期
         this.getSettings().setJavaScriptEnabled(true);
     }
 
@@ -198,6 +300,7 @@ public class BaseWebView extends WebView {
      * 页面不可见关闭js交互
      */
     public void stop() {
+        //生命周期
         this.getSettings().setJavaScriptEnabled(false);
     }
 

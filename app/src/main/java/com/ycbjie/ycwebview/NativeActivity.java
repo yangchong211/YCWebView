@@ -69,12 +69,11 @@ public class NativeActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onResume() {
         super.onResume();
         if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.resume();
         }
     }
 
@@ -82,7 +81,7 @@ public class NativeActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(false);
+            mWebView.stop();
         }
     }
 

@@ -35,22 +35,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".SplashActivity">
+        <activity android:name="com.ycbjie.ycwebview.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
         </activity>
-        <activity android:name=".FirstActivity1"/>
-        <activity android:name=".FirstActivity2"/>
-        <activity android:name=".FirstActivity3"/>
+        <activity android:name=".FirstActivity1"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".FirstActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".FirstActivity3"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
         <activity android:name=".SecondActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
         <activity android:name=".ThreeActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
         <activity android:name=".FiveActivity"
             android:hardwareAccelerated="true"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
@@ -62,9 +72,9 @@
         <activity android:name=".SixActivity2"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".WebViewActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity android:name=".NativeActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity android:name=".EightActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".DeepLinkActivity"
@@ -77,18 +87,42 @@
         <activity android:name=".WvNativeActivity"
             android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
-        <activity android:name=".FileDisplayActivity"/>
-        <activity android:name=".TenActivity"/>
-        <activity android:name=".DownActivity"/>
-        <activity android:name=".NativeActivity2"/>
-        <activity android:name=".NativeActivity3"/>
-        <activity android:name=".ScrollViewActivity"/>
-        <activity android:name=".VertcalWebActivity"/>
-        <activity android:name=".WvNativeActivity2"/>
-        <activity android:name=".WvNativeActivity3"/>
-        <activity android:name=".WebViewActivity2"/>
-        <activity android:name=".ImageActivity"/>
-        <activity android:name=".ThreeActivity2"/>
+        <activity android:name=".FileDisplayActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".TenActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".DownActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".NativeActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".NativeActivity3"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".ScrollViewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".VertcalWebActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".WvNativeActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".WvNativeActivity3"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".WebViewActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".ImageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".ThreeActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
 
 
     </application>

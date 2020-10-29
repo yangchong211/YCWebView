@@ -1,1 +1,2 @@
+include ':demo'
 include ':app', ':WebViewLib'

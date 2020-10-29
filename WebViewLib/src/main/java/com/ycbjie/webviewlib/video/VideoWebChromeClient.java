@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.sdk.WebChromeClient;
+import com.ycbjie.webviewlib.inter.VideoWebListener;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 
 /**
@@ -21,23 +22,33 @@ import com.ycbjie.webviewlib.utils.X5LogUtils;
  *     revise: 专门处理视频，后续看VideoChromeClient类代码
  * </pre>
  */
-@Deprecated
 public class VideoWebChromeClient extends WebChromeClient {
 
     private Context context;
     private View customView;
     private IX5WebChromeClient.CustomViewCallback customViewCallback;
     private FullscreenHolder videoFullView;
+    private VideoWebListener mListener;
+    /**
+     * 设置是否使用该自定义视频，默认使用
+     */
     private boolean isShowCustomVideo = true;
 
     /**
      * 设置是否使用
      * @param showCustomVideo                   是否使用自定义视频视图
      */
-    public void setShowCustomVideo(boolean showCustomVideo) {
+    public void setCustomVideo(boolean showCustomVideo) {
         isShowCustomVideo = showCustomVideo;
     }
 
+    /**
+     * 设置视频播放监听，主要是比如全频，取消全频，隐藏和现实webView
+     * @param videoWebListener                  listener
+     */
+    public void setVideoListener(VideoWebListener videoWebListener){
+        this.mListener = videoWebListener;
+    }
 
     /**
      * 构造方法
@@ -67,11 +78,17 @@ public class VideoWebChromeClient extends WebChromeClient {
                 // 如果一个视图已经存在，那么立刻终止并新建一个
                 if (customView != null) {
                     callback.onCustomViewHidden();
+                    if (mListener!=null){
+                        mListener.hindWebView();
+                    }
                     return;
                 }
                 fullViewAddView(view);
                 customView = view;
                 customViewCallback = callback;
+                if (mListener!=null){
+                    mListener.showVideoFullView();
+                }
             }
         }
     }
@@ -136,6 +153,9 @@ public class VideoWebChromeClient extends WebChromeClient {
             }
             customView = null;
             customViewCallback.onCustomViewHidden();
+            if (mListener!=null){
+                mListener.showWebView();
+            }
         }
     }
 

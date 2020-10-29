@@ -1,22 +1,24 @@
 package com.ycbjie.ycwebview;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
-
 
 /**
  * <pre>
@@ -27,19 +29,21 @@ import com.ycbjie.webviewlib.widget.WebProgress;
  *     revise: 暂时先用假数据替代
  * </pre>
  */
-public class WebViewActivity2 extends AppCompatActivity {
+public class WebViewActivity extends AppCompatActivity {
 
     private X5WebView mWebView;
     private WebProgress progress;
     private String url;
-    private boolean isLoadFinish = false;
+    private boolean hide = false;
+    private boolean isHaveHide = false;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (mWebView.canGoBack() && event.getKeyCode() ==
-                KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            mWebView.goBack();
-            return true;
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            if (mWebView.pageCanGoBack()) {
+                //退出网页
+                return mWebView.pageGoBack();
+            }
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -47,13 +51,7 @@ public class WebViewActivity2 extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (mWebView != null) {
-            mWebView.clearHistory();
-            ViewGroup parent = (ViewGroup) mWebView.getParent();
-            if (parent != null) {
-                parent.removeView(mWebView);
-            }
             mWebView.destroy();
-            //mWebView = null;
         }
         super.onDestroy();
     }
@@ -75,49 +73,69 @@ public class WebViewActivity2 extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view2);
-        initData();
-        initView();
-        final RelativeLayout rl_window = findViewById(R.id.rl_window);
-        findViewById(R.id.btn_1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isLoadFinish){
-                    //Bitmap bitmap = AppUtils.measureSize(WebViewActivity2.this, mWebView);
-                    Bitmap bitmap = AppUtils.activityShot(WebViewActivity2.this);
-                    ModelStorage.getInstance().setBitmap(bitmap);
-                    startActivity(new Intent(WebViewActivity2.this,ImageActivity.class));
-                } else {
-                    Toast.makeText(WebViewActivity2.this,"还没有加载完",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        findViewById(R.id.btn_2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isLoadFinish){
-                    //Bitmap bitmap = AppUtils.activityShot(WebViewActivity2.this);
-                    //第一种
-                    //Bitmap bitmap = AppUtils.getRelativeLayoutBitmap(rl_window);
-                    //第二种，实际开发中，建议用这种
-                    Bitmap bitmap = AppUtils.measureSize(WebViewActivity2.this, rl_window);
-                    ModelStorage.getInstance().setBitmap(bitmap);
-                    startActivity(new Intent(WebViewActivity2.this,ImageActivity.class));
-                } else {
-                    Toast.makeText(WebViewActivity2.this,"还没有加载完",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && hide) {
+            isHaveHide = false;
+            hideSysBar();
+        }
     }
 
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_web_view);
+        initData();
+        initView();
+    }
 
     public void initData() {
         Intent intent = getIntent();
         if (intent!=null){
-            url = intent.getStringExtra("url");
+            url = "http://tongbuxueht.zhugexuetang.com/douzhanggui";
+            hide = true;
+            isHaveHide = false;
+            hideSysBar();
         }
+    }
+
+    private void hideSysBar() {
+        if (getWindow()==null){
+            return;
+        }
+        if (isHaveHide){
+            return;
+        }
+        View decorView = this.getWindow().getDecorView();
+        int uiOptions = decorView.getSystemUiVisibility();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+        decorView.setSystemUiVisibility(uiOptions);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        isHaveHide = true;
+    }
+
+    private void hideSystemUI() {
+        if (getWindow()==null){
+            return;
+        }
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY //(修改这个选项，可以设置不同模式)
+                        //使用下面三个参数，可以使内容显示在system bar的下面，防止system bar显示或
+                        //隐藏时，Activity的大小被resize。
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // 隐藏导航栏和状态栏
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     public void initView() {
@@ -126,9 +144,17 @@ public class WebViewActivity2 extends AppCompatActivity {
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent),this.getResources().getColor(R.color.colorPrimaryDark));
 
-        mWebView.loadUrl("https://github.com/yangchong211/LifeHelper");
+        //String url = "http://10.3.138.78:8080/wangzhebiyeji";
+        if (url==null || url.length()==0){
+            url = "https://baidu.com";
+            ToastUtils.showRoundRectToast("输入地址不能为空");
+        }
+        mWebView.loadUrl(url);
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
+        if (!X5WebUtils.isConnected(this)){
+            ToastUtils.showRoundRectToast("请先连接上网络");
+        }
     }
 
 
@@ -136,10 +162,6 @@ public class WebViewActivity2 extends AppCompatActivity {
         @Override
         public void hindProgressBar() {
             progress.hide();
-            isLoadFinish = true;
-            findViewById(R.id.btn_1).setVisibility(View.VISIBLE);
-            findViewById(R.id.btn_2).setVisibility(View.VISIBLE);
-
         }
 
         @Override
@@ -175,4 +197,5 @@ public class WebViewActivity2 extends AppCompatActivity {
 
         }
     };
+
 }

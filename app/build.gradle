@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.ycbjie.ycwebview"
         minSdkVersion 17
@@ -22,10 +23,11 @@ dependencies {
     //官方库
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation  'com.android.support:cardview-v7:28.0.0'
-    implementation 'cn.yc:WebViewLib:1.4.1'
+    implementation 'cn.yc:WebViewLib:1.4.6'
+    api 'com.tencent.tbs.tbssdk:sdk:43967'
     implementation 'cn.yc:YCSlideLib:1.1.2'
     //okhttp库
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-//    implementation project(':WebViewLib')
-    //implementation files('lib/tbs_sdk_thirdapp_v4.3.0.3_43903_sharewithdownloadwithfile_withoutGame_obfs_20200402_121309.jar')
+    //implementation project(':WebViewLib')
+
 }

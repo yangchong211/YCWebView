@@ -1,21 +1,15 @@
 package com.ycbjie.ycwebview;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
+import com.tencent.smtt.export.external.extension.proxy.ProxyWebChromeClientExtension;
 import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
@@ -59,13 +53,11 @@ public class WebViewActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onResume() {
         super.onResume();
         if (mWebView != null) {
-            mWebView.onResume();
+            mWebView.resume();
         }
     }
 
@@ -73,15 +65,18 @@ public class WebViewActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (mWebView != null) {
-            mWebView.getSettings().setJavaScriptEnabled(false);
+            mWebView.stop();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mWebView.onPause();
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && hide) {
+            hideSysBar();
+        }
     }
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,7 +85,6 @@ public class WebViewActivity extends AppCompatActivity {
         initData();
         initView();
     }
-
 
     public void initData() {
         Intent intent = getIntent();
@@ -102,7 +96,6 @@ public class WebViewActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void hideSysBar() {
         if (getWindow()==null){
@@ -121,6 +114,22 @@ public class WebViewActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
+    private void hideSystemUI() {
+        if (getWindow()==null){
+            return;
+        }
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY //(修改这个选项，可以设置不同模式)
+                        //使用下面三个参数，可以使内容显示在system bar的下面，防止system bar显示或
+                        //隐藏时，Activity的大小被resize。
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // 隐藏导航栏和状态栏
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
 
     public void initView() {
         mWebView = findViewById(R.id.web_view);
@@ -136,6 +145,9 @@ public class WebViewActivity extends AppCompatActivity {
         mWebView.loadUrl(url);
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
+        if (!X5WebUtils.isConnected(this)){
+            ToastUtils.showRoundRectToast("请先连接上网络");
+        }
     }
 
 
@@ -180,72 +192,20 @@ public class WebViewActivity extends AppCompatActivity {
     };
 
 
-    public class AndroidBug5497Workaround {
-
-        // For more information, see https://code.google.com/p/android/issues/detail?id=5497
-        // To use this class, simply invoke assistActivity() on an Activity that already has its content
-
-
-        public void assistActivity (Activity activity) {
-            new AndroidBug5497Workaround(activity);
-        }
-        private Activity activity;
-        private View mChildOfContent;
-        private int usableHeightPrevious;
-        private FrameLayout.LayoutParams frameLayoutParams;
-
-        private AndroidBug5497Workaround(Activity activity) {
-            this.activity = activity;
-            FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
-            mChildOfContent = content.getChildAt(0);
-            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    possiblyResizeChildOfContent();
-                }
-            });
-            frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
-        }
-
-        private void possiblyResizeChildOfContent() {
-            int usableHeightNow = computeUsableHeight();
-            //LogUtils.e("possiblyResizeChildOfContent","usableHeightNow:"+usableHeightNow);
-            //LogUtils.e("possiblyResizeChildOfContent","usableHeightPrevious:"+usableHeightPrevious);
-            if (usableHeightNow != usableHeightPrevious) {
-                int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
-
-                //这个判断是为了解决19之前的版本不支持沉浸式状态栏导致布局显示不完全的问题
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
-                    Rect frame = new Rect();
-                    activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-                    int statusBarHeight = frame.top;
-                    usableHeightSansKeyboard -= statusBarHeight;
-                }
-                int heightDifference = usableHeightSansKeyboard - usableHeightNow;
-                if (heightDifference > (usableHeightSansKeyboard/4)) {
-                    // keyboard probably just became visible
-                    frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
-                } else {
-                    // keyboard probably just became hidden
-                    frameLayoutParams.height = usableHeightSansKeyboard;
-                }
-                mChildOfContent.requestLayout();
-                usableHeightPrevious = usableHeightNow;
-            }
-        }
-
-        private int computeUsableHeight() {
-            Rect frame = new Rect();
-            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-            int statusBarHeight = frame.top;
-            Rect r = new Rect();
-            mChildOfContent.getWindowVisibleDisplayFrame(r);
-            //这个判断是为了解决19之后的版本在弹出软键盘时，键盘和推上去的布局（adjustResize）之间有黑色区域
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                return (r.bottom - r.top)+statusBarHeight;
-            }
-            return (r.bottom - r.top);
-        }
-
+    private void test(){
+        //夜间模式，enable:true(日间模式)，enable：false（夜间模式）
+        mWebView.setDayOrNight(true);
+        //前进后退缓存，true表示缓存
+        mWebView.setContentCacheEnable(true);
+        //对于无法缩放的页面当用户双指缩放时会提示强制缩放，再次操作将触发缩放功能
+        mWebView.setForcePinchScaleEnabled(true);
+        //设置无痕模式
+        mWebView.setShouldTrackVisitedLinks(true);
+        //刘海屏适配
+        mWebView.setDisplayCutoutEnable(true);
+        //一次性删除所有缓存
+        mWebView.clearAllWebViewCache(true);
+        //缓存清除，针对性删除
+        mWebView.clearCache();
     }
 }

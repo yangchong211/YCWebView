@@ -39,6 +39,8 @@ import com.ycbjie.webviewlib.inter.VideoWebListener;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.video.VideoChromeClient;
+import com.ycbjie.webviewlib.video.VideoWebChromeClient;
+
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -53,7 +55,7 @@ import static android.app.Activity.RESULT_OK;
  *             作用：WebViewClient主要辅助WebView执行处理各种响应请求事件的
  * </pre>
  */
-public class X5WebChromeClient extends VideoChromeClient {
+public class X5WebChromeClient extends VideoWebChromeClient {
 
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mUploadMessageForAndroid5;
@@ -98,7 +100,8 @@ public class X5WebChromeClient extends VideoChromeClient {
      * @param context                          上下文
      */
     public X5WebChromeClient(WebView webView , Context context) {
-        super(context, webView);
+        //super(context, webView);
+        super(context);
         this.context = context;
         this.webView = webView;
     }
