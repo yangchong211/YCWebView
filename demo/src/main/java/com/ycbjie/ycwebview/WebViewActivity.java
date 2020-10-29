@@ -93,7 +93,7 @@ public class WebViewActivity extends AppCompatActivity {
     public void initData() {
         Intent intent = getIntent();
         if (intent!=null){
-            url = "http://tongbuxueht.zhugexuetang.com/douzhanggui";
+            url = "https://baidu.com";
             hide = true;
             isHaveHide = false;
             hideSysBar();
