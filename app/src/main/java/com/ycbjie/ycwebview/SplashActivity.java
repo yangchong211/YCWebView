@@ -30,11 +30,6 @@ public class SplashActivity extends AppCompatActivity {
         mTv3 = findViewById(R.id.tv_3);
         mTv4 = findViewById(R.id.tv_4);
 
-//        Intent intent = new Intent(SplashActivity.this,WebViewActivity.class);
-//        intent.putExtra("url","http://tongbuxueht.zhugexuetang.com/douzhanggui");
-//        intent.putExtra("hide",true);
-//        startActivity(intent);
-//        finish();
 
         mTv1.setOnClickListener(new View.OnClickListener() {
             @Override
