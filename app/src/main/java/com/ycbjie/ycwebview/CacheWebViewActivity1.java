@@ -17,7 +17,8 @@ import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.cache.WebResponseAdapter;
 import com.ycbjie.webviewlib.cache.WebViewCacheDelegate;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.helper.WebFidderHelper;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -149,7 +150,7 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
     }
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();
@@ -190,8 +191,12 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
     };
 
     private class YcX5WebViewClient extends JsX5WebViewClient {
+
+       private WebFidderHelper webFidderHelper;
+
         public YcX5WebViewClient(X5WebView webView, Context context) {
             super(webView, context);
+            webFidderHelper = new WebFidderHelper();
         }
         /**
          * 此方法废弃于API21，调用于非UI线程，拦截资源请求并返回响应数据，返回null时WebView将继续加载资源
@@ -204,6 +209,7 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
          */
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView webView, String s) {
+//            return webFidderHelper.shouldInterceptRequest(mWebView,s);
             WebResourceResponse request = WebViewCacheDelegate.getInstance().interceptRequest(s);
             return WebResponseAdapter.adapter(request);
         }
@@ -222,6 +228,8 @@ public class CacheWebViewActivity1 extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
             WebResourceResponse request = WebViewCacheDelegate.getInstance().interceptRequest(webResourceRequest);
             return WebResponseAdapter.adapter(request);
+
+//            return webFidderHelper.shouldInterceptRequest(mWebView,webResourceRequest);
         }
 
     }

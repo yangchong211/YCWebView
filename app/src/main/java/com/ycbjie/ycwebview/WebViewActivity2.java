@@ -1,6 +1,5 @@
 package com.ycbjie.ycwebview;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -132,7 +131,7 @@ public class WebViewActivity2 extends AppCompatActivity {
     }
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

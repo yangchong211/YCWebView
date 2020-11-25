@@ -10,7 +10,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 
 import java.util.Map;

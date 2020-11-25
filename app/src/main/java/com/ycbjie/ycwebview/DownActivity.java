@@ -6,12 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.tencent.smtt.sdk.DownloadListener;
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -76,7 +74,7 @@ public class DownActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         initData();
         initView();
     }
@@ -107,7 +105,7 @@ public class DownActivity extends AppCompatActivity {
     }
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

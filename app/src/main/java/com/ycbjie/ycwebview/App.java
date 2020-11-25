@@ -2,7 +2,6 @@ package com.ycbjie.ycwebview;
 
 import android.app.Application;
 
-
 import com.ycbjie.webviewlib.cache.WebCacheType;
 import com.ycbjie.webviewlib.cache.WebViewCacheDelegate;
 import com.ycbjie.webviewlib.cache.WebViewCacheWrapper;

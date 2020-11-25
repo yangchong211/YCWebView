@@ -17,10 +17,10 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.base.RequestInfo;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 import com.ycbjie.webviewlib.view.BaseWebView;

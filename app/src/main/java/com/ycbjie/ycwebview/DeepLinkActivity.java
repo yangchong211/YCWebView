@@ -15,15 +15,14 @@ import android.view.ViewGroup;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.client.JsX5WebViewClient;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <pre>
@@ -85,7 +84,7 @@ public class DeepLinkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         initData();
         initView();
     }
@@ -113,7 +112,7 @@ public class DeepLinkActivity extends AppCompatActivity {
     }
 
 
-    private class MyX5WebViewClient extends X5WebViewClient {
+    private class MyX5WebViewClient extends JsX5WebViewClient {
 
         /**
          * 构造方法
@@ -122,7 +121,7 @@ public class DeepLinkActivity extends AppCompatActivity {
          * @param context 上下文
          */
         public MyX5WebViewClient(WebView webView, Context context) {
-            super(webView, context);
+            super(mWebView, context);
         }
 
         @Override
@@ -226,7 +225,7 @@ public class DeepLinkActivity extends AppCompatActivity {
 
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

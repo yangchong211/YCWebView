@@ -5,24 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.JavascriptInterface;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.tencent.smtt.sdk.ValueCallback;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.ToastUtils;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.widget.WebProgress;
-import com.ycbjie.webviewlib.wv.MethodExistCallback;
-import com.ycbjie.webviewlib.wv.ResponseCallback;
-import com.ycbjie.webviewlib.wv.WvJsHandler;
 import com.ycbjie.webviewlib.wv.X5WvWebView;
-
-import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * <pre>
@@ -111,10 +103,11 @@ public class WvNativeActivity extends AppCompatActivity {
         mWebView.loadUrl(url);
     }
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();
+            setJavascript("ugc-content");
         }
 
         @Override
@@ -150,5 +143,30 @@ public class WvNativeActivity extends AppCompatActivity {
 
         }
     };
+
+
+    public void setJavascript(String className) {
+        try {
+            //https://h5.zybang.com/plat/app-vue/ugcDetail.html?articleId=0f89385c4205377ef2442ed0969e0b9c&hideNativeTitleBar=1
+            //定义javaScript方法
+            //定义javaScript方法
+            String javascript = "javascript:function getDivContent() { "
+                    + "document.getElementsByClassName('" + className + "')[0]";
+            String javaScript = "javascript:function getDivContent() { "
+                    + "document.getElementsByClassName(\"ugc-content\")[0]";
+            mWebView.loadUrl(javaScript);
+            //mWebView.loadUrl("javascript:getDivContent();");
+            mWebView.evaluateJavascript("javascript:getDivContent();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String s) {
+                    //此处为 js 返回的结果
+                    X5LogUtils.i("抓包返回数据---"+s);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

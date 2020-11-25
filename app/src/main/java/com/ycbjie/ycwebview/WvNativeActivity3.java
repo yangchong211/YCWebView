@@ -13,13 +13,11 @@ import android.webkit.JavascriptInterface;
 import android.widget.Button;
 import android.widget.Toast;
 
-
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.widget.WebProgress;
 import com.ycbjie.webviewlib.wv.ResponseCallback;
 import com.ycbjie.webviewlib.wv.WvJsHandler;
-import com.ycbjie.webviewlib.wv.WvWebView;
 import com.ycbjie.webviewlib.wv.X5WvWebView;
 
 import org.json.JSONObject;
@@ -132,7 +130,7 @@ public class WvNativeActivity3 extends AppCompatActivity {
 
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

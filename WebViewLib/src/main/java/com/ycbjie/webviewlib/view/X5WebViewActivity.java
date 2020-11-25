@@ -1,28 +1,29 @@
 package com.ycbjie.webviewlib.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ycbjie.webviewlib.R;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
-import com.ycbjie.webviewlib.inter.InterWebListener;
-import com.ycbjie.webviewlib.inter.VideoWebListener;
+import com.ycbjie.webviewlib.inter.DefaultVideoListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.tools.AndroidBug5497Workaround;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
-import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
 
 
@@ -38,10 +39,11 @@ import com.ycbjie.webviewlib.widget.WebProgress;
  */
 public class X5WebViewActivity extends AppCompatActivity {
 
-    private X5WebView webView;
-    private WebProgress pb;
-    private TextView tvTitle;
-    private Toolbar mTitleToolBar;
+    private LinearLayout mLlBack;
+    private TextView mTvTitle;
+    private ImageView mIvMore;
+    private X5WebView mWebView;
+    private WebProgress mProgress;
     private X5WebChromeClient x5WebChromeClient;
     private X5WebViewClient x5WebViewClient;
     private AndroidBug5497Workaround workaround;
@@ -55,9 +57,9 @@ public class X5WebViewActivity extends AppCompatActivity {
                 x5WebChromeClient.hideCustomView();
                 return true;
                 //返回网页上一页
-            } else if (webView.pageCanGoBack()) {
+            } else if (mWebView.pageCanGoBack()) {
                 //退出网页
-                return webView.pageGoBack();
+                return mWebView.pageGoBack();
             } else {
                 handleFinish();
             }
@@ -78,16 +80,16 @@ public class X5WebViewActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (webView != null) {
-            webView.getSettings().setJavaScriptEnabled(true);
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(true);
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (webView != null) {
-            webView.getSettings().setJavaScriptEnabled(false);
+        if (mWebView != null) {
+            mWebView.getSettings().setJavaScriptEnabled(false);
         }
     }
 
@@ -97,7 +99,7 @@ public class X5WebViewActivity extends AppCompatActivity {
             if (x5WebChromeClient!=null){
                 x5WebChromeClient.removeVideoView();
             }
-            webView.destroy();
+            mWebView.destroy();
         } catch (Exception e) {
             Log.e("X5WebViewActivity", e.getMessage());
         }
@@ -111,48 +113,77 @@ public class X5WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         initFindViewById();
         initToolBar();
         initWebView();
         // 处理 作为三方浏览器打开传过来的值
         getDataFromBrowser(getIntent());
-        AndroidBug5497Workaround workaround = new AndroidBug5497Workaround(this);
+        //AndroidBug5497Workaround workaround = new AndroidBug5497Workaround(this);
     }
 
     private void initFindViewById() {
-        webView = findViewById(R.id.web_view);
-        pb = findViewById(R.id.progress);
-        tvTitle = findViewById(R.id.tv_title);
-        mTitleToolBar = findViewById(R.id.title_tool_bar);
+        mLlBack = findViewById(R.id.ll_back);
+        mTvTitle = findViewById(R.id.tv_title);
+        mIvMore = findViewById(R.id.iv_more);
+        mWebView = findViewById(R.id.web_view);
+        mProgress = findViewById(R.id.progress);
+
         //显示进度条
-        pb.show();
+        mProgress.show();
         //设置进度条过度颜色
-        pb.setColor(Color.BLUE,Color.RED);
+        mProgress.setColor(Color.BLUE,Color.RED);
         //设置单色进度条
-        pb.setColor(Color.BLUE);
+        mProgress.setColor(Color.BLUE);
     }
 
     private void initToolBar() {
-        setSupportActionBar(mTitleToolBar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            //去除默认Title显示
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
-        mTitleToolBar.setOverflowIcon(ContextCompat.getDrawable(this, R.drawable.icon_more));
-        tvTitle.postDelayed(new Runnable() {
+        mTvTitle.postDelayed(new Runnable() {
             @Override
             public void run() {
-                tvTitle.setSelected(true);
+                mTvTitle.setSelected(true);
             }
         }, 1000);
-        tvTitle.setText("加载中……");
+        mTvTitle.setText("加载中……");
+        mLlBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //全屏播放退出全屏
+                if (x5WebChromeClient!=null && x5WebChromeClient.inCustomView()) {
+                    x5WebChromeClient.hideCustomView();
+                    //返回网页上一页
+                } else if (mWebView.pageCanGoBack()) {
+                    //退出网页
+                    mWebView.pageGoBack();
+                } else {
+                    handleFinish();
+                }
+            }
+        });
+        mIvMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openLink(X5WebViewActivity.this,
+                        "https://github.com/yangchong211/YCWebView");
+            }
+        });
     }
 
+    /**
+     * 使用外部浏览器打开链接
+     * @param context
+     * @param content
+     */
+    public static void openLink(Context context, String content) {
+        Uri issuesUrl = Uri.parse(content);
+        Intent intent = new Intent(Intent.ACTION_VIEW, issuesUrl);
+        context.startActivity(intent);
+    }
+
+
     private void initWebView() {
-        x5WebChromeClient = webView.getX5WebChromeClient();
-        x5WebViewClient = webView.getX5WebViewClient();
+        x5WebChromeClient = mWebView.getX5WebChromeClient();
+        x5WebViewClient = mWebView.getX5WebViewClient();
         x5WebChromeClient.setVideoWebListener(videoWebListener);
         x5WebViewClient.setWebListener(interWebListener);
         x5WebChromeClient.setWebListener(interWebListener);
@@ -192,20 +223,23 @@ public class X5WebViewActivity extends AppCompatActivity {
         Uri data = intent.getData();
         if (data != null) {
             try {
+                X5LogUtils.i("X5WebViewActivity-------uri-----"+data);
                 String scheme = data.getScheme();
                 String host = data.getHost();
                 String path = data.getPath();
                 String text = "Scheme: " + scheme + "\n" + "host: " + host + "\n" + "path: " + path;
-                Log.e("data", text);
+                X5LogUtils.i("X5WebViewActivity-------data-----"+text);
                 String url = scheme + "://" + host + path;
-                webView.loadUrl(url);
+                X5LogUtils.i("X5WebViewActivity-------url-----"+url);
+                //mWebView.loadUrl(url);
+                mWebView.loadUrl(data.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private VideoWebListener videoWebListener = new VideoWebListener() {
+    private DefaultVideoListener videoWebListener = new DefaultVideoListener() {
         @Override
         public void showVideoFullView() {
             //视频全频播放时监听
@@ -227,12 +261,12 @@ public class X5WebViewActivity extends AppCompatActivity {
         }
     };
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             //pb.setVisibility(View.GONE);
             //进度完成后消失
-            pb.hide();
+            mProgress.hide();
         }
 
         @Override
@@ -258,12 +292,12 @@ public class X5WebViewActivity extends AppCompatActivity {
         @Override
         public void startProgress(int newProgress) {
             //为单独处理WebView进度条
-            pb.setWebProgress(newProgress);
+            mProgress.setWebProgress(newProgress);
         }
 
         @Override
         public void showTitle(String title) {
-            tvTitle.setText(title);
+            mTvTitle.setText(title);
         }
     };
 

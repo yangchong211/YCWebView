@@ -171,12 +171,14 @@ public final class X5WebUtils {
         if (arrayList==null || arrayList.size()==0){
             return false;
         }
+        //重要提醒：建议只使用https协议通信，避免中间人攻击
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             return false;
         }
         //提取host
         String host = "";
         try {
+            //提取host，如果需要校验Path可以通过url.getPath()获取
             host = Uri.parse(url).getHost();
         } catch (Exception e){
             e.printStackTrace();
@@ -271,7 +273,7 @@ public final class X5WebUtils {
      * 注解限定符
      */
     @IntDef({ErrorMode.NO_NET,ErrorMode.STATE_404, ErrorMode.RECEIVED_ERROR, ErrorMode.SSL_ERROR,
-            ErrorMode.TIME_OUT,ErrorMode.STATE_500})
+            ErrorMode.TIME_OUT,ErrorMode.STATE_500,ErrorMode.ERROR_PROXY})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorType{}
 
@@ -283,6 +285,7 @@ public final class X5WebUtils {
      * SSL_ERROR                    在加载资源时通知主机应用程序发生SSL错误
      * TIME_OUT                     网络连接超时
      * STATE_500                    服务器异常
+     * ERROR_PROXY                  代理异常
      */
     @Retention(RetentionPolicy.SOURCE)
     public @interface ErrorMode {
@@ -292,6 +295,7 @@ public final class X5WebUtils {
         int SSL_ERROR = 1004;
         int TIME_OUT = 1005;
         int STATE_500 = 1006;
+        int ERROR_PROXY = 1007;
     }
 
     /**

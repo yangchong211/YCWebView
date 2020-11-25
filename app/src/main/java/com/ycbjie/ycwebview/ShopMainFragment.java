@@ -12,8 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.ycbjie.ycwebview.R;
-
 
 public class ShopMainFragment extends Fragment {
 

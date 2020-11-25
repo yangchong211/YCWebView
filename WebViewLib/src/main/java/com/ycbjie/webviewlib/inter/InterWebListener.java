@@ -53,4 +53,10 @@ public interface InterWebListener {
      * @param title                         title标题
      */
     void showTitle(String title);
+
+    /**
+     * 加载完成
+     * @param url                           连接
+     */
+    void onPageFinished(String url);
 }

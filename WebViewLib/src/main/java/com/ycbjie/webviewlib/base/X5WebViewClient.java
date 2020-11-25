@@ -35,14 +35,12 @@ import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
+import com.ycbjie.webviewlib.helper.WebSchemeIntent;
+import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.utils.EncodeUtils;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
-import com.ycbjie.webviewlib.helper.WebSchemeIntent;
-import com.ycbjie.webviewlib.inter.InterWebListener;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Stack;
 
 /**
@@ -361,6 +359,7 @@ public class X5WebViewClient extends WebViewClient {
         }
         if (webListener!=null){
             //隐藏进度条方法
+            //这个方法会执行多次
             webListener.hindProgressBar();
         }
         super.onPageFinished(view, url);
@@ -374,6 +373,9 @@ public class X5WebViewClient extends WebViewClient {
         //addImageClickListener();
         addImageArrayClickListener(webView);
         isLoadFinish = true;
+        if (webListener!=null){
+            webListener.onPageFinished(url);
+        }
     }
 
 
@@ -414,7 +416,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
-        X5LogUtils.i("-------onReceivedError-------"+failingUrl);
+        X5LogUtils.i("-------onReceivedError------1-"+failingUrl+"---"+errorCode+ "----"+description);
         if (Build.VERSION.SDK_INT < 23) {
             //错误重定向循环
             if (errorCode == ERROR_REDIRECT_LOOP) {
@@ -430,7 +432,10 @@ public class X5WebViewClient extends WebViewClient {
             } else if (errorCode == ERROR_CONNECT){
                 //断网
                 webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
-            } {
+            } else if (errorCode == ERROR_PROXY_AUTHENTICATION){
+                //代理异常
+                webListener.showErrorView(X5WebUtils.ErrorMode.ERROR_PROXY);
+            } else {
                 //其他情况
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
@@ -456,7 +461,7 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
-        X5LogUtils.i("-------onReceivedError-------"+error.getDescription().toString());
+        X5LogUtils.i("-------onReceivedError------2-"+error.getDescription()+"---"+error.getErrorCode());
         if (Build.VERSION.SDK_INT >= 23) {
             //错误重定向循环
             if (error != null && error.getErrorCode() == ERROR_REDIRECT_LOOP) {
@@ -467,6 +472,7 @@ public class X5WebViewClient extends WebViewClient {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             X5LogUtils.d("服务器异常"+error.getDescription().toString());
+
         }
         //ToastUtils.showToast("服务器异常6.0之后");
         //当加载错误时，就让它加载本地错误网页文件
@@ -482,7 +488,10 @@ public class X5WebViewClient extends WebViewClient {
             } else if (errorCode == ERROR_CONNECT){
                 //断网
                 webListener.showErrorView(X5WebUtils.ErrorMode.NO_NET);
-            } {
+            } else if (errorCode == ERROR_PROXY_AUTHENTICATION){
+                //代理异常
+                webListener.showErrorView(X5WebUtils.ErrorMode.ERROR_PROXY);
+            } else {
                 //其他情况
                 webListener.showErrorView(X5WebUtils.ErrorMode.RECEIVED_ERROR);
             }
@@ -504,7 +513,7 @@ public class X5WebViewClient extends WebViewClient {
         super.onReceivedHttpError(view, request, errorResponse);
         int statusCode = errorResponse.getStatusCode();
         String reasonPhrase = errorResponse.getReasonPhrase();
-        X5LogUtils.i("-------onReceivedHttpError-------"+ statusCode + "-------"+reasonPhrase);
+        X5LogUtils.i("-------onReceivedHttpError------3-"+ statusCode + "-------"+reasonPhrase);
         if (statusCode == 404) {
             //用javascript隐藏系统定义的404页面信息
             //String data = "Page NO FOUND！";
@@ -608,7 +617,9 @@ public class X5WebViewClient extends WebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, String s) {
         X5LogUtils.i("---shouldInterceptRequest-------->---"+s);
-        return super.shouldInterceptRequest(webView, s);
+        WebResourceResponse webResourceResponse = super.shouldInterceptRequest(webView, s);
+        return webResourceResponse;
+        //return super.shouldInterceptRequest(webView, s);
     }
 
     /**
@@ -625,7 +636,9 @@ public class X5WebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
         String method = webResourceRequest.getMethod();
         X5LogUtils.i("---shouldInterceptRequest-------->21---"+method + "----" +webResourceRequest.getUrl());
-        return super.shouldInterceptRequest(webView, webResourceRequest);
+        WebResourceResponse webResourceResponse = super.shouldInterceptRequest(webView, webResourceRequest);
+        return webResourceResponse;
+        //return super.shouldInterceptRequest(webView, webResourceRequest);
     }
 
     /**
@@ -639,7 +652,9 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest, Bundle bundle) {
-        return super.shouldInterceptRequest(webView, webResourceRequest, bundle);
+        WebResourceResponse webResourceResponse = super.shouldInterceptRequest(webView, webResourceRequest, bundle);
+        return webResourceResponse;
+        //return super.shouldInterceptRequest(webView, webResourceRequest, bundle);
     }
 
     /**

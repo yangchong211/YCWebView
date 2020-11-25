@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.VerticalWebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -150,7 +150,7 @@ public class VertcalWebActivity extends AppCompatActivity {
         return mWebView.getHeight() + mWebView.getScrollY() >= mWebView.getContentHeight() * mWebView.getScale();
     }
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

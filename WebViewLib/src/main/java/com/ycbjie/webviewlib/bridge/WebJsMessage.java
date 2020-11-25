@@ -16,13 +16,14 @@ limitations under the License.
 package com.ycbjie.webviewlib.bridge;
 
 import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONTokener;
 
 /**
  * <pre>

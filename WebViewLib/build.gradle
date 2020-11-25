@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 46
-        versionName "1.4.6"
+        versionCode 47
+        versionName "1.4.7"
 
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -59,7 +59,7 @@ group = "cn.yc"
 //发布到JCenter上的项目名字，必须填写
 def libName = "WebViewLib"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.4.6"
+version = "1.4.7"
 
 //生成源文件
 task sourcesJar(type: Jar) {

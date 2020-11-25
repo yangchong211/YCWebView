@@ -9,8 +9,8 @@ import android.view.KeyEvent;
 
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
-import com.ycbjie.webviewlib.inter.InterWebListener;
-import com.ycbjie.webviewlib.inter.VideoWebListener;
+import com.ycbjie.webviewlib.inter.DefaultVideoListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
@@ -67,7 +67,7 @@ public class FiveActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         webView = findViewById(R.id.web_view);
 
         String movieUrl = "https://www.youku.com";
@@ -82,7 +82,7 @@ public class FiveActivity2 extends AppCompatActivity {
         x5WebViewClient.setWebListener(interWebListener);
         //设置是否自定义视频视图
         webView.setShowCustomVideo(false);
-        x5WebChromeClient.setVideoWebListener(new VideoWebListener() {
+        x5WebChromeClient.setVideoWebListener(new DefaultVideoListener() {
             @Override
             public void showVideoFullView() {
                 //视频全频播放时监听
@@ -107,7 +107,7 @@ public class FiveActivity2 extends AppCompatActivity {
 
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

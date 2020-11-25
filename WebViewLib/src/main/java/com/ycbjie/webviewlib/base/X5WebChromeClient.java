@@ -38,7 +38,6 @@ import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.inter.VideoWebListener;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
-import com.ycbjie.webviewlib.video.VideoChromeClient;
 import com.ycbjie.webviewlib.video.VideoWebChromeClient;
 
 import static android.app.Activity.RESULT_OK;
@@ -462,8 +461,7 @@ public class X5WebChromeClient extends VideoWebChromeClient {
             Intent i = new Intent(Intent.ACTION_GET_CONTENT);
             i.addCategory(Intent.CATEGORY_OPENABLE);
             i.setType("image/*");
-            activity.startActivityForResult(
-                    Intent.createChooser(i, "文件选择"), FILE_CHOOSER_RESULT_CODE);
+            activity.startActivityForResult(Intent.createChooser(i, "文件选择"), FILE_CHOOSER_RESULT_CODE);
         }
     }
 

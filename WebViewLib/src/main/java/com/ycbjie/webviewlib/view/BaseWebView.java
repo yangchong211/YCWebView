@@ -2,7 +2,6 @@ package com.ycbjie.webviewlib.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -261,6 +260,17 @@ public class BaseWebView extends WebView {
     public void setDayOrNight(boolean dayOrNight){
         // enable:true(日间模式)，enable：false（夜间模式）
         this.getSettingsExtension().setDayOrNight(dayOrNight);
+    }
+
+    /**
+     * 设置是否允许抓包
+     * APP自身必须调用WebView.setWebContentsDebuggingEnabled(true); 才会允许被DevTools调试
+     * @param isOpen                                默认允许
+     */
+    public void setFidderOpen(boolean isOpen){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(isOpen);
+        }
     }
 
     /**

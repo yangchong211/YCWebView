@@ -25,9 +25,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.ycbjie.webviewlib.R;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
-import com.ycbjie.webviewlib.inter.InterWebListener;
 
 /**
  * <pre>
@@ -65,7 +65,7 @@ public class ProgressWebView extends FrameLayout {
         final WebProgress pbProgress = view.findViewById(R.id.progress);
         pbProgress.show();
         pbProgress.setColor(Color.BLUE);
-        webView.getX5WebChromeClient().setWebListener(new InterWebListener() {
+        webView.getX5WebChromeClient().setWebListener(new DefaultWebListener() {
             @Override
             public void hindProgressBar() {
                 pbProgress.setVisibility(GONE);

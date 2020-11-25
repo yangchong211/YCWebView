@@ -57,7 +57,7 @@ public class ThreeActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         webView = findViewById(R.id.web_view);
 
         String url = "file:///android_asset/editer/index.html";

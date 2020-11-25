@@ -16,7 +16,6 @@ limitations under the License.
 package com.ycbjie.webviewlib.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -33,15 +32,11 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 import com.ycbjie.webviewlib.base.X5WebChromeClient;
-import com.ycbjie.webviewlib.inter.InterExtensionListener;
-import com.ycbjie.webviewlib.tools.WebViewException;
-import com.ycbjie.webviewlib.utils.FastClickUtils;
-import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.helper.SaveImageProcessor;
-
-import java.util.Date;
+import com.ycbjie.webviewlib.tools.WebViewException;
+import com.ycbjie.webviewlib.utils.X5WebUtils;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 
@@ -342,9 +337,6 @@ public class X5WebView extends BridgeWebView {
      */
     public void reLoadView(){
         //防止短时间多次触发load方法
-        if (FastClickUtils.isFastDoubleClick()){
-            return;
-        }
         X5WebView.super.reload();
     }
 
@@ -533,13 +525,13 @@ public class X5WebView extends BridgeWebView {
     public void hideHtmlDivView(String className) {
         try {
             //定义javaScript方法
-            String javascript = "javascript:function hideBottom() { "
+            String javascript = "javascript:function hideDiv() { "
                     + "document.getElementsByClassName('" +className+
                     "')[0].style.display='none'}";
             //加载方法
             this.loadUrl(javascript);
             //执行方法
-            this.loadUrl("javascript:hideBottom();");
+            this.loadUrl("javascript:hideDiv();");
         } catch (Exception e) {
             e.printStackTrace();
         }

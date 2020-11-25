@@ -123,8 +123,9 @@
         <activity android:name=".ThreeActivity2"
             android:configChanges="orientation|keyboardHidden|screenSize"
             />
-
-
+        <activity android:name=".WebViewWhiteActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            />
     </application>
 
 </manifest>

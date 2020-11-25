@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.ycbjie.webviewlib.R;
 

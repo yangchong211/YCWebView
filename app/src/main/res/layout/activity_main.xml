@@ -144,6 +144,7 @@
             android:text="6.2 在h5中上传身份证图片"/>
 
 
+
         <TextView
             android:id="@+id/tv_7_1"
             android:layout_width="match_parent"
@@ -195,7 +196,7 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="9.加载word，ppt，pdf等文档文件"/>
+            android:text="9.1 加载word，ppt，pdf等文档文件"/>
 
         <TextView
             android:id="@+id/tv_9_2"
@@ -276,6 +277,26 @@
             android:textSize="12sp"
             android:background="@color/colorAccent"
             android:text="14.3 使用webView富文本控件"/>
+
+        <TextView
+            android:id="@+id/tv_14_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="14.4 使用webView长按自定义弹框"/>
+
+        <TextView
+            android:id="@+id/tv_14_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:background="@color/colorAccent"
+            android:text="14.5 使用webView设置白名单操作"/>
 
         <TextView
             android:layout_width="match_parent"

@@ -21,27 +21,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Base64;
-import android.widget.Toast;
 
 import com.tencent.smtt.sdk.WebView;
 import com.ycbjie.webviewlib.utils.EncodeUtils;
+import com.ycbjie.webviewlib.utils.OkHttpUtils;
 import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.WebFileUtils;
-import com.ycbjie.webviewlib.utils.OkHttpUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * <pre>

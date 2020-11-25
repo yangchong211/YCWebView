@@ -19,8 +19,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.ycbjie.webviewlib.view.ScrollWebView;
-
 
 /**
  * <pre>

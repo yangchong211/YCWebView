@@ -4,6 +4,7 @@
 - 4.6.8 WebView中onPause和onResume误区
 - 4.6.9 iframe是什么东西
 - 4.6.10 如何设置字体大小或者更换字体
+- 4.6.11 net::ERR_PROXY_CONNECTION_FAILED
 
 
 
@@ -192,15 +193,13 @@
     settings.setLoadWithOverviewMode(true); 
     settings.setTextZoom(100);
     ```
-- 如何更换字体
-```
-
-```
 
 
 
 
-
+### 4.6.11 net::ERR_PROXY_CONNECTION_FAILED
+- 解决办法
+    - 这个时候要查下手机网络是否设置成代理了，把代理关掉就可以了。设置方法：修改当前连接的网络配置，“代理”项设置成“无”。
 
 
 

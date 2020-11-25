@@ -23,11 +23,11 @@ dependencies {
     //官方库
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation  'com.android.support:cardview-v7:28.0.0'
-    implementation 'cn.yc:WebViewLib:1.4.6'
+    implementation 'cn.yc:WebViewLib:1.4.7'
     api 'com.tencent.tbs.tbssdk:sdk:43967'
     implementation 'cn.yc:YCSlideLib:1.1.2'
     //okhttp库
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    //implementation project(':WebViewLib')
+//    implementation project(':WebViewLib')
 
 }

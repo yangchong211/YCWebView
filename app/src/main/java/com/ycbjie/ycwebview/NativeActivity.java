@@ -1,36 +1,23 @@
 package com.ycbjie.ycwebview;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Toast;
-
 
 import com.ycbjie.webviewlib.bridge.DefaultHandler;
 import com.ycbjie.webviewlib.inter.BridgeHandler;
 import com.ycbjie.webviewlib.inter.CallBackFunction;
-import com.ycbjie.webviewlib.inter.InterWebListener;
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 import com.ycbjie.webviewlib.view.X5WebView;
 import com.ycbjie.webviewlib.widget.WebProgress;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <pre>
@@ -136,7 +123,7 @@ public class NativeActivity extends AppCompatActivity {
         initWebViewBridge();
     }
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();

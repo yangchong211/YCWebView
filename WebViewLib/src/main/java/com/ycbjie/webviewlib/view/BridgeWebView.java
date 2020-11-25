@@ -17,26 +17,19 @@ package com.ycbjie.webviewlib.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.tencent.smtt.sdk.ValueCallback;
-import com.tencent.smtt.sdk.WebView;
-import com.ycbjie.webviewlib.base.RequestInfo;
-import com.ycbjie.webviewlib.inter.CallBackFunction;
+import com.ycbjie.webviewlib.bridge.BridgeUtil;
 import com.ycbjie.webviewlib.bridge.DefaultHandler;
 import com.ycbjie.webviewlib.bridge.WebJsMessage;
+import com.ycbjie.webviewlib.inter.BridgeHandler;
+import com.ycbjie.webviewlib.inter.CallBackFunction;
 import com.ycbjie.webviewlib.inter.WebViewJavascriptBridge;
 import com.ycbjie.webviewlib.utils.X5LogUtils;
-import com.ycbjie.webviewlib.inter.BridgeHandler;
-import com.ycbjie.webviewlib.bridge.BridgeUtil;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
-import com.ycbjie.webviewlib.wv.WvWebView;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -106,9 +99,7 @@ public class  BridgeWebView extends BaseWebView implements WebViewJavascriptBrid
 		this.setVerticalScrollBarEnabled(false);
 		this.setHorizontalScrollBarEnabled(false);
 		this.getSettings().setJavaScriptEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
+        setFidderOpen(true);
 	}
 
     /**
