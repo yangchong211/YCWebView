@@ -15,11 +15,12 @@
 ### 2.1 如何引入
 - **如何引用，该x5的库已经更新到最新版本，引用最新稳定版，采用maven依赖**
     ```
-    //普通版本
-    implementation 'cn.yc:WebViewLib:1.2.4'
-
-    //添加阿里https+dns解析版本
-    implementation 'cn.yc:WebViewLib:1.4.6'
+    //第一种：以maven依赖形式
+    implementation 'cn.yc:WebViewLib:1.4.7'
+    api 'com.tencent.tbs.tbssdk:sdk:43967'
+  
+    //第二种：以jar依赖形式
+    implementation 'cn.yc:WebViewLib:1.4.8'
     ```
 
 

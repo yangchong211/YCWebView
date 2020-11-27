@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import com.alibaba.sdk.android.httpdns.HttpDns;
 import com.alibaba.sdk.android.httpdns.HttpDnsService;
+import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebHistoryItem;
@@ -35,7 +36,9 @@ import com.ycbjie.webviewlib.base.X5WebChromeClient;
 import com.ycbjie.webviewlib.base.X5WebViewClient;
 import com.ycbjie.webviewlib.client.JsX5WebViewClient;
 import com.ycbjie.webviewlib.helper.SaveImageProcessor;
+import com.ycbjie.webviewlib.inter.InterValueCallback;
 import com.ycbjie.webviewlib.tools.WebViewException;
+import com.ycbjie.webviewlib.utils.X5LogUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
@@ -537,5 +540,80 @@ public class X5WebView extends BridgeWebView {
         }
     }
 
+    /**
+     * 隐藏html某个div标签的内容
+     * @param className                             div标签className
+     */
+    public void hideHtmlDivContent(String className) {
+        try {
+            //定义javaScript方法
+            String javascript = "javascript:function hideDiv() { "
+                    + "document.getElementsByClassName('" +className+
+                    "')[0].style.display='none'}";
+            //加载方法
+            this.evaluateJavascript(javascript);
+            //执行方法
+            this.evaluateJavascript("javascript:hideDiv();");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取html某个div标签的内容
+     * @param className                             div标签className
+     * @param callback                              回调数据
+     */
+    @Deprecated
+    public void getHtmlDivView(String className , final InterValueCallback<String> callback) {
+        try {
+            //定义javaScript方法
+            String javaScript = "javascript:function getDivContent() { "
+                    + "return document.getElementsByClassName('" + className + "')[0].innerText; }";
+            //加载方法
+            this.loadUrl(javaScript);
+            //执行方法
+            this.evaluateJavascript("javascript:getDivContent();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String s) {
+                    //此处为 js 返回的结果
+                    X5LogUtils.i("抓包返回数据---"+s);
+                    if (callback!=null){
+                        callback.onReceiveValue(s);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取html某个div标签的内容
+     * @param className                             div标签className
+     * @param callback                              回调数据
+     */
+    public void getHtmlDivContent(String className , final InterValueCallback<String> callback) {
+        try {
+            //定义javaScript方法
+            String javaScript = "javascript:function getDivContent() { "
+                    + "return document.getElementsByClassName('" + className + "')[0].innerText; }";
+            //加载方法
+            this.evaluateJavascript(javaScript);
+            //执行方法
+            this.evaluateJavascript("javascript:getDivContent();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String s) {
+                    //此处为 js 返回的结果
+                    X5LogUtils.i("抓包返回数据---"+s);
+                    if (callback!=null){
+                        callback.onReceiveValue(s);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

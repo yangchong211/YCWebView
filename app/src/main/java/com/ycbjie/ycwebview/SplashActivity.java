@@ -18,7 +18,6 @@ public class SplashActivity extends AppCompatActivity {
     private TextView mTv2;
     private TextView mTv3;
     private TextView mTv4;
-    private TextView mTv5;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,7 +29,6 @@ public class SplashActivity extends AppCompatActivity {
         mTv2 = findViewById(R.id.tv_2);
         mTv3 = findViewById(R.id.tv_3);
         mTv4 = findViewById(R.id.tv_4);
-        mTv5 = findViewById(R.id.tv_5);
 
 //        Intent intent = new Intent(SplashActivity.this,WebViewActivity.class);
 //        intent.putExtra("url","http://tongbuxueht.zhugexuetang.com/douzhanggui");
@@ -98,11 +96,6 @@ public class SplashActivity extends AppCompatActivity {
                 intent.putExtra("url",url);
                 intent.putExtra("hide",true);
                 startActivity(intent);
-            }
-        });
-        mTv5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
             }
         });
     }

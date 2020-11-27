@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.ycbjie.webviewlib.inter.DefaultWebListener;
 import com.ycbjie.webviewlib.inter.InterWebListener;
 import com.ycbjie.webviewlib.utils.ToastUtils;
 import com.ycbjie.webviewlib.utils.X5WebUtils;
@@ -80,7 +81,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_yc_web_view);
         initData();
         initView();
     }
@@ -153,7 +154,7 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
 
-    private InterWebListener interWebListener = new InterWebListener() {
+    private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override
         public void hindProgressBar() {
             progress.hide();
